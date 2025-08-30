@@ -24,7 +24,7 @@
     </div> --}}
 
     <!-- Table responsive wrapper -->
-    <div class="border dark:border-none bg-white dark:bg-neutral-700 mt-10 p-4 sm:p-6 rounded-2xl">
+    <div class="border dark:border-none bg-white dark:bg-neutral-700 mt-8 p-4 sm:p-6 rounded-2xl">
 
         <!-- Top controls -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
@@ -32,7 +32,8 @@
                 <!-- Search -->
                 <div class="relative w-full sm:w-64">
                     <label for="inputSearch" class="sr-only">Search</label>
-                    <input id="inputSearch" type="text" placeholder="Search..." wire:model.live.debounce.300ms='search'
+                    <input id="inputSearch" type="text" placeholder="Search..."
+                        wire:model.live.debounce.300ms='search'
                         class="block w-full rounded-lg border dark:border-none dark:bg-neutral-600 py-2.5 pl-10 pr-4 text-sm focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400" />
                     <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transform">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -59,16 +60,16 @@
             </div>
 
             <!-- Per Page -->
-                <div class="flex items-center gap-2">
-                    <label for="inputFilter" class="text-neutral-600 dark:text-neutral-300">Per Page: </label>
-                    <select id="inputFilter" wire:model.live='perPage'
-                        class="block rounded-lg border dark:border-none dark:bg-neutral-600 p-2.5 text-sm focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400">
-                        <option value="10" selected>10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
+            <div class="flex items-center gap-2">
+                <label for="inputFilter" class="text-neutral-600 dark:text-neutral-300">Per Page: </label>
+                <select id="inputFilter" wire:model.live='perPage'
+                    class="block rounded-lg border dark:border-none dark:bg-neutral-600 p-2.5 text-sm focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400">
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
         </div>
 
         <!-- Mobile list (xs only) -->
@@ -81,7 +82,7 @@
                                 <img src="{{ asset($cat->image) }}" alt="{{ $cat->name }}"
                                     class="h-12 w-12 rounded object-cover">
                             @else
-                                <img src="https://cdn.dribbble.com/userupload/22570626/file/original-379b4978ee41eeb352e0ddacbaa6df96.jpg?resize=752x564&vertical=center"
+                                <img src="{{ asset('assets/images/placeholders/cat-placeholder.png') }}"
                                     alt="placeholder" class="h-12 w-12 rounded object-cover">
                             @endif
                         </div>
@@ -96,7 +97,7 @@
                             </div>
 
                             <div class="mt-1 flex flex-wrap items-center gap-2">
-                                
+
                                 <span class="text-xs text-neutral-500 dark:text-neutral-300">
                                     {{ $cat->created_at->format('M d, Y') }}
                                 </span>
@@ -141,22 +142,25 @@
         </ul>
 
         <!-- Desktop table (≥sm) -->
-        <div class="overflow-x-auto max-h-[65vh] mt-2 hidden sm:block">
+        <div class="overflow-x-auto max-h-[50vh] mt-2 hidden sm:block">
             <table class="min-w-full text-left text-sm whitespace-nowrap">
                 <thead
                     class="uppercase tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
                     <tr>
                         <th scope="col" class="px-4 lg:px-6 py-3">#</th>
                         <th scope="col" class="px-4 lg:px-6 py-3">Image</th>
-                        <th scope="col" class="px-4 lg:px-6 py-3" wire:click="setSortBy('name')">
-                            Name
-                        </th>
-                        <th scope="col" class="px-4 lg:px-6 py-3" wire:click="setSortBy('status')">
-                            Status
-                        </th>
-                        <th scope="col" class="px-4 lg:px-6 py-3" wire:click="setSortBy('created_at')">
-                            Created At
-                        </th>
+                        @include('livewire.common.sortable-th', [
+                            'name' => 'name',
+                            'displayName' => 'Name'
+                        ])
+                        @include('livewire.common.sortable-th', [
+                            'name' => 'status',
+                            'displayName' => 'Status'
+                        ])
+                        @include('livewire.common.sortable-th', [
+                            'name' => 'created_at',
+                            'displayName' => 'Created At'
+                        ])
                         <th scope="col" class="px-4 lg:px-6 py-3">Actions</th>
                     </tr>
                 </thead>
@@ -169,7 +173,7 @@
                                     <img src="{{ asset($cat->image) }}" alt="{{ $cat->name }}"
                                         class="h-12 w-12 rounded object-cover">
                                 @else
-                                    <img src="https://cdn.dribbble.com/userupload/22570626/file/original-379b4978ee41eeb352e0ddacbaa6df96.jpg?resize=752x564&vertical=center"
+                                    <img src="{{ asset('assets/images/placeholders/cat-placeholder.png') }}"
                                         alt="placeholder" class="h-12 w-12 rounded object-cover">
                                 @endif
                             </td>
