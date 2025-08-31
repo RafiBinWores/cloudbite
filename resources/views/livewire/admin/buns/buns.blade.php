@@ -1,19 +1,19 @@
 <div>
     {{-- Page Heading --}}
     <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">{{ __('Crusts') }}</flux:heading>
-        <flux:subheading size="lg" class="mb-6">{{ __('Manage all of the crusts') }}</flux:subheading>
+        <flux:heading size="xl" level="1">{{ __('Buns') }}</flux:heading>
+        <flux:subheading size="lg" class="mb-6">{{ __('Manage all of the buns') }}</flux:subheading>
         <flux:separator variant="subtle" />
     </div>
 
     {{-- Create modal Button --}}
-    <flux:modal.trigger name="crust-modal">
-        <flux:button class="cursor-pointer" icon="add-icon" wire:click="$dispatch('open-crust-modal', {mode: 'create'})">
+    <flux:modal.trigger name="bun-modal">
+        <flux:button class="cursor-pointer" icon="add-icon" wire:click="$dispatch('open-bun-modal', {mode: 'create'})">
             Create</flux:button>
     </flux:modal.trigger>
 
     {{-- Create Modal --}}
-    <livewire:admin.crusts.crust-form />
+    <livewire:admin.buns.bun-form />
 
     {{-- Delete Confirmation Modal --}}
     <livewire:common.delete-confirmation />
@@ -70,34 +70,23 @@
 
         <!-- Mobile list (xs only) -->
         <ul class="sm:hidden space-y-3">
-            @forelse ($crusts as $crust)
+            @forelse ($buns as $bun)
                 <li class="rounded-xl border dark:border-neutral-600 p-3 bg-white dark:bg-neutral-700">
                     <div class="flex items-center gap-3">
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="font-medium truncate">{{ $crust->name }} 
-                                    <span class="ps-2">
-                                        @if (is_null($crust->price) || $crust->price == 0)
-                                    <span class="text-green-600 font-semibold text-sm">Free</span>
-                                @elseif (intval($crust->price) == $crust->price)
-                                    <span class="text-yellow-500 font-medium text-sm"><i class="fa-regular fa-bangladeshi-taka-sign pe-1"></i> {{ intval($crust->price) }}</span>
-                                @else
-                                    <span class="text-yellow-500 font-medium text-sm">
-                                        <i class="fa-regular fa-bangladeshi-taka-sign pe-1"></i> {{ rtrim(rtrim(number_format($crust->price, 2, '.', ''), '0'), '.') }}
-                                    </span>
-                                @endif
-                                    </span>
+                                <p class="font-medium truncate">{{ $bun->name }}
                                 </p>
                                 <flux:badge variant="solid" size="sm"
-                                    color="{{ $crust->status === 'active' ? 'emerald' : 'yellow' }}">
-                                    {{ $crust->status }}
+                                    color="{{ $bun->status === 'active' ? 'emerald' : 'yellow' }}">
+                                    {{ $bun->status }}
                                 </flux:badge>
                             </div>
 
                             <div class="mt-1 flex flex-wrap items-center gap-2">
 
                                 <span class="text-xs text-neutral-500 dark:text-neutral-300">
-                                    {{ $crust->created_at->format('M d, Y') }}
+                                    {{ $bun->created_at->format('M d, Y') }}
                                 </span>
                             </div>
                         </div>
@@ -105,15 +94,15 @@
 
                     <!-- Actions -->
                     <div class="mt-3 flex items-center gap-2">
-                        <flux:modal.trigger name="category-modal">
+                        <flux:modal.trigger name="bun-modal">
                             <flux:button
-                                wire:click="$dispatch('open-category-modal', {mode: 'view', category: {{ $crust }}})"
+                                wire:click="$dispatch('open-bun-modal', {mode: 'view', bun: {{ $bun }}})"
                                 class="cursor-pointer h-[30px]" variant="primary" color="yellow">
                                 view
                             </flux:button>
 
                             <flux:button
-                                wire:click="$dispatch('open-category-modal', {mode: 'edit', category: {{ $crust }}})"
+                                wire:click="$dispatch('open-bun-modal', {mode: 'edit', bun: {{ $bun }}})"
                                 class="cursor-pointer  h-[30px]" variant="primary" color="blue">
                                 Edit
                             </flux:button>
@@ -122,11 +111,11 @@
                         <flux:modal.trigger name="delete-confirmation-modal">
                             <flux:button
                                 wire:click="$dispatch('confirm-delete', {
-                                    id: {{ $crust->id }},
-                                    dispatchAction: 'delete-category',
+                                    id: {{ $bun->id }},
+                                    dispatchAction: 'delete-bun',
                                     modalName: 'delete-confirmation-modal',
-                                    heading: 'Delete category?',
-                                    message: 'You are about to delete this category: <strong>{{ $crust->name }}</strong>. This action cannot be reversed.',
+                                    heading: 'Delete bun?',
+                                    message: 'You are about to delete this bun: <strong>{{ $bun->name }}</strong>. This action cannot be reversed.',
                                 })"
                                 class="cursor-pointer h-[30px]" variant="primary" color="red">
                                 Delete
@@ -135,7 +124,7 @@
                     </div>
                 </li>
             @empty
-                <li class="text-center py-4">No crusts found.</li>
+                <li class="text-center py-4">No bun record found.</li>
             @endforelse
         </ul>
 
@@ -150,7 +139,6 @@
                             'name' => 'name',
                             'displayName' => 'Name',
                         ])
-                        <th scope="col" class="px-4 lg:px-6 py-3">Price</th>
                         @include('livewire.common.sortable-th', [
                             'name' => 'status',
                             'displayName' => 'Status',
@@ -163,38 +151,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($crusts as $crust)
-                        <tr wire:key="{{ $crust->id }}" class="border-b dark:border-neutral-600">
+                    @forelse ($buns as $bun)
+                        <tr wire:key="{{ $bun->id }}" class="border-b dark:border-neutral-600">
                             <th scope="row" class="px-4 lg:px-6 py-3">{{ $loop->index + 1 }}</th>
-                            <td class="px-4 lg:px-6 py-3">{{ $crust->name }}</td>
-                            <td class="px-4 lg:px-6 py-3">
-                                @if (is_null($crust->price) || $crust->price == 0)
-                                    <span class="text-green-600 font-semibold">Free</span>
-                                @elseif (intval($crust->price) == $crust->price)
-                                    <span class="text-yellow-500 font-medium"><i class="fa-regular fa-bangladeshi-taka-sign pe-1"></i> {{ intval($crust->price) }}</span>
-                                @else
-                                    <span class="text-yellow-500 font-medium">
-                                        <i class="fa-regular fa-bangladeshi-taka-sign pe-1"></i> {{ rtrim(rtrim(number_format($crust->price, 2, '.', ''), '0'), '.') }}
-                                    </span>
-                                @endif
-                            </td>
-                            
+                            <td class="px-4 lg:px-6 py-3">{{ $bun->name }}</td>                            
                             <td class="px-4 lg:px-6 py-3 capitalize">
                                 <flux:badge variant="solid" size="sm"
-                                    color="{{ $crust->status === 'active' ? 'green' : 'red' }}">{{ $crust->status }}
+                                    color="{{ $bun->status === 'active' ? 'green' : 'red' }}">{{ $bun->status }}
                                 </flux:badge>
                             </td>
-                            <td class="px-4 lg:px-6 py-3">{{ $crust->created_at->format('M d, Y') }}</td>
+                            <td class="px-4 lg:px-6 py-3">{{ $bun->created_at->format('M d, Y') }}</td>
                             <td class="px-4 lg:px-6 py-3">
                                 <div class="flex gap-2">
-                                    <flux:modal.trigger name="crust-modal">
+                                    <flux:modal.trigger name="bun-modal">
                                         <flux:button
-                                            wire:click="$dispatch('open-crust-modal', {mode: 'view', crust: {{ $crust }}})"
+                                            wire:click="$dispatch('open-bun-modal', {mode: 'view', bun: {{ $bun }}})"
                                             class="cursor-pointer min-h-[40px]" icon="eye" variant="primary"
                                             color="yellow">
                                         </flux:button>
                                         <flux:button
-                                            wire:click="$dispatch('open-crust-modal', {mode: 'edit', crust: {{ $crust }}})"
+                                            wire:click="$dispatch('open-bun-modal', {mode: 'edit', bun: {{ $bun }}})"
                                             class="cursor-pointer min-h-[40px]" icon="pencil" variant="primary"
                                             color="blue">
                                         </flux:button>
@@ -203,11 +179,11 @@
                                     <flux:modal.trigger name="delete-confirmation-modal">
                                         <flux:button
                                             wire:click="$dispatch('confirm-delete', {
-                                                id: {{ $crust->id }},
-                                                dispatchAction: 'delete-crust',
+                                                id: {{ $bun->id }},
+                                                dispatchAction: 'delete-bun',
                                                 modalName: 'delete-confirmation-modal',
-                                                heading: 'Delete crust?',
-                                                message: 'You are about to delete this crust: <strong>{{ $crust->name }}</strong>. This action cannot be reversed.',
+                                                heading: 'Delete bun?',
+                                                message: 'You are about to delete this bun: <strong>{{ $bun->name }}</strong>. This action cannot be reversed.',
                                                 })"
                                             class="cursor-pointer min-h-[40px]" icon="trash" variant="primary"
                                             color="red">
@@ -218,7 +194,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 lg:px-6 pt-4 text-center">No crusts found.</td>
+                            <td colspan="6" class="px-4 lg:px-6 pt-4 text-center">No bun record found.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -228,10 +204,10 @@
         <!-- Pagination -->
         <nav class="mt-4">
             <div class="sm:hidden text-center">
-                {{ $crusts->onEachSide(0)->links() }}
+                {{ $buns->onEachSide(0)->links() }}
             </div>
             <div class="hidden sm:block">
-                {{ $crusts->links() }}
+                {{ $buns->links() }}
             </div>
         </nav>
     </div>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\Buns\Buns;
 use App\Livewire\Admin\Categories\Index;
 use App\Livewire\Admin\Crusts\Crusts;
 use App\Livewire\Settings\Appearance;
@@ -22,10 +23,14 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
 
-
+    // Categories Route
     Route::get('categories', Index::class)->name('categories.index');
 
+    // Crust Routes
     Route::get('crusts', Crusts::class)->name('crusts.index');
+
+    // bun Route
+    Route::get('buns', Buns::class)->name('buns.index');
 
 });
 
