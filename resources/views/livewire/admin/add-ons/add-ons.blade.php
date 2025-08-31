@@ -115,7 +115,7 @@
                         </ul>
                     </div>
                 </div>
-                
+
             </div>
         </div>
         <flux:separator variant="subtle" />
@@ -123,7 +123,7 @@
 
     {{-- Create modal Button --}}
     <flux:modal.trigger name="addOn-modal">
-        <flux:button class="cursor-pointer" icon="add-icon"
+        <flux:button class="cursor-pointer" icon="add-icon" variant="primary" color="rose"
             wire:click="$dispatch('open-addOn-modal', {mode: 'create'})">
             Create</flux:button>
     </flux:modal.trigger>

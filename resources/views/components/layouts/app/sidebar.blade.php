@@ -18,15 +18,16 @@
                 <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
                     wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
             </flux:navlist.group>
-        </flux:navlist>
 
-        <flux:navlist variant="outline">
-            <flux:navlist.group :heading="__('Lists')" class="grid">
-                <flux:navlist.item icon="cat-icon" :href="route('categories.index')"
+            <flux:navlist.item icon="cat-icon" :href="route('categories.index')"
                     :current="request()->routeIs('categories.index')" wire:navigate>
                     {{ __('Categories') }}</flux:navlist.item>
-            </flux:navlist.group>
+
+                <flux:navlist.item icon="dish-icon" :href="route('categories.index')"
+                    :current="request()->routeIs('categories.index')" wire:navigate>
+                    {{ __('Dishes') }}</flux:navlist.item>
         </flux:navlist>
+
 
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Dish Customization')" class="grid">
