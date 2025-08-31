@@ -75,17 +75,20 @@
                     <div class="flex items-center gap-3">
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="font-medium truncate">{{ $crust->name }} 
+                                <p class="font-medium truncate">{{ $crust->name }}
                                     <span class="ps-2">
                                         @if (is_null($crust->price) || $crust->price == 0)
-                                    <span class="text-green-600 font-semibold text-sm">Free</span>
-                                @elseif (intval($crust->price) == $crust->price)
-                                    <span class="text-yellow-500 font-medium text-sm"><i class="fa-regular fa-bangladeshi-taka-sign pe-1"></i> {{ intval($crust->price) }}</span>
-                                @else
-                                    <span class="text-yellow-500 font-medium text-sm">
-                                        <i class="fa-regular fa-bangladeshi-taka-sign pe-1"></i> {{ rtrim(rtrim(number_format($crust->price, 2, '.', ''), '0'), '.') }}
-                                    </span>
-                                @endif
+                                            <span class="text-green-600 font-semibold text-sm">Free</span>
+                                        @elseif (intval($crust->price) == $crust->price)
+                                            <span class="text-yellow-500 font-medium text-sm"><i
+                                                    class="fa-regular fa-bangladeshi-taka-sign pe-1"></i>
+                                                {{ intval($crust->price) }}</span>
+                                        @else
+                                            <span class="text-yellow-500 font-medium text-sm">
+                                                <i class="fa-regular fa-bangladeshi-taka-sign pe-1"></i>
+                                                {{ rtrim(rtrim(number_format($crust->price, 2, '.', ''), '0'), '.') }}
+                                            </span>
+                                        @endif
                                     </span>
                                 </p>
                                 <flux:badge variant="solid" size="sm"
@@ -105,15 +108,15 @@
 
                     <!-- Actions -->
                     <div class="mt-3 flex items-center gap-2">
-                        <flux:modal.trigger name="category-modal">
+                        <flux:modal.trigger name="crust-modal">
                             <flux:button
-                                wire:click="$dispatch('open-category-modal', {mode: 'view', category: {{ $crust }}})"
+                                wire:click="$dispatch('open-crust-modal', {mode: 'view', crust: {{ $crust }}})"
                                 class="cursor-pointer h-[30px]" variant="primary" color="yellow">
                                 view
                             </flux:button>
 
                             <flux:button
-                                wire:click="$dispatch('open-category-modal', {mode: 'edit', category: {{ $crust }}})"
+                                wire:click="$dispatch('open-crust-modal', {mode: 'edit', crust: {{ $crust }}})"
                                 class="cursor-pointer  h-[30px]" variant="primary" color="blue">
                                 Edit
                             </flux:button>
@@ -123,10 +126,10 @@
                             <flux:button
                                 wire:click="$dispatch('confirm-delete', {
                                     id: {{ $crust->id }},
-                                    dispatchAction: 'delete-category',
+                                    dispatchAction: 'delete-crust',
                                     modalName: 'delete-confirmation-modal',
-                                    heading: 'Delete category?',
-                                    message: 'You are about to delete this category: <strong>{{ $crust->name }}</strong>. This action cannot be reversed.',
+                                    heading: 'Delete crust?',
+                                    message: 'You are about to delete this crust: <strong>{{ $crust->name }}</strong>. This action cannot be reversed.',
                                 })"
                                 class="cursor-pointer h-[30px]" variant="primary" color="red">
                                 Delete
@@ -171,14 +174,17 @@
                                 @if (is_null($crust->price) || $crust->price == 0)
                                     <span class="text-green-600 font-semibold">Free</span>
                                 @elseif (intval($crust->price) == $crust->price)
-                                    <span class="text-yellow-500 font-medium"><i class="fa-regular fa-bangladeshi-taka-sign pe-1"></i> {{ intval($crust->price) }}</span>
+                                    <span class="text-yellow-500 font-medium"><i
+                                            class="fa-regular fa-bangladeshi-taka-sign pe-1"></i>
+                                        {{ intval($crust->price) }}</span>
                                 @else
                                     <span class="text-yellow-500 font-medium">
-                                        <i class="fa-regular fa-bangladeshi-taka-sign pe-1"></i> {{ rtrim(rtrim(number_format($crust->price, 2, '.', ''), '0'), '.') }}
+                                        <i class="fa-regular fa-bangladeshi-taka-sign pe-1"></i>
+                                        {{ rtrim(rtrim(number_format($crust->price, 2, '.', ''), '0'), '.') }}
                                     </span>
                                 @endif
                             </td>
-                            
+
                             <td class="px-4 lg:px-6 py-3 capitalize">
                                 <flux:badge variant="solid" size="sm"
                                     color="{{ $crust->status === 'active' ? 'green' : 'red' }}">{{ $crust->status }}
