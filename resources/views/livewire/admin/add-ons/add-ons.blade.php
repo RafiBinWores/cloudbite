@@ -283,8 +283,12 @@
                 <tbody>
                     @forelse ($addOns as $addOn)
                         <tr wire:key="{{ $addOn->id }}" class="border-b dark:border-neutral-600">
-                            <th scope="row" class="px-4 lg:px-6 py-3">{{ $loop->index + 1 }}</th>
+                            <th scope="row" class="px-4 lg:px-6 py-3">
+                                {{ ($addOns->currentPage() - 1) * $addOns->perPage() + $loop->iteration }}
+                            </th>
+
                             <td class="px-4 lg:px-6 py-3">{{ $addOn->name }}</td>
+                            
                             <td class="px-4 lg:px-6 py-3">
                                 @if (is_null($addOn->price) || $addOn->price == 0)
                                     <span class="text-green-600 font-semibold">Free</span>

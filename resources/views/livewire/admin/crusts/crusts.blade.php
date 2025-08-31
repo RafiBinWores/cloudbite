@@ -168,7 +168,9 @@
                 <tbody>
                     @forelse ($crusts as $crust)
                         <tr wire:key="{{ $crust->id }}" class="border-b dark:border-neutral-600">
-                            <th scope="row" class="px-4 lg:px-6 py-3">{{ $loop->index + 1 }}</th>
+                            <th scope="row" class="px-4 lg:px-6 py-3">
+                                {{ ($crusts->currentPage() - 1) * $crusts->perPage() + $loop->iteration }}
+                            </th>
                             <td class="px-4 lg:px-6 py-3">{{ $crust->name }}</td>
                             <td class="px-4 lg:px-6 py-3">
                                 @if (is_null($crust->price) || $crust->price == 0)

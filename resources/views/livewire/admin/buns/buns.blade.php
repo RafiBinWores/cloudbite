@@ -153,7 +153,9 @@
                 <tbody>
                     @forelse ($buns as $bun)
                         <tr wire:key="{{ $bun->id }}" class="border-b dark:border-neutral-600">
-                            <th scope="row" class="px-4 lg:px-6 py-3">{{ $loop->index + 1 }}</th>
+                            <th scope="row" class="px-4 lg:px-6 py-3">
+                                {{ ($buns->currentPage() - 1) * $buns->perPage() + $loop->iteration }}
+                            </th>
                             <td class="px-4 lg:px-6 py-3">{{ $bun->name }}</td>                            
                             <td class="px-4 lg:px-6 py-3 capitalize">
                                 <flux:badge variant="solid" size="sm"
