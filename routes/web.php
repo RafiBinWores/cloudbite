@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Admin\Categories\Index;
+use App\Livewire\Admin\Crusts\Crusts;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -23,6 +24,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
 
     Route::get('categories', Index::class)->name('categories.index');
+
+    Route::get('crusts', Crusts::class)->name('crusts.index');
 
 });
 

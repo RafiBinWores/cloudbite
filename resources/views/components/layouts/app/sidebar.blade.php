@@ -23,6 +23,14 @@
                         {{ __('Categories') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
+            <flux:navlist variant="outline">
+                <flux:navlist.group :heading="__('Dish Customization')" class="grid">
+                    <flux:navlist.item icon="crust-icon" :href="route('crusts.index')" :current="request()->routeIs('crusts.index')" wire:navigate>
+                        {{ __('Crusts') }}</flux:navlist.item>
+                    <flux:navlist.item icon="bun-icon" :href="route('buns.index')" :current="request()->routeIs('buns.index')" wire:navigate>
+                        {{ __('Buns') }}</flux:navlist.item>
+                </flux:navlist.group>
+            </flux:navlist>
 
             <flux:spacer />
 
