@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\AddOns\AddOns;
 use App\Livewire\Admin\Buns\Buns;
 use App\Livewire\Admin\Categories\Index;
 use App\Livewire\Admin\Crusts\Crusts;
@@ -29,8 +30,11 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // Crust Routes
     Route::get('crusts', Crusts::class)->name('crusts.index');
 
-    // bun Route
+    // Bun Route
     Route::get('buns', Buns::class)->name('buns.index');
+
+    // Add Ons Route
+    Route::get('add-ons', AddOns::class)->name('addOns.index');
 
 });
 
