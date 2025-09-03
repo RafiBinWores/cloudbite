@@ -25,13 +25,18 @@
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Product Management')" class="grid">
 
-
-            {{-- Categories --}}
+                {{-- Categories --}}
                 <flux:navlist.item icon="cat-icon" :href="route('categories.index')"
                     :current="request()->routeIs('categories.index')" wire:navigate>
                     {{ __('Categories') }}</flux:navlist.item>
 
-                    {{-- product --}}
+
+                {{-- Cuisine --}}
+                <flux:navlist.item icon="cuisine-icon" :href="route('cuisines.index')"
+                    :current="request()->routeIs('cuisines.index')" wire:navigate>
+                    {{ __('Cuisines') }}</flux:navlist.item>
+
+                {{-- product --}}
                 <flux:navlist.item icon="dish-icon" :href="route('dishes.index')"
                     :current="request()->routeIs('dishes.index')" wire:navigate>
                     {{ __('Dishes') }}</flux:navlist.item>

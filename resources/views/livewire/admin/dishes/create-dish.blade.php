@@ -318,7 +318,7 @@
                         {{-- Daily Stock --}}
                         <div class="from-group md:col-span-2">
                             <x-input type="number" min="0" wire:model.live="daily_stock" label="Daily Stock" hint="Only required when track stock selected Yes"
-                                class="rounded-lg !border-neutral-300 dark:!border-neutral-500 !bg-white/10 !py-[9px] focus:!ring-red-500"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('daily_stock') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Daily Stock" />
                         </div>
                     </div>

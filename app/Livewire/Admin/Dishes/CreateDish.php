@@ -30,11 +30,12 @@ class CreateDish extends Component
             'crusts' => 'nullable',
             'addOns' => 'required',
             'price' => 'required',
-            'discount_type' => 'required',
-            'discount' => 'required',
-            'vat' => 'required',
+            'discount_type' => 'nullable',
+            'discount' => 'nullable',
+            'vat' => 'nullable',
             'sku' => 'required|in:Yes,No',
             'track_stock' => 'required|in:Yes,No',
+            'daily_stock' => 'required_if:track_stock,Yes|nullable|integer|min:0',
             'status' => 'required|in:active,disable',
 
             // images
