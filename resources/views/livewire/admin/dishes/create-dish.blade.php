@@ -79,6 +79,13 @@
                                 placeholder="eg. Chicken Fry" />
                         </div>
 
+                        {{-- Short description --}}
+                        <div class="from-group md:col-span-2">
+                            <x-textarea label="Short Description" rows="3" wire:model.live="short_description"
+                                class="ounded-lg !bg-white/10 !py-[9px] {{ $errors->has('short_description') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-400' }}"
+                                placeholder="Mention about what your dish include or what item u will provide for the menu" />
+                        </div>
+
                         {{-- Description --}}
                         <div class="form-group dark">
                             <label for="editor">Description</label>
@@ -171,28 +178,36 @@
                 <!-- Manage Stock -->
                 <section
                     class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
-                    <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Manage Stock</h3>
+                    <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Dish Pricing</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                        {{-- SKU --}}
-                        <div class="from-group">
-                            <x-input wire:model.live="sku" label="Stock Keeping Unit (SKU)"
-                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('sku') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
-                                placeholder="SKU-BB-66-A6" />
+                        {{-- Price --}}
+                        <div class="form-group md:col-span-2">
+                            <x-input type="number" min="0" label="Price (Tk)" wire:model.live="price"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('price') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                                placeholder="Price" />
                         </div>
 
-                        {{-- Track Stock --}}
+                        {{-- discount type --}}
                         <div class="from-group">
-                            <x-select wire:model.live="track_stock" label="Track Stock" :options="['Yes', 'No',]" class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('track_stock') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" clearable />
+                            <x-select wire:model.live="discount_type" label="Discount type" :options="['Percent', 'Amount',]" class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('discount_type') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
+                        </div>
+                        
+                        {{-- Discount --}}
+                        <div class="form-group">
+                            <x-input type="number" min="0" label="Discount" wire:model.live="discount"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('discount') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                                placeholder="Discount" />
+                        </div>
+                        
+                        {{-- Vat --}}
+                        <div class="form-group md:col-span-2">
+                            <x-input type="number" min="0" label="Vat (%)" wire:model.live="vat"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('vat') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                                placeholder="Vat" />
                         </div>
 
-                        {{-- Daily Stock --}}
-                        <div class="from-group md:col-span-2">
-                            <x-input type="number" min="0" wire:model.live="daily_stock" label="Daily Stock" hint="Only required when track stock selected Yes"
-                                class="rounded-lg !border-neutral-300 dark:!border-neutral-500 !bg-white/10 !py-[9px] focus:!ring-red-500"
-                                placeholder="Daily Stock" />
-                        </div>
                     </div>
                 </section>
 
@@ -222,7 +237,7 @@
 
                         {{-- Meta description --}}
                         <div class="from-group md:col-span-2">
-                            <x-textarea label="Your bio" rows="3" wire:model.live="meta_description"
+                            <x-textarea label="Description" rows="3" wire:model.live="meta_description"
                                 class="rounded-lg !border-neutral-300 dark:!border-neutral-500 !bg-white/10 !py-[9px] focus:!ring-red-500"
                                 placeholder="Meta Description" />
                         </div>
@@ -284,31 +299,28 @@
                 <!-- Product Pricing -->
                 <section
                     class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
-                    <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Dish Pricing</h3>
+                    <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Manage Stock</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                        {{-- Price --}}
-                        <div class="form-group">
-                            <x-input type="number" min="0" label="Price (Tk)" wire:model.live="price"
-                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('price') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
-                                placeholder="Price" />
-                        </div>
-                        
-                        {{-- Discount --}}
-                        <div class="form-group">
-                            <x-input type="number" min="0" label="Discount (%)" wire:model.live="discount"
-                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('discount') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
-                                placeholder="Discount" />
-                        </div>
-                        
-                        {{-- Vat --}}
-                        <div class="form-group md:col-span-2">
-                            <x-input type="number" min="0" label="Vat (%)" wire:model.live="vat"
-                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('vat') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
-                                placeholder="Vat" />
+                        {{-- SKU --}}
+                        <div class="from-group">
+                            <x-input wire:model.live="sku" label="Stock Keeping Unit (SKU)"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('sku') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                                placeholder="SKU-BB-66-A6" />
                         </div>
 
+                        {{-- Track Stock --}}
+                        <div class="from-group">
+                            <x-select wire:model.live="track_stock" label="Track Stock" :options="['Yes', 'No',]" class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('track_stock') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
+                        </div>
+
+                        {{-- Daily Stock --}}
+                        <div class="from-group md:col-span-2">
+                            <x-input type="number" min="0" wire:model.live="daily_stock" label="Daily Stock" hint="Only required when track stock selected Yes"
+                                class="rounded-lg !border-neutral-300 dark:!border-neutral-500 !bg-white/10 !py-[9px] focus:!ring-red-500"
+                                placeholder="Daily Stock" />
+                        </div>
                     </div>
                 </section>
 
@@ -322,8 +334,8 @@
 
                     <!-- Thumbnail (Big Preview) -->
                     <div class="relative aspect-square w-full overflow-hidden rounded-xl border 
-                {{ $errors->has('thumbnail') ? 'border-red-500' : 'border-gray-200 dark:border-neutral-600' }} 
-                bg-neutral-50 dark:bg-neutral-600 cursor-pointer"
+                            {{ $errors->has('thumbnail') ? 'border-red-500' : 'border-gray-200 dark:border-neutral-600' }} 
+                            bg-neutral-50 dark:bg-neutral-600 cursor-pointer"
                         @click="!thumbnailSrc && $refs.thumbnailInput.click()">
 
                         <template x-if="thumbnailSrc">

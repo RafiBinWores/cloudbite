@@ -9,7 +9,7 @@ class CreateDish extends Component
 {
     use WithFileUploads;
 
-    public $title, $description , $status = 'active', $category, $related_dish, $tags, $crusts, $buns, $addOns, $price, $discount, $vat, $sku, $track_stock;
+    public $title,$short_description, $description , $status = 'active', $category, $related_dish, $tags, $crusts, $buns, $addOns, $price, $discount, $vat, $discount_type, $sku, $track_stock = 'No', $daily_stock;
     public array $user_id = [];
 
     public $thumbnail;
@@ -21,6 +21,7 @@ class CreateDish extends Component
     {
         return [
             'title' => 'required|string|max:255|unique:dishes,title',
+            'short_description' => 'required',
             'description' => 'required',
             'category' => 'required',
             'related_dish' => 'required',
@@ -29,6 +30,7 @@ class CreateDish extends Component
             'crusts' => 'nullable',
             'addOns' => 'required',
             'price' => 'required',
+            'discount_type' => 'required',
             'discount' => 'required',
             'vat' => 'required',
             'sku' => 'required|in:Yes,No',

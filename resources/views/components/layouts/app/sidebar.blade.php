@@ -13,23 +13,33 @@
             <x-app-logo />
         </a>
 
+        {{-- Main --}}
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Main')" class="grid">
                 <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
                     wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
             </flux:navlist.group>
+        </flux:navlist>
 
-            <flux:navlist.item icon="cat-icon" :href="route('categories.index')"
+        {{-- Product Management --}}
+        <flux:navlist variant="outline">
+            <flux:navlist.group :heading="__('Product Management')" class="grid">
+
+
+            {{-- Categories --}}
+                <flux:navlist.item icon="cat-icon" :href="route('categories.index')"
                     :current="request()->routeIs('categories.index')" wire:navigate>
                     {{ __('Categories') }}</flux:navlist.item>
 
+                    {{-- product --}}
                 <flux:navlist.item icon="dish-icon" :href="route('dishes.index')"
                     :current="request()->routeIs('dishes.index')" wire:navigate>
                     {{ __('Dishes') }}</flux:navlist.item>
-
+            </flux:navlist.group>
         </flux:navlist>
 
 
+        {{-- Dish Customization --}}
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Dish Customization')" class="grid">
 
@@ -76,7 +86,8 @@
                 <flux:menu.separator />
 
                 <flux:menu.radio.group>
-                    <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>{{ __('Settings') }}
+                    <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>
+                        {{ __('Settings') }}
                     </flux:menu.item>
                 </flux:menu.radio.group>
 
