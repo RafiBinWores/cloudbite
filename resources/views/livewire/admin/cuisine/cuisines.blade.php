@@ -18,7 +18,7 @@
     <livewire:common.delete-confirmation />
 
 
-        <!-- Table responsive wrapper -->
+    <!-- Table responsive wrapper -->
     <div class="border dark:border-none bg-white dark:bg-neutral-700 mt-8 p-4 sm:p-6 rounded-2xl">
 
         <!-- Top controls -->
@@ -146,15 +146,15 @@
                         <th scope="col" class="px-4 lg:px-6 py-3">Image</th>
                         @include('livewire.common.sortable-th', [
                             'name' => 'name',
-                            'displayName' => 'Name'
+                            'displayName' => 'Name',
                         ])
                         @include('livewire.common.sortable-th', [
                             'name' => 'status',
-                            'displayName' => 'Status'
+                            'displayName' => 'Status',
                         ])
                         @include('livewire.common.sortable-th', [
                             'name' => 'created_at',
-                            'displayName' => 'Created At'
+                            'displayName' => 'Created At',
                         ])
                         <th scope="col" class="px-4 lg:px-6 py-3">Actions</th>
                     </tr>
@@ -175,11 +175,10 @@
                                 @endif
                             </td>
                             <td class="px-4 lg:px-6 py-3">{{ $cuisine->name }}</td>
-                            <td class="px-4 lg:px-6 py-3 capitalize">
-                                <flux:badge variant="solid" size="sm"
-                                    color="{{ $cuisine->status === 'active' ? 'green' : 'red' }}">{{ $cuisine->status }}
-                                </flux:badge>
+                            <td class="px-4 lg:px-6 py-3 capitalize" x-data="{ on: @js($cuisine->status === 'active') }">
+                                <flux:switch x-model="on" @change="$wire.setStatus({{ $cuisine->id }}, on)" />
                             </td>
+
                             <td class="px-4 lg:px-6 py-3">{{ $cuisine->created_at->format('M d, Y') }}</td>
                             <td class="px-4 lg:px-6 py-3">
                                 <div class="flex gap-2">
