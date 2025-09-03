@@ -1,3 +1,7 @@
+@import './tallcraftui.css';
+@plugin '@tailwindcss/forms';
+@source '../../vendor/developermithu/tallcraftui/src/**/*.php';
+
 @import "tailwindcss";
 @import "../../vendor/livewire/flux/dist/flux.css";
 
@@ -28,9 +32,12 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-   --color-accent: var(--color-rose-500);
+    --color-accent: var(--color-rose-500);
     --color-accent-content: var(--color-rose-500);
     --color-accent-foreground: var(--color-white);
+
+        --color-primary: var(--color-rose-500);
+    --color-secondary: var(--color-rose-500);
 }
 
 @layer theme {

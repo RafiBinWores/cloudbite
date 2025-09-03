@@ -23,9 +23,10 @@
                     :current="request()->routeIs('categories.index')" wire:navigate>
                     {{ __('Categories') }}</flux:navlist.item>
 
-                <flux:navlist.item icon="dish-icon" :href="route('categories.index')"
-                    :current="request()->routeIs('categories.index')" wire:navigate>
+                <flux:navlist.item icon="dish-icon" :href="route('dishes.index')"
+                    :current="request()->routeIs('dishes.index')" wire:navigate>
                     {{ __('Dishes') }}</flux:navlist.item>
+
         </flux:navlist>
 
 
@@ -199,6 +200,7 @@
         </template>
     </div>
 
+    <script src="./node_modules/preline/dist/preline.js"></script>
     <script>
         function toastHub() {
             return {

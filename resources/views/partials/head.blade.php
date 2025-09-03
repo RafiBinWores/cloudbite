@@ -14,5 +14,9 @@
 {{-- Font Awesome --}}
 <link rel="stylesheet" href="{{ asset('assets/css/all.css') }}">
 
+
+{{-- Css --}}
+@stack('styles')
+
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @fluxAppearance
