@@ -1,22 +1,23 @@
 <div>
     {{-- Page Heading --}}
     <div class="relative mb-6 w-full">
-        <flux:heading size="xl" class="pb-4" level="1">{{ __('Cuisines') }}</flux:heading>
+        <flux:heading size="xl" class="mb-4" level="1">{{ __('Tags') }}</flux:heading>
         <flux:separator variant="subtle" />
     </div>
 
     {{-- Create modal Button --}}
-    <flux:modal.trigger name="cuisine-modal">
-        <flux:button class="cursor-pointer" icon="add-icon" variant="primary" color="rose"
-            wire:click="$dispatch('open-cuisine-modal', {mode: 'create'})">Create</flux:button>
+    <flux:modal.trigger name="tag-modal">
+        <flux:button class="cursor-pointer" icon="add-icon" variant="primary" color="rose" wire:click="$dispatch('open-tag-modal', {mode: 'create'})">
+            Create</flux:button>
     </flux:modal.trigger>
 
     {{-- Create Modal --}}
-    <livewire:admin.cuisine.cuisine-form />
+    <livewire:admin.tags.tag-form />
 
     {{-- Delete Confirmation Modal --}}
     <livewire:common.delete-confirmation />
 
+    
     <!-- Table responsive wrapper -->
     <div class="border dark:border-none bg-white dark:bg-neutral-700 mt-8 p-4 sm:p-6 rounded-2xl">
 
@@ -68,32 +69,22 @@
 
         <!-- Mobile list (xs only) -->
         <ul class="sm:hidden space-y-3">
-            @forelse ($cuisines as $cuisine)
+            @forelse ($tags as $tag)
                 <li class="rounded-xl border dark:border-neutral-600 p-3 bg-white dark:bg-neutral-700">
                     <div class="flex items-center gap-3">
-                        <div class="shrink-0">
-                            @if (!empty($cuisine->image))
-                                <img src="{{ asset($cuisine->image) }}" alt="{{ $cuisine->name }}"
-                                    class="h-12 w-12 rounded object-cover">
-                            @else
-                                <img src="{{ asset('assets/images/placeholders/cat-placeholder.png') }}"
-                                    alt="placeholder" class="h-12 w-12 rounded object-cover">
-                            @endif
-                        </div>
-
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="font-medium truncate">{{ $cuisine->name }}</p>
+                                <p class="font-medium truncate">{{ $tag->name }}</p>
                                 <flux:badge variant="solid" size="sm"
-                                    color="{{ $cuisine->status === 'active' ? 'emerald' : 'yellow' }}">
-                                    {{ $cuisine->status }}
+                                    color="{{ $tag->status === 'active' ? 'emerald' : 'yellow' }}">
+                                    {{ $tag->status }}
                                 </flux:badge>
                             </div>
 
                             <div class="mt-1 flex flex-wrap items-center gap-2">
 
                                 <span class="text-xs text-neutral-500 dark:text-neutral-300">
-                                    {{ $cuisine->created_at->format('M d, Y') }}
+                                    {{ $tag->created_at->format('M d, Y') }}
                                 </span>
                             </div>
                         </div>
@@ -101,15 +92,15 @@
 
                     <!-- Actions -->
                     <div class="mt-3 flex items-center gap-2">
-                        <flux:modal.trigger name="cuisine-modal">
+                        <flux:modal.trigger name="tag-modal">
                             <flux:button
-                                wire:click="$dispatch('open-cuisine-modal', {mode: 'view', cuisine: {{ $cuisine }}})"
+                                wire:click="$dispatch('open-tag-modal', {mode: 'view', tag: {{ $tag }}})"
                                 class="cursor-pointer h-[30px]" variant="primary" color="yellow">
                                 view
                             </flux:button>
 
                             <flux:button
-                                wire:click="$dispatch('open-cuisine-modal', {mode: 'edit', cuisine: {{ $cuisine }}})"
+                                wire:click="$dispatch('open-tag-modal', {mode: 'edit', tag: {{ $tag }}})"
                                 class="cursor-pointer  h-[30px]" variant="primary" color="blue">
                                 Edit
                             </flux:button>
@@ -118,11 +109,11 @@
                         <flux:modal.trigger name="delete-confirmation-modal">
                             <flux:button
                                 wire:click="$dispatch('confirm-delete', {
-                                    id: {{ $cuisine->id }},
-                                    dispatchAction: 'delete-cuisine',
+                                    id: {{ $tag->id }},
+                                    dispatchAction: 'delete-tag',
                                     modalName: 'delete-confirmation-modal',
-                                    heading: 'Delete cuisine?',
-                                    message: 'You are about to delete this cuisine: <strong>{{ $cuisine->name }}</strong>. This action cannot be reversed.',
+                                    heading: 'Delete tag?',
+                                    message: 'You are about to delete this tag: <strong>{{ $tag->name }}</strong>. This action cannot be reversed.',
                                 })"
                                 class="cursor-pointer h-[30px]" variant="primary" color="red">
                                 Delete
@@ -142,7 +133,6 @@
                     class="uppercase tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
                     <tr>
                         <th scope="col" class="px-4 lg:px-6 py-3">#</th>
-                        <th scope="col" class="px-4 lg:px-6 py-3">Image</th>
                         @include('livewire.common.sortable-th', [
                             'name' => 'name',
                             'displayName' => 'Name',
@@ -159,36 +149,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($cuisines as $cuisine)
-                        <tr wire:key="{{ $cuisine->id }}" class="border-b dark:border-neutral-600">
+                    @forelse ($tags as $tag)
+                        <tr wire:key="{{ $tag->id }}" class="border-b dark:border-neutral-600">
                             <th scope="row" class="px-4 lg:px-6 py-3">
-                                {{ ($cuisines->currentPage() - 1) * $cuisines->perPage() + $loop->iteration }}
+                                {{ ($tags->currentPage() - 1) * $tags->perPage() + $loop->iteration }}
                             </th>
-                            <td class="px-4 lg:px-6 py-3">
-                                @if (!empty($cuisine->image))
-                                    <img src="{{ asset($cuisine->image) }}" alt="{{ $cuisine->name }}"
-                                        class="h-12 w-12 rounded object-cover">
-                                @else
-                                    <img src="{{ asset('assets/images/placeholders/cat-placeholder.png') }}"
-                                        alt="placeholder" class="h-12 w-12 rounded object-cover">
-                                @endif
-                            </td>
-                            <td class="px-4 lg:px-6 py-3">{{ $cuisine->name }}</td>
-                            <td class="px-4 lg:px-6 py-3 capitalize" x-data="{ on: @js($cuisine->status === 'active') }">
-                                <flux:switch x-model="on" @change="$wire.setStatus({{ $cuisine->id }}, on)" />
+                            <td class="px-4 lg:px-6 py-3">{{ $tag->name }}</td>
+                            <td class="px-4 lg:px-6 py-3 capitalize" x-data="{ on: @js($tag->status === 'active') }">
+                                <flux:switch x-model="on" @change="$wire.setStatus({{ $tag->id }}, on)" class="cursor-pointer" />
                             </td>
 
-                            <td class="px-4 lg:px-6 py-3">{{ $cuisine->created_at->format('M d, Y') }}</td>
+                            <td class="px-4 lg:px-6 py-3">{{ $tag->created_at->format('M d, Y') }}</td>
                             <td class="px-4 lg:px-6 py-3">
                                 <div class="flex gap-2">
-                                    <flux:modal.trigger name="cuisine-modal">
+                                    <flux:modal.trigger name="tag-modal">
                                         <flux:button
-                                            wire:click="$dispatch('open-cuisine-modal', {mode: 'view', cuisine: {{ $cuisine }}})"
+                                            wire:click="$dispatch('open-tag-modal', {mode: 'view', tag: {{ $tag }}})"
                                             class="cursor-pointer min-h-[40px]" icon="eye" variant="primary"
                                             color="yellow">
                                         </flux:button>
                                         <flux:button
-                                            wire:click="$dispatch('open-cuisine-modal', {mode: 'edit', cuisine: {{ $cuisine }}})"
+                                            wire:click="$dispatch('open-tag-modal', {mode: 'edit', tag: {{ $tag }}})"
                                             class="cursor-pointer min-h-[40px]" icon="pencil" variant="primary"
                                             color="blue">
                                         </flux:button>
@@ -197,11 +178,11 @@
                                     <flux:modal.trigger name="delete-confirmation-modal">
                                         <flux:button
                                             wire:click="$dispatch('confirm-delete', {
-                                                id: {{ $cuisine->id }},
-                                                dispatchAction: 'delete-cuisine',
+                                                id: {{ $tag->id }},
+                                                dispatchAction: 'delete-tag',
                                                 modalName: 'delete-confirmation-modal',
-                                                heading: 'Delete cuisine?',
-                                                message: 'You are about to delete this cuisine: <strong>{{ $cuisine->name }}</strong>. This action cannot be reversed.',
+                                                heading: 'Delete tag?',
+                                                message: 'You are about to delete this tag: <strong>{{ $tag->name }}</strong>. This action cannot be reversed.',
                                                 })"
                                             class="cursor-pointer min-h-[40px]" icon="trash" variant="primary"
                                             color="red">
@@ -222,11 +203,13 @@
         <!-- Pagination -->
         <nav class="mt-4">
             <div class="sm:hidden text-center">
-                {{ $cuisines->onEachSide(0)->links() }}
+                {{ $tags->onEachSide(0)->links() }}
             </div>
             <div class="hidden sm:block">
-                {{ $cuisines->links() }}
+                {{ $tags->links() }}
             </div>
         </nav>
     </div>
+
+
 </div>

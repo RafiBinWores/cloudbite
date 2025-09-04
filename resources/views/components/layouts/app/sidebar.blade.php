@@ -16,6 +16,8 @@
         {{-- Main --}}
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Main')" class="grid">
+                
+                {{-- Dashboard --}}
                 <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
                     wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
             </flux:navlist.group>
@@ -48,17 +50,25 @@
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Dish Customization')" class="grid">
 
+            {{-- Crusts --}}
                 <flux:navlist.item icon="crust-icon" :href="route('crusts.index')"
                     :current="request()->routeIs('crusts.index')" wire:navigate>
                     {{ __('Crusts') }}</flux:navlist.item>
 
+                    {{-- Buns --}}
                 <flux:navlist.item icon="bun-icon" :href="route('buns.index')"
                     :current="request()->routeIs('buns.index')" wire:navigate>
                     {{ __('Buns') }}</flux:navlist.item>
 
+                    {{-- Add ons --}}
                 <flux:navlist.item icon="addOns-icon" :href="route('addOns.index')"
                     :current="request()->routeIs('addOns.index')" wire:navigate>
                     {{ __('Add Ons') }}</flux:navlist.item>
+
+                    {{-- Tags --}}
+                <flux:navlist.item icon="tag" :href="route('tags.index')"
+                    :current="request()->routeIs('tags.index')" wire:navigate>
+                    {{ __('Tags') }}</flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
 
