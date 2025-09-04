@@ -9,10 +9,8 @@ class CreateDish extends Component
 {
     use WithFileUploads;
 
-    public $title,$short_description, $description , $status = 'active', $category, $related_dish, $tags, $crusts, $buns, $addOns, $price, $discount, $vat, $discount_type, $sku, $track_stock = 'No', $daily_stock, $available_from, $available_till, $visibility = "Yes";
-    public array $user_id = [];
-
-    public $thumbnail;
+    public $title, $short_description, $description, $status = 'active', $category, $related_dish, $tags, $crusts, $buns, $addOns, $price, $discount, $vat, $discount_type, $sku, $track_stock = 'No', $daily_stock, $available_from, $available_till, $visibility = "Yes", $thumbnail;
+    
     public $gallery = [];
 
 
@@ -23,13 +21,13 @@ class CreateDish extends Component
             'title' => 'required|string|max:255|unique:dishes,title',
             'short_description' => 'required',
             'description' => 'required',
-            'category' => 'required',
-            'related_dish' => 'required',
+            'category_id' => 'required',
+            'related_dish_id' => 'required',
+            'price' => 'required',
             'tags' => 'required',
             'buns' => 'nullable',
             'crusts' => 'nullable',
             'addOns' => 'nullable',
-            'price' => 'required',
             'discount_type' => 'nullable',
             'discount' => 'nullable',
             'vat' => 'nullable',
@@ -38,12 +36,13 @@ class CreateDish extends Component
             'daily_stock' => 'required_if:track_stock,Yes|nullable|integer|min:0',
             'available_from' => 'required',
             'available_till' => 'required',
-            'status' => 'required|in:active,disable',
-
-            // images
+            'visibility' => 'required',
             'thumbnail'        => 'required|image|max:5048|mimes:jpg,jpeg,png,webp,svg',
             'gallery'      => 'array|max:4',
             'gallery.*'    => 'image|max:5048|mimes:jpg,jpeg,png,webp',
+            'meta_title' => 'nullable|string',
+            'meta_description' => 'nullable|string',
+            'meta_keyword' => 'nullable|string',
         ];
     }
 
@@ -69,10 +68,10 @@ class CreateDish extends Component
         return ['thumbnail' => $thumbnail, 'gallery' => $gallery];
     }
 
-   public function clearThumbnail(): void
-{
-    $this->thumbnail = null;
-}
+    public function clearThumbnail(): void
+    {
+        $this->thumbnail = null;
+    }
 
     public function removeFromGallery(int $index): void
     {
