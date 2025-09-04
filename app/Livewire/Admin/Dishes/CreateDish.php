@@ -41,7 +41,7 @@ class CreateDish extends Component
             'status' => 'required|in:active,disable',
 
             // images
-            'thumbnail'        => 'required|image|max:5048|mimes:jpg,jpeg,png,webp',
+            'thumbnail'        => 'required|image|max:5048|mimes:jpg,jpeg,png,webp,svg',
             'gallery'      => 'array|max:4',
             'gallery.*'    => 'image|max:5048|mimes:jpg,jpeg,png,webp',
         ];

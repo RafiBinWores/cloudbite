@@ -392,7 +392,8 @@
                                 class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300">
                                 <p>
                                     Click to add Thumbnail <br>
-                                    <small class="text-sm">Recommended image size for upload is 552x538 px.</small>
+                                    <small class="text-sm">Recommended image size for upload is 552x538 px. <br>
+                                    Support png/jpg/jpeg/svg/webp • up to 5MB</small>
                                 </p>
                             </div>
                         </template>
