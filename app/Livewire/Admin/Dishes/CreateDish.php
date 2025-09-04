@@ -9,7 +9,7 @@ class CreateDish extends Component
 {
     use WithFileUploads;
 
-    public $title,$short_description, $description , $status = 'active', $category, $related_dish, $tags, $crusts, $buns, $addOns, $price, $discount, $vat, $discount_type, $sku, $track_stock = 'No', $daily_stock;
+    public $title,$short_description, $description , $status = 'active', $category, $related_dish, $tags, $crusts, $buns, $addOns, $price, $discount, $vat, $discount_type, $sku, $track_stock = 'No', $daily_stock, $available_from, $available_till, $visibility = "Yes";
     public array $user_id = [];
 
     public $thumbnail;
@@ -28,14 +28,16 @@ class CreateDish extends Component
             'tags' => 'required',
             'buns' => 'nullable',
             'crusts' => 'nullable',
-            'addOns' => 'required',
+            'addOns' => 'nullable',
             'price' => 'required',
             'discount_type' => 'nullable',
             'discount' => 'nullable',
             'vat' => 'nullable',
-            'sku' => 'required|in:Yes,No',
+            'sku' => 'nullable',
             'track_stock' => 'required|in:Yes,No',
             'daily_stock' => 'required_if:track_stock,Yes|nullable|integer|min:0',
+            'available_from' => 'required',
+            'available_till' => 'required',
             'status' => 'required|in:active,disable',
 
             // images

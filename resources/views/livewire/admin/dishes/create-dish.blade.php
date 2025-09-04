@@ -74,21 +74,21 @@
                     <div class="space-y-6">
                         {{-- Title --}}
                         <div class="form-group">
-                            <x-input label="Dish Title" wire:model.live="title"
+                            <x-input label="Dish Title*" wire:model.live="title"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('title') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-400' }}"
                                 placeholder="eg. Chicken Fry" />
                         </div>
 
                         {{-- Short description --}}
                         <div class="from-group md:col-span-2">
-                            <x-textarea label="Short Description" rows="3" wire:model.live="short_description"
+                            <x-textarea label="Short Description*" rows="3" wire:model.live="short_description"
                                 class="ounded-lg !bg-white/10 !py-[9px] {{ $errors->has('short_description') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-400' }}"
                                 placeholder="Mention about what your dish include or what item u will provide for the menu" />
                         </div>
 
                         {{-- Description --}}
                         <div class="form-group dark">
-                            <label for="editor">Description</label>
+                            <label for="editor">Description <span class="text-red-500">*</span></label>
 
                             {{-- Only the editor is ignored --}}
                             <div wire:ignore>
@@ -131,20 +131,40 @@
                                 );
                             @endphp
 
-                            <x-select wire:model.live="category" label="Category" :options="$cat"
+                            <x-select wire:model.live="category" label="Category*" :options="$cat"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('category') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable />
 
                         </div>
 
-                        {{-- Tags --}}
+                        {{-- Cuisines --}}
                         <div class="form-group">
+
+                            @php
+                                $cuisines = App\Models\Cuisine::all(['id', 'name', 'image'])->map(
+                                    fn($c) => [
+                                        'id' => $c->id,
+                                        'name' => $c->name,
+                                        'image' => $c->image
+                                            ? Storage::url($c->image)
+                                            : asset('assets/images/placeholders/cat-placeholder.png'),
+                                    ],
+                                )
+                            @endphp
+
+                            <x-select wire:model.live="cuisine" label="Cuisine*" :options="$cuisines"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('cuisine') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                                clearable searchable multiple />
+
+                        </div>
+                        {{-- Tags --}}
+                        <div class="form-group md:col-span-2">
 
                             @php
                                 $cat = App\Models\Category::all(['id', 'name']);
                             @endphp
 
-                            <x-select wire:model.live="tags" label="Tags" :options="$cat"
+                            <x-select wire:model.live="tags" label="Tags*" :options="$cat"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('tags') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable multiple />
 
@@ -167,7 +187,7 @@
                                 );
                             @endphp --}}
 
-                            <x-select wire:model.live="related_dish" label="Related Dish"
+                            <x-select wire:model.live="related_dish*" label="Related Dish*"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('related_dish') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable searchable />
 
@@ -184,23 +204,24 @@
 
                         {{-- Price --}}
                         <div class="form-group md:col-span-2">
-                            <x-input type="number" min="0" label="Price (Tk)" wire:model.live="price"
+                            <x-input type="number" min="0" label="Price (Tk)*" wire:model.live="price"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('price') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Price" />
                         </div>
 
                         {{-- discount type --}}
                         <div class="from-group">
-                            <x-select wire:model.live="discount_type" label="Discount type" :options="['Percent', 'Amount',]" class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('discount_type') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
+                            <x-select wire:model.live="discount_type" label="Discount type" :options="['Percent', 'Amount']"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('discount_type') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
                         </div>
-                        
+
                         {{-- Discount --}}
                         <div class="form-group">
                             <x-input type="number" min="0" label="Discount" wire:model.live="discount"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('discount') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Discount" />
                         </div>
-                        
+
                         {{-- Vat --}}
                         <div class="form-group md:col-span-2">
                             <x-input type="number" min="0" label="Vat (%)" wire:model.live="vat"
@@ -247,7 +268,7 @@
 
             <!-- RIGHT COLUMN -->
             <div class="lg:col-span-5 space-y-6">
-                <!-- Product Details -->
+                <!-- Dish Customization -->
                 <section
                     class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Dish Customization</h3>
@@ -296,7 +317,7 @@
                     </div>
                 </section>
 
-                <!-- Product Pricing -->
+                <!-- Manage stock -->
                 <section
                     class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Manage Stock</h3>
@@ -312,14 +333,37 @@
 
                         {{-- Track Stock --}}
                         <div class="from-group">
-                            <x-select wire:model.live="track_stock" label="Track Stock" :options="['Yes', 'No',]" class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('track_stock') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
+                            <x-select wire:model.live="track_stock" label="Track Stock" :options="['Yes', 'No']"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('track_stock') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
                         </div>
 
                         {{-- Daily Stock --}}
                         <div class="from-group md:col-span-2">
-                            <x-input type="number" min="0" wire:model.live="daily_stock" label="Daily Stock" hint="Only required when track stock selected Yes"
+                            <x-input type="number" min="0" wire:model.live="daily_stock" label="Daily Stock"
+                                hint="Only required when Track Stock is set to Yes"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('daily_stock') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Daily Stock" />
+                        </div>
+                    </div>
+                </section>
+
+                {{-- Availability --}}
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                    <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Availability</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        {{-- Available From --}}
+                        <div class="from-group">
+                            <x-input type="time" wire:model.live="available_from" label="Available From*"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('available_from') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
+                        </div>
+
+                        {{-- Available Till --}}
+                        <div class="from-group">
+                            <x-input type="time" wire:model.live="available_till" label="Available Till*"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('available_from') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
                         </div>
                     </div>
                 </section>
@@ -329,7 +373,7 @@
                     class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
 
                     <div class="flex items-center gap-2 mb-4">
-                        <h3 class="text-lg font-semibold dark:text-gray-100">Display Image</h3>
+                        <h3 class="text-lg font-semibold dark:text-gray-100">Display Image <span class="text-red-500 font-normal text-base">*</span></h3>
                     </div>
 
                     <!-- Thumbnail (Big Preview) -->
@@ -344,10 +388,11 @@
                         </template>
 
                         <template x-if="!thumbnailSrc">
-                            <div class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300">
+                            <div
+                                class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300">
                                 <p>
                                     Click to add Thumbnail <br>
-                                <small class="text-sm">Recommended image size for upload is 552x538 px.</small>
+                                    <small class="text-sm">Recommended image size for upload is 552x538 px.</small>
                                 </p>
                             </div>
                         </template>
@@ -393,6 +438,23 @@
                     <div x-cloak x-show="$wire.__instance.uploadsInProgress > 0"
                         class="text-xs text-neutral-500 dark:text-neutral-300 mt-2">
                         Uploading... please wait.
+                    </div>
+                </section>
+
+                {{-- Visibility --}}
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                    <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Visibility</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        {{-- Visibility --}}
+                        <div class="form-group md:col-span-2">
+
+                            <x-select wire:model.live="visibility" label="Turning visibility off will not show this dish in the website*" :options="['Yes', 'No']"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('visibility') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
+
+                        </div>
                     </div>
                 </section>
 

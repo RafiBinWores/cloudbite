@@ -63,7 +63,7 @@
             <div class="flex items-center gap-2">
                 <label for="inputFilter" class="text-neutral-600 dark:text-neutral-300">Per Page: </label>
                 <select id="inputFilter" wire:model.live='perPage'
-                    class="block rounded-lg border dark:border-none dark:bg-neutral-600 p-2.5 text-sm focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400">
+                    class="block rounded-lg border dark:border-none dark:bg-neutral-600 p-2.5 text-sm focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400 w-20">
                     <option value="10" selected>10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
