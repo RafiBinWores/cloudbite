@@ -545,7 +545,7 @@
                     const html = quill.root.innerHTML;
                     const plain = quill.getText().trim();
                     const input = document.getElementById('description');
-                    input.value = plain.length ? html : ''; // normalize empty (<p><br></p>) to ''
+                    input.value = plain.length ? html : '';
                     input.dispatchEvent(new Event('input'));
                 });
             });

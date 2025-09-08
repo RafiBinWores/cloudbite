@@ -5,15 +5,6 @@
         <flux:separator variant="subtle" />
     </div>
 
-    {{-- Create modal Button --}}
-    {{-- <flux:button :href="route('dishes.create')" wire:navigate class="cursor-pointer" icon="add-icon" variant="primary"
-        color="rose">
-        Create</flux:button> --}}
-
-
-    {{-- Delete Confirmation Modal --}}
-    <livewire:common.delete-confirmation />
-
     @php
         use Carbon\Carbon;
         use Illuminate\Support\Facades\Storage;
@@ -25,7 +16,7 @@
         $basePrice = (float) ($dish->price ?? 0);
         $hasDiscount = $dish->discount_type && ($dish->discount ?? 0) > 0;
         $discounted = $hasDiscount
-            ? ($dish->discount_type === 'Percent'
+            ? ($dish->discount_type === 'percent'
                 ? max(0, $basePrice - $basePrice * (($dish->discount ?? 0) / 100))
                 : max(0, $basePrice - (float) $dish->discount))
             : $basePrice;
@@ -131,11 +122,51 @@
                         <div class="line-through text-neutral-400">৳{{ $money($basePrice) }}</div>
                         <span
                             class="px-2 py-0.5 text-xs rounded bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200">
-                            -{{ $dish->discount_type === 'Percent' ? $money($dish->discount) . '%' : '৳' . $money($dish->discount) }}
+                            -{{ $dish->discount_type === 'percent' ? $money($dish->discount) . '%' : '৳' . $money($dish->discount) }}
                         </span>
                     @else
                         <div class="text-2xl font-semibold text-emerald-500">৳{{ $money($basePrice) }}</div>
                     @endif
+
+                    <flux:separator vertical />
+
+                    <div>
+                        @php
+                            $basePrice = (float) ($dish->price ?? 0);
+
+                            // Apply discount
+                            if ($dish->discount_type && $dish->discount > 0) {
+                                if ($dish->discount_type === 'percent') {
+                                    $afterDiscount = max(0, $basePrice - $basePrice * ($dish->discount / 100));
+                                } else {
+                                    $afterDiscount = max(0, $basePrice - (float) $dish->discount);
+                                }
+                            } else {
+                                $afterDiscount = $basePrice;
+                            }
+
+                            // Apply VAT (assume $dish->vat = percent, e.g. 15)
+                            $vatPercent = (float) ($dish->vat ?? 0);
+                            $finalPrice = $afterDiscount + $afterDiscount * ($vatPercent / 100);
+
+                            // Format function
+                            $money = fn($v) => fmod($v, 1) == 0 ? number_format($v, 0) : number_format($v, 2);
+                        @endphp
+
+                        <!-- Show price -->
+                        <div class="text-xl font-semibold text-emerald-600">
+                            ৳{{ $money($finalPrice) }} <span
+                                class="px-2 py-0.5 text-xs rounded bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200">
+                                -{{ $dish->discount_type === 'percent' ? $money($dish->discount) . '%' : '৳' . $money($dish->discount) }}
+                            </span>
+                        </div>
+
+                        @if ($dish->vat)
+                            <div class="text-xs text-neutral-500">
+                                (includes {{ $dish->vat }}% VAT & Discount)
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
                 <!-- Availability + Time window + Visibility -->
@@ -219,6 +250,7 @@
                                         <span
                                             class="text-neutral-500 dark:text-neutral-400">৳{{ $money($bun->price) }}</span>
                                     @endif
+
                                 </span>
                             @endforeach
                         </div>
@@ -280,33 +312,33 @@
                 </div>
             </div>
 
-                            <!-- SEO / Meta (collapsible) -->
-                <div x-data="{ openSeo: false }" class="border border-neutral-200 dark:border-neutral-700 rounded-2xl">
-                    <button type="button" @click="openSeo = !openSeo"
-                        class="w-full flex items-center justify-between px-4 py-3 text-left">
-                        <span class="font-medium text-neutral-800 dark:text-neutral-100">SEO Metadata</span>
-                        <span class="text-sm text-neutral-500" x-text="openSeo ? 'Hide' : 'Show'"></span>
-                    </button>
-                    <div x-show="openSeo" x-cloak class="px-4 pb-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <div class="text-neutral-500 dark:text-neutral-400">Meta Title</div>
-                                <div class="font-medium text-neutral-800 dark:text-neutral-100">
-                                    {{ $dish->meta_title ?: '—' }}</div>
-                            </div>
-                            <div>
-                                <div class="text-neutral-500 dark:text-neutral-400">Meta Keywords</div>
-                                <div class="font-medium text-neutral-800 dark:text-neutral-100">
-                                    {{ $dish->meta_keyword ?: '—' }}</div>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <div class="text-neutral-500 dark:text-neutral-400">Meta Description</div>
-                                <div class="font-medium text-neutral-800 dark:text-neutral-100">
-                                    {{ $dish->meta_description ?: '—' }}</div>
-                            </div>
+            <!-- SEO / Meta (collapsible) -->
+            <div x-data="{ openSeo: false }" class="border border-neutral-200 dark:border-neutral-700 rounded-2xl">
+                <button type="button" @click="openSeo = !openSeo"
+                    class="w-full flex items-center justify-between px-4 py-3 text-left">
+                    <span class="font-medium text-neutral-800 dark:text-neutral-100">SEO Metadata</span>
+                    <span class="text-sm text-neutral-500" x-text="openSeo ? 'Hide' : 'Show'"></span>
+                </button>
+                <div x-show="openSeo" x-cloak class="px-4 pb-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <div class="text-neutral-500 dark:text-neutral-400">Meta Title</div>
+                            <div class="font-medium text-neutral-800 dark:text-neutral-100">
+                                {{ $dish->meta_title ?: '—' }}</div>
+                        </div>
+                        <div>
+                            <div class="text-neutral-500 dark:text-neutral-400">Meta Keywords</div>
+                            <div class="font-medium text-neutral-800 dark:text-neutral-100">
+                                {{ $dish->meta_keyword ?: '—' }}</div>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <div class="text-neutral-500 dark:text-neutral-400">Meta Description</div>
+                            <div class="font-medium text-neutral-800 dark:text-neutral-100">
+                                {{ $dish->meta_description ?: '—' }}</div>
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
     </div> <!-- /container -->
 

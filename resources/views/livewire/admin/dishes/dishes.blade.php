@@ -76,6 +76,7 @@
                             'name' => 'title',
                             'displayName' => 'Name',
                         ])
+                        <th class="px-4 lg:px-6 py-3">Price</th>
                         @include('livewire.common.sortable-th', [
                             'name' => 'visibility',
                             'displayName' => 'Visibility',
@@ -102,9 +103,46 @@
 
                             <td class="px-4 lg:px-6 py-3">
                                 <div class="font-medium">{{ $dish->title }}</div>
-                                <div class="text-xs text-neutral-500 dark:text-neutral-400">
-                                    <span class="text-base">৳
-                                    </span>{{ fmod($dish->price, 1) == 0 ? number_format($dish->price, 0) : number_format($dish->price, 2) }}
+                            </td>
+                            <td class="px-4 lg:px-6 py-3">
+                                <div class="font-medium">
+                                    @php
+                                        $basePrice = (float) ($dish->price ?? 0);
+
+                                        // Apply discount
+                                        if ($dish->discount_type && $dish->discount > 0) {
+                                            if ($dish->discount_type === 'Percent') {
+                                                $afterDiscount = max(
+                                                    0,
+                                                    $basePrice - $basePrice * ($dish->discount / 100),
+                                                );
+                                            } else {
+                                                $afterDiscount = max(0, $basePrice - (float) $dish->discount);
+                                            }
+                                        } else {
+                                            $afterDiscount = $basePrice;
+                                        }
+
+                                        // Apply VAT (assume $dish->vat = percent, e.g. 15)
+                                        $vatPercent = (float) ($dish->vat ?? 0);
+                                        $finalPrice = $afterDiscount + $afterDiscount * ($vatPercent / 100);
+
+                                        // Format function
+                                        $money = fn($v) => fmod($v, 1) == 0
+                                            ? number_format($v, 0)
+                                            : number_format($v, 2);
+                                    @endphp
+
+                                    <!-- Show price -->
+                                    <div class="text-lg font-semibold text-emerald-600">
+                                        ৳{{ $money($finalPrice) }}
+                                    </div>
+
+                                    @if ($dish->vat)
+                                        <div class="text-xs text-neutral-500">
+                                            (includes {{ $dish->vat }}% VAT)
+                                        </div>
+                                    @endif
                                 </div>
                             </td>
 
