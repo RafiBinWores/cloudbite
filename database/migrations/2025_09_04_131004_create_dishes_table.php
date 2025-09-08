@@ -16,11 +16,13 @@ return new class extends Migration
 
             // Basic info
             $table->string('title')->unique();
+            $table->string('slug');
             $table->string('short_description');
             $table->longText('description');
 
             // Relations
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('cuisine_id')->constrained()->cascadeOnDelete();
 
             // Pricing & stock
             $table->decimal('price', 10, 2);

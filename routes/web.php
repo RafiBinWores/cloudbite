@@ -7,6 +7,7 @@ use App\Livewire\Admin\Crusts\Crusts;
 use App\Livewire\Admin\Cuisine\Cuisines;
 use App\Livewire\Admin\Dishes\CreateDish;
 use App\Livewire\Admin\Dishes\Dishes;
+use App\Livewire\Admin\Dishes\ShowDish;
 use App\Livewire\Admin\Tags\Tags;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
@@ -49,6 +50,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // Dishes Route
     Route::get('dishes', Dishes::class)->name('dishes.index');
     Route::get('dishes/create', CreateDish::class)->name('dishes.create');
+    Route::get('dishes/{slug}', ShowDish::class)->name('dishes.show');
 
 });
 

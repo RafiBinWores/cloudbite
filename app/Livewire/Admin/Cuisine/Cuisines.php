@@ -97,20 +97,20 @@ class Cuisines extends Component
     }
 
     public function setStatus(int $id, bool $on): void
-{
-    $cuisine = \App\Models\Cuisine::find($id);
-    if (!$cuisine) {
-        $this->dispatch('toast', type: 'error', message: 'Cuisine not found.');
-        return;
+    {
+        $cuisine = \App\Models\Cuisine::find($id);
+        if (!$cuisine) {
+            $this->dispatch('toast', type: 'error', message: 'Cuisine not found.');
+            return;
+        }
+
+        $cuisine->status = $on ? 'active' : 'disable';
+        $cuisine->save();
+
+        // Optional: toast/refresh if your table needs it
+        // $this->dispatch('cuisines:refresh');
+        $this->dispatch('toast', type: 'success', message: 'Status updated to ' . $cuisine->status . '.');
     }
-
-    $cuisine->status = $on ? 'active' : 'disable';
-    $cuisine->save();
-
-    // Optional: toast/refresh if your table needs it
-    // $this->dispatch('cuisines:refresh');
-    $this->dispatch('toast', type: 'success', message: 'Status updated to '.$cuisine->status.'.');
-}
 
 
     #[On('delete-cuisine')]

@@ -131,7 +131,7 @@
                                 );
                             @endphp
 
-                            <x-select wire:model.live="category" label="Category*" :options="$cat"
+                            <x-select wire:model.live="category_id" label="Category*" :options="$cat"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('category') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable />
 
@@ -152,19 +152,19 @@
                                 )
                             @endphp
 
-                            <x-select wire:model.live="cuisine" label="Cuisine*" :options="$cuisines"
+                            <x-select wire:model.live="cuisine_id" label="Cuisine*" :options="$cuisines"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('cuisine') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
-                                clearable searchable multiple />
+                                clearable searchable />
 
                         </div>
                         {{-- Tags --}}
                         <div class="form-group md:col-span-2">
 
                             @php
-                                $cat = App\Models\Category::all(['id', 'name']);
+                                $tags = \App\Models\Tag::pluck('name')->toArray();
                             @endphp
 
-                            <x-select wire:model.live="tags" label="Tags*" :options="$cat"
+                            <x-select wire:model.live="tags" label="Tags*" :options="$tags"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('tags') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable multiple />
 
@@ -173,23 +173,22 @@
                         {{-- Related Dish --}}
                         <div class="form-group md:col-span-2">
 
-                            {{-- @php
-                                use Illuminate\Support\Facades\Storage;
+                            @php
 
-                                $cat = App\Models\Category::all(['id', 'name', 'image'])->map(
+                                $dishes = App\Models\Dish::all(['id', 'title', 'thumbnail'])->map(
                                     fn($c) => [
                                         'id' => $c->id,
-                                        'name' => $c->name,
-                                        'avatar' => $c->image
-                                            ? Storage::url($c->image)
+                                        'name' => $c->title,
+                                        'avatar' => $c->thumbnail
+                                            ? Storage::url($c->thumbnail)
                                             : asset('assets/images/placeholders/cat-placeholder.png'),
                                     ],
                                 );
-                            @endphp --}}
+                            @endphp
 
-                            <x-select wire:model.live="related_dish*" label="Related Dish*"
-                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('related_dish') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
-                                clearable searchable searchable />
+                            <x-select type="number" wire:model.live="related_dish_id" label="Related Dish*" :options="$dishes"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('related_dish_id') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                                clearable searchable multiple />
 
                         </div>
                     </div>
@@ -204,7 +203,7 @@
 
                         {{-- Price --}}
                         <div class="form-group md:col-span-2">
-                            <x-input type="number" min="0" label="Price (Tk)*" wire:model.live="price"
+                            <x-input type="number" min="0" step="any" label="Price (Tk)*" wire:model.live="price"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('price') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Price" />
                         </div>
@@ -217,7 +216,7 @@
 
                         {{-- Discount --}}
                         <div class="form-group">
-                            <x-input type="number" min="0" label="Discount" wire:model.live="discount"
+                            <x-input type="number" min="0" step="any" label="Discount" wire:model.live="discount"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('discount') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Discount" />
                         </div>
@@ -251,7 +250,7 @@
 
                         {{-- Meta keyword --}}
                         <div class="from-group md:col-span-2">
-                            <x-input type="number" min="0" wire:model.live="meta_keyword" label="Meta Keywords"
+                            <x-input wire:model.live="meta_keyword" label="Meta Keywords"
                                 class="rounded-lg !border-neutral-300 dark:!border-neutral-500 !bg-white/10 !py-[9px] focus:!ring-red-500"
                                 placeholder="Meta Keywords" />
                         </div>
@@ -477,6 +476,7 @@
             </div>
         </div>
     </form>
+    
 
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>

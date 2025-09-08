@@ -58,6 +58,12 @@ return [
             'url' => env('APP_URL') . '/storage/cuisine',
             'visibility' => 'public',
         ],
+        'dishes' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/dishes'),
+            'url' => env('APP_URL') . '/storage/dishes',
+            'visibility' => 'public',
+        ],
 
         's3' => [
             'driver' => 's3',
