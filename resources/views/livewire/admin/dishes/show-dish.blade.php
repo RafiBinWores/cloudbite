@@ -117,16 +117,10 @@
 
                 <!-- Price -->
                 <div class="flex items-center gap-3">
-                    @if ($hasDiscount)
-                        <div class="text-2xl font-semibold text-rose-500">৳{{ $money($discounted) }}</div>
-                        <div class="line-through text-neutral-400">৳{{ $money($basePrice) }}</div>
-                        <span
-                            class="px-2 py-0.5 text-xs rounded bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200">
-                            -{{ $dish->discount_type === 'percent' ? $money($dish->discount) . '%' : '৳' . $money($dish->discount) }}
-                        </span>
-                    @else
+                    <div>
                         <div class="text-2xl font-semibold text-emerald-500">৳{{ $money($basePrice) }}</div>
-                    @endif
+                    <span class="text-xs text-neutral-500">(Base Price)</span>
+                    </div>
 
                     <flux:separator vertical />
 
@@ -163,7 +157,7 @@
 
                         @if ($dish->vat)
                             <div class="text-xs text-neutral-500">
-                                (includes {{ $dish->vat }}% VAT & Discount)
+                                (includes {{ $dish->vat }}% VAT)
                             </div>
                         @endif
                     </div>

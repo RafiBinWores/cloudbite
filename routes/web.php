@@ -53,5 +53,4 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('dishes/{slug}', ShowDish::class)->name('dishes.show');
 
 });
-
 require __DIR__.'/auth.php';

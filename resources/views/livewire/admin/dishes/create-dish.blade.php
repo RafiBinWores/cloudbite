@@ -186,8 +186,8 @@
                                 );
                             @endphp
 
-                            <x-select type="number" wire:model.live="related_dish_id" label="Related Dish*" :options="$dishes"
-                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('related_dish_id') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                            <x-select type="number" wire:model.live="related_dishes" label="Related Dish*" :options="$dishes"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('related_dishes') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable multiple />
 
                         </div>

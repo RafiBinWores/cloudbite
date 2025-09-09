@@ -111,7 +111,7 @@
 
                                         // Apply discount
                                         if ($dish->discount_type && $dish->discount > 0) {
-                                            if ($dish->discount_type === 'Percent') {
+                                            if ($dish->discount_type === 'percent') {
                                                 $afterDiscount = max(
                                                     0,
                                                     $basePrice - $basePrice * ($dish->discount / 100),
