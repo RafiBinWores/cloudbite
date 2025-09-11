@@ -1,74 +1,48 @@
 <div>
-
-    {{-- Styles --}}
     @push('styles')
         <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
-
         <style>
-            /* Dark theme override for Quill toolbar */
-            .dark .ql-toolbar {
-                background-color: none;
-                border-top-left-radius: 8px;
-                border-top-right-radius: 8px;
-            }
-
-            .dark .ql-toolbar button,
-            .dark .ql-toolbar .ql-picker {
-                color: #828690;
-                /* Tailwind gray-200 */
-            }
-
-            .dark .ql-toolbar button:hover,
-            .dark .ql-toolbar .ql-picker-label:hover {
-                color: #f87171;
-                /* Tailwind rose-400 for hover */
-            }
-
-            .dark .ql-toolbar .ql-stroke {
-                stroke: #828690 !important;
-                /* make SVG icons visible */
-            }
-
-            .dark .ql-toolbar .ql-fill {
-                fill: #828690 !important;
-            }
-
-            .dark .ql-toolbar .ql-picker-options {
-                background-color: #111827;
-                /* Tailwind neutral-900 */
-                border-color: #374151;
-            }
-
-            .dark .ql-toolbar .ql-picker-options span {
-                color: #828690;
-            }
-
-            .dark .ql-toolbar .ql-picker-options span:hover {
-                background: #374151;
-            }
+            .dark .ql-toolbar { background-color: none; border-top-left-radius: 8px; border-top-right-radius: 8px; }
+            .dark .ql-toolbar button, .dark .ql-toolbar .ql-picker { color:#828690; }
+            .dark .ql-toolbar button:hover, .dark .ql-toolbar .ql-picker-label:hover { color:#f87171; }
+            .dark .ql-toolbar .ql-stroke { stroke:#828690 !important; }
+            .dark .ql-toolbar .ql-fill { fill:#828690 !important; }
+            .dark .ql-toolbar .ql-picker-options { background:#111827; border-color:#374151; }
+            .dark .ql-toolbar .ql-picker-options span { color:#828690; }
+            .dark .ql-toolbar .ql-picker-options span:hover { background:#374151; }
         </style>
     @endpush
 
+    {{-- Preload existing image URLs for Alpine fallbacks --}}
+    @php
+        use Illuminate\Support\Facades\Storage;
+        $existingThumb   = $this->dish?->thumbnail ? Storage::url($this->dish->thumbnail) : null;
+        $existingGallery = collect((array)($this->dish?->gallery ?? []))
+            ->map(fn($p) => Storage::url($p))
+            ->filter()
+            ->values()
+            ->toArray();
+    @endphp
+
     {{-- Page Heading --}}
     <div class="relative mb-6 w-full">
-        <flux:heading size="xl" class="mb-3" level="1">{{ __('Add New Dish') }}</flux:heading>
+        <flux:heading size="xl" class="mb-3" level="1">{{ __('Edit Dish') }}</flux:heading>
         <flux:breadcrumbs class="mb-6">
             <flux:breadcrumbs.item href="{{ route('dashboard') }}" icon="home" separator="slash" wire:navigate />
-            <flux:breadcrumbs.item href="{{ route('dishes.index') }}" separator="slash" wire:navigate>Dishes
-            </flux:breadcrumbs.item>
-            <flux:breadcrumbs.item separator="slash">Add New Dish</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item href="{{ route('dishes.index') }}" separator="slash" wire:navigate>Dishes</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item separator="slash">Edit Dish</flux:breadcrumbs.item>
         </flux:breadcrumbs>
         <flux:separator variant="subtle" />
     </div>
 
-    <form wire:submit="submit" class="mt-6 space-y-6">
+    {{-- IMPORTANT: call updateDish --}}
+    <form wire:submit.prevent="updateDish" class="mt-6 space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
             <!-- LEFT COLUMN -->
             <div class="lg:col-span-7 space-y-6">
                 <!-- Name & Description -->
-                <section
-                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Name and Description</h3>
 
                     <div class="space-y-6">
@@ -80,127 +54,88 @@
                         </div>
 
                         {{-- Short description --}}
-                        <div class="from-group md:col-span-2">
+                        <div class="form-group md:col-span-2">
                             <x-textarea label="Short Description*" rows="3" wire:model.live="short_description"
-                                class="ounded-lg !bg-white/10 !py-[9px] {{ $errors->has('short_description') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-400' }}"
-                                placeholder="Mention about what your dish include or what item u will provide for the menu" />
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('short_description') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-400' }}"
+                                placeholder="Mention what your dish includes" />
                         </div>
 
                         {{-- Description --}}
                         <div class="form-group dark">
                             <label for="editor">Description <span class="text-red-500">*</span></label>
-
-                            {{-- Only the editor is ignored --}}
                             <div wire:ignore>
                                 <div id="editor" class="min-h-38 rounded-b-lg border border-gray-300"></div>
                             </div>
-
-                            {{-- Hidden input bound to Livewire --}}
                             <input type="hidden" id="description" wire:model.live="description">
-
-                            {{-- This will now update properly --}}
-                            @error('description')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
                         </div>
-
                     </div>
-
                 </section>
 
-                <!-- Category -->
-                <section
-                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <!-- Product Details -->
+                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Product Details</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {{-- Categories --}}
                         <div class="form-group">
-
                             @php
-                                use Illuminate\Support\Facades\Storage;
-
-                                $cat = App\Models\Category::where('status', 'active')->orderBy('name', 'ASC')->get()->map(
-                                    fn($c) => [
-                                        'id' => $c->id,
-                                        'name' => $c->name,
-                                        'avatar' => $c->image
-                                            ? Storage::url($c->image)
-                                            : asset('assets/images/placeholders/cat-placeholder.png'),
-                                    ],
-                                );
+                                $cat = App\Models\Category::where('status', 'active')->get(['id','name','image'])->map(fn($c) => [
+                                    'id' => $c->id,
+                                    'name' => $c->name,
+                                    'avatar' => $c->image ? Storage::url($c->image) : asset('assets/images/placeholders/cat-placeholder.png'),
+                                ]);
                             @endphp
 
                             <x-select wire:model.live="category_id" label="Category*" :options="$cat"
-                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('category') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('category_id') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable />
-
                         </div>
 
                         {{-- Cuisines --}}
                         <div class="form-group">
-
                             @php
-                                $cuisines = App\Models\Cuisine::where('status', 'active')->orderBy('name', 'ASC')->get()->map(
-                                    fn($c) => [
-                                        'id' => $c->id,
-                                        'name' => $c->name,
-                                        'image' => $c->image
-                                            ? Storage::url($c->image)
-                                            : asset('assets/images/placeholders/cat-placeholder.png'),
-                                    ],
-                                )
+                                $cuisines = App\Models\Cuisine::where('status', 'active')->get(['id','name','image'])->map(fn($c) => [
+                                    'id' => $c->id,
+                                    'name' => $c->name,
+                                    'image' => $c->image ? Storage::url($c->image) : asset('assets/images/placeholders/cat-placeholder.png'),
+                                ]);
                             @endphp
 
                             <x-select wire:model.live="cuisine_id" label="Cuisine*" :options="$cuisines"
-                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('cuisine') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('cuisine_id') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable />
-
                         </div>
+
                         {{-- Tags --}}
                         <div class="form-group md:col-span-2">
-
-                            @php
-                                $tags = \App\Models\Tag::where('status', 'active')->pluck('name')->toArray();
-                            @endphp
-
+                            @php $tags = \App\Models\Tag::where('status', 'active')->pluck('name')->toArray(); @endphp
                             <x-select wire:model.live="tags" label="Tags" :options="$tags"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('tags') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable multiple />
-
                         </div>
 
                         {{-- Related Dish --}}
                         <div class="form-group md:col-span-2">
-
                             @php
-
-                                $dishes = App\Models\Dish::where('visibility', 'Yes')->get(['id', 'title', 'thumbnail'])->map(
-                                    fn($c) => [
-                                        'id' => $c->id,
-                                        'name' => $c->title,
-                                        'avatar' => $c->thumbnail
-                                            ? Storage::url($c->thumbnail)
-                                            : asset('assets/images/placeholders/cat-placeholder.png'),
-                                    ],
-                                );
+                                $dishes = App\Models\Dish::where('visibility', 'Yes')->get(['id','title','thumbnail'])->map(fn($d) => [
+                                    'id' => $d->id,
+                                    'name' => $d->title,
+                                    'avatar' => $d->thumbnail ? Storage::url($d->thumbnail) : asset('assets/images/placeholders/cat-placeholder.png'),
+                                ]);
                             @endphp
 
-                            <x-select type="number" wire:model.live="related_dishes" label="Related Dish" :options="$dishes"
+                            <x-select wire:model.live="related_dishes" label="Related Dishes" :options="$dishes"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('related_dishes') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable multiple />
-
                         </div>
                     </div>
                 </section>
 
-                <!-- Manage Stock -->
-                <section
-                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <!-- Pricing -->
+                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Dish Pricing</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                         {{-- Price --}}
                         <div class="form-group md:col-span-2">
                             <x-input type="number" min="0" step="any" label="Price (Tk)*" wire:model.live="price"
@@ -208,9 +143,9 @@
                                 placeholder="Price" />
                         </div>
 
-                        {{-- discount type --}}
-                        <div class="from-group">
-                            <x-select wire:model.live="discount_type" label="Discount type" :options="['percent', 'amount']"
+                        {{-- Discount type --}}
+                        <div class="form-group">
+                            <x-select wire:model.live="discount_type" label="Discount Type" :options="['percent', 'amount']"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('discount_type') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
                         </div>
 
@@ -227,36 +162,30 @@
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('vat') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Vat" />
                         </div>
-
                     </div>
                 </section>
 
                 {{-- Meta info --}}
-                <section
-                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <div class="flex items-center gap-1 mb-4">
                         <h3 class="text-lg font-semibold dark:text-gray-100">Meta Information</h3>
                         <small>(Optional)</small>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                        {{-- Meta Title --}}
-                        <div class="from-group md:col-span-2">
+                        <div class="form-group md:col-span-2">
                             <x-input wire:model.live="meta_title" label="Meta Title"
                                 class="rounded-lg !border-neutral-300 dark:!border-neutral-500 !bg-white/10 !py-[9px] focus:!ring-red-500"
                                 placeholder="Meta Title" />
                         </div>
 
-                        {{-- Meta keyword --}}
-                        <div class="from-group md:col-span-2">
+                        <div class="form-group md:col-span-2">
                             <x-input wire:model.live="meta_keyword" label="Meta Keywords"
                                 class="rounded-lg !border-neutral-300 dark:!border-neutral-500 !bg-white/10 !py-[9px] focus:!ring-red-500"
                                 placeholder="Meta Keywords" />
                         </div>
 
-                        {{-- Meta description --}}
-                        <div class="from-group md:col-span-2">
+                        <div class="form-group md:col-span-2">
                             <x-textarea label="Description" rows="3" wire:model.live="meta_description"
                                 class="rounded-lg !border-neutral-300 dark:!border-neutral-500 !bg-white/10 !py-[9px] focus:!ring-red-500"
                                 placeholder="Meta Description" />
@@ -268,76 +197,53 @@
             <!-- RIGHT COLUMN -->
             <div class="lg:col-span-5 space-y-6">
                 <!-- Dish Customization -->
-                <section
-                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Dish Customization</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {{-- Crust --}}
+                        {{-- Crusts --}}
                         <div class="form-group">
-
-                            @php
-                                $crusts = App\Models\Crust::where('status', 'active')->orderBy('name', 'ASC')->get();
-                            @endphp
-
+                            @php $crusts = App\Models\Crust::where('status','active')->orderBy('name')->get(); @endphp
                             <x-select wire:model.live="crusts" label="Crusts" :options="$crusts"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('crusts') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable multiple />
-
                         </div>
 
                         {{-- Buns --}}
                         <div class="form-group">
-
-                            @php
-
-                                $bun = App\Models\Bun::where('status', 'active')->orderBy('name', 'ASC')->get();
-                            @endphp
-
+                            @php $bun = App\Models\Bun::where('status', 'active')->get(['id','name']); @endphp
                             <x-select wire:model.live="buns" label="Buns" :options="$bun"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('buns') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable multiple />
-
                         </div>
 
-                        {{-- Add ons --}}
+                        {{-- AddOns --}}
                         <div class="form-group md:col-span-2">
-
-                            @php
-
-                                $addOn = App\Models\AddOn::where('status', 'active')->orderBy('name', 'ASC')->get();
-                            @endphp
-
+                            @php $addOn = App\Models\AddOn::where('status', 'active')->get(['id','name']); @endphp
                             <x-select wire:model.live="addOns" label="Add Ons" :options="$addOn"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('addOns') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable multiple />
-
                         </div>
                     </div>
                 </section>
 
                 <!-- Manage stock -->
-                <section
-                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Manage Stock</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                        {{-- SKU --}}
-                        <div class="from-group">
+                        <div class="form-group">
                             <x-input wire:model.live="sku" label="Stock Keeping Unit (SKU)"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('sku') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="SKU-BB-66-A6" />
                         </div>
 
-                        {{-- Track Stock --}}
-                        <div class="from-group">
-                            <x-select wire:model.live="track_stock" label="Track Stock" :options="['Yes', 'No']"
+                        <div class="form-group">
+                            <x-select wire:model.live="track_stock" label="Track Stock" :options="['Yes','No']"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('track_stock') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
                         </div>
 
-                        {{-- Daily Stock --}}
-                        <div class="from-group md:col-span-2">
+                        <div class="form-group md:col-span-2">
                             <x-input type="number" min="0" wire:model.live="daily_stock" label="Daily Stock"
                                 hint="Only required when Track Stock is set to Yes"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('daily_stock') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
@@ -347,32 +253,31 @@
                 </section>
 
                 {{-- Availability --}}
-                <section
-                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Availability</h3>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                        {{-- Available From --}}
-                        <div class="from-group">
+                        {{-- If you truly store only time (H:i), these are fine. --}}
+                        <div class="form-group">
                             <x-input type="time" wire:model.live="available_from" label="Available From*"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('available_from') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
                         </div>
-
-                        {{-- Available Till --}}
-                        <div class="from-group">
+                        <div class="form-group">
                             <x-input type="time" wire:model.live="available_till" label="Available Till*"
-                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('available_from') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('available_till') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
                         </div>
                     </div>
                 </section>
 
                 <!-- Product Image -->
-                <section x-data="dishImages()" x-init="init()"
+                <section
+                    x-data="dishImages({ existingThumb: @js($existingThumb), existingGallery: @js($existingGallery) })"
+                    x-init="init()"
                     class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
 
                     <div class="flex items-center gap-2 mb-4">
-                        <h3 class="text-lg font-semibold dark:text-gray-100">Display Image <span class="text-red-500 font-normal text-base">*</span></h3>
+                        <h3 class="text-lg font-semibold dark:text-gray-100">
+                            Display Image <span class="text-red-500 font-normal text-base">*</span>
+                        </h3>
                     </div>
 
                     <!-- Thumbnail (Big Preview) -->
@@ -382,41 +287,30 @@
                         @click="!thumbnailSrc && $refs.thumbnailInput.click()">
 
                         <template x-if="thumbnailSrc">
-                            <img :src="thumbnailSrc" class="h-full w-full object-cover object-center"
-                                alt="">
+                            <img :src="thumbnailSrc" class="h-full w-full object-cover object-center" alt="">
                         </template>
 
                         <template x-if="!thumbnailSrc">
-                            <div
-                                class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300">
+                            <div class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300">
                                 <p>
                                     Click to add Thumbnail <br>
-                                    <small class="text-sm">Recommended image size for upload is 552x538 px. <br>
-                                    Support png/jpg/jpeg/svg/webp • up to 5MB</small>
+                                    <small class="text-sm">Recommended 552x538 • png/jpg/jpeg/svg/webp • up to 5MB</small>
                                 </p>
                             </div>
                         </template>
 
-                        <!-- Remove thumbnail button -->
                         <button x-show="thumbnailSrc" @click.stop="removeThumbnail()" type="button"
                             class="absolute m-2 right-0 top-0 inline-flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white text-sm">×</button>
                     </div>
-
-                    <!-- Validation error -->
-                    @error('thumbnail')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+                    @error('thumbnail') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
 
                     <!-- Hidden inputs -->
-                    <input x-ref="thumbnailInput" type="file" accept="image/*" class="hidden"
-                        wire:model.live="thumbnail">
-                    <input x-ref="galleryInput" type="file" accept="image/*" multiple class="hidden"
-                        wire:model.live="gallery">
+                    <input x-ref="thumbnailInput" type="file" accept="image/*" class="hidden" wire:model.live="thumbnail">
+                    <input x-ref="galleryInput" type="file" accept="image/*" multiple class="hidden" wire:model.live="gallery">
 
                     <!-- Gallery row -->
                     <p class="mt-3">Images</p>
                     <div class="flex items-center gap-2 overflow-x-auto pt-1.5">
-                        <!-- Gallery items -->
                         <template x-for="(g, i) in gallerySrcs" :key="g">
                             <div class="relative h-16 w-16 shrink-0 rounded-lg overflow-hidden border border-gray-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-600 cursor-pointer"
                                 :class="displaySrc === g ? 'ring-2 ring-rose-400' : ''" @click="setDisplay(g)">
@@ -434,7 +328,6 @@
                             title="Add gallery images">+</button>
                     </div>
 
-                    <!-- Uploading state -->
                     <div x-cloak x-show="$wire.__instance.uploadsInProgress > 0"
                         class="text-xs text-neutral-500 dark:text-neutral-300 mt-2">
                         Uploading... please wait.
@@ -442,117 +335,72 @@
                 </section>
 
                 {{-- Visibility --}}
-                <section
-                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Visibility</h3>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                        {{-- Visibility --}}
                         <div class="form-group md:col-span-2">
-
-                            <x-select wire:model.live="visibility" label="Turning visibility off will not show this dish in the website*" :options="['Yes', 'No']"
+                            <x-select wire:model.live="visibility"
+                                label="Turning visibility off will not show this dish on the website*"
+                                :options="['Yes','No']"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('visibility') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
-
                         </div>
                     </div>
                 </section>
 
-                {{-- Submit & Cancel button --}}
+                {{-- Submit & Cancel --}}
                 <div class="flex">
                     <flux:spacer />
 
                     <flux:modal.close>
-                        <flux:button icon="cross-icon" variant="filled" class="cursor-pointer me-2">Cancel
-                        </flux:button>
+                        <flux:button icon="cross-icon" variant="filled" class="cursor-pointer me-2">Cancel</flux:button>
                     </flux:modal.close>
 
                     <flux:button type="submit" icon="fileAdd-icon" class="cursor-pointer" variant="primary"
-                        color="rose" wire:loading.attr="disabled" wire:target="submit">
-                        <span wire:loading.remove wire:target="submit">Add Dish</span>
-                        <span wire:loading wire:target="submit">Creating...</span>
+                        color="rose" wire:loading.attr="disabled" wire:target="updateDish">
+                        <span wire:loading.remove wire:target="updateDish">Update Dish</span>
+                        <span wire:loading wire:target="updateDish">Updating...</span>
                     </flux:button>
                 </div>
             </div>
         </div>
     </form>
-    
 
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
         <script>
             let quill;
-
             document.addEventListener('livewire:navigated', () => {
-                // init once per navigation
                 quill = new Quill('#editor', {
                     theme: 'snow',
                     modules: {
                         toolbar: [
-                            ['bold', 'italic', 'underline', 'strike'],
-                            ['blockquote'],
-                            ['link'],
-                            [{
-                                list: 'ordered'
-                            }, {
-                                list: 'bullet'
-                            }, {
-                                list: 'check'
-                            }],
-                            [{
-                                script: 'sub'
-                            }, {
-                                script: 'super'
-                            }],
-                            [{
-                                indent: '-1'
-                            }, {
-                                indent: '+1'
-                            }],
-                            [{
-                                direction: 'rtl'
-                            }],
-                            [{
-                                size: ['small', false, 'large', 'huge']
-                            }],
-                            [{
-                                header: [1, 2, 3, 4, 5, 6, false]
-                            }],
-                            [{
-                                color: []
-                            }, {
-                                background: []
-                            }],
-                            [{
-                                font: []
-                            }],
-                            [{
-                                align: []
-                            }],
-                            ['clean']
+                            ['bold','italic','underline','strike'],
+                            ['blockquote'], ['link'],
+                            [{ list:'ordered' }, { list:'bullet' }, { list:'check' }],
+                            [{ script:'sub' }, { script:'super' }],
+                            [{ indent:'-1' }, { indent:'+1' }],
+                            [{ direction:'rtl' }],
+                            [{ size:['small', false, 'large', 'huge'] }],
+                            [{ header:[1,2,3,4,5,6,false] }],
+                            [{ color:[] }, { background:[] }],
+                            [{ font:[] }], [{ align:[] }], ['clean']
                         ]
                     }
                 });
 
-                // set initial value from Livewire (edit mode)
                 const initial = @this.get('description') ?? '';
                 if (initial) quill.root.innerHTML = initial;
 
-                // keep Livewire in sync via hidden input
                 const input = document.querySelector('#description');
-
                 quill.on('text-change', () => {
                     const html = quill.root.innerHTML;
                     const plain = quill.getText().trim();
-                    const input = document.getElementById('description');
                     input.value = plain.length ? html : '';
                     input.dispatchEvent(new Event('input'));
                 });
             });
-        </script>
 
-        <script>
-            function dishImages() {
+            function dishImages({ existingThumb = null, existingGallery = [] } = {}) {
                 return {
                     displaySrc: null,
                     thumbnailSrc: null,
@@ -566,29 +414,35 @@
                     },
 
                     async sync() {
+                        // Prefer new uploads (temporaryUrl), else fallback to stored URLs
                         const urls = await this.$wire.previewUrls();
-                        this.thumbnailSrc = urls.thumbnail || null;
-                        this.gallerySrcs = urls.gallery || [];
-                        if (!this.displaySrc) this.displaySrc = this.thumbnailSrc || this.gallerySrcs[0] || null;
+                        this.thumbnailSrc = urls.thumbnail || existingThumb || null;
+
+                        const tempGallery = urls.gallery || [];
+                        this.gallerySrcs = tempGallery.length ? tempGallery : existingGallery;
+
+                        if (!this.displaySrc) {
+                            this.displaySrc = this.thumbnailSrc || (this.gallerySrcs[0] ?? null);
+                        }
                     },
 
-                    setDisplay(src) {
-                        if (src) this.displaySrc = src;
-                    },
+                    setDisplay(src) { if (src) this.displaySrc = src; },
+
                     removeThumbnail() {
                         this.$wire.clearThumbnail();
+                        // do not clear existingThumb automatically; keep UI clean
                         this.thumbnailSrc = null;
                     },
+
                     removeGallery(i) {
+                        // When removing, only affects newly uploaded array; existing still shown until update
                         this.$wire.removeFromGallery(i);
                         this.gallerySrcs.splice(i, 1);
                     },
-                    canAddMore() {
-                        return this.gallerySrcs.length < this.maxGallery;
-                    },
+
+                    canAddMore() { return this.gallerySrcs.length < this.maxGallery; },
                 }
             }
         </script>
     @endpush
-
 </div>

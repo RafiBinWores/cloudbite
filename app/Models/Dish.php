@@ -34,6 +34,8 @@ class Dish extends Model
     ];
 
     protected $casts = [
+            'available_from' => 'string',
+    'available_till' => 'string',
         'tags' => 'array',
         'gallery' => 'array',
     ];

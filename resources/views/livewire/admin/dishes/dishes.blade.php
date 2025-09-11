@@ -156,10 +156,10 @@
 
                             <td class="px-4 lg:px-6 py-3">
                                 <div class="flex gap-2">
-                                    <flux:button href="{{ route('dishes.show', $dish->slug) }}" class="min-h-[40px]"
+                                    <flux:button href="{{ route('dishes.show', $dish->slug) }}" wire:navigate class="min-h-[40px]"
                                         icon="eye" variant="primary" color="yellow"></flux:button>
 
-                                    <flux:button wire:click="editDish({{ $dish->id }})" class="min-h-[40px]"
+                                    <flux:button href="{{ route('dishes.edit', $dish->id) }}" wire:navigate class="min-h-[40px]"
                                         icon="pencil" variant="primary" color="blue" />
                                     <flux:modal.trigger name="delete-confirmation-modal">
                                         <flux:button
