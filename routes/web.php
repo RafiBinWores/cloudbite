@@ -3,6 +3,7 @@
 use App\Livewire\Admin\AddOns\AddOns;
 use App\Livewire\Admin\Buns\Buns;
 use App\Livewire\Admin\Categories\Index;
+use App\Livewire\Admin\Coupons\Coupons;
 use App\Livewire\Admin\Crusts\Crusts;
 use App\Livewire\Admin\Cuisine\Cuisines;
 use App\Livewire\Admin\Dishes\CreateDish;
@@ -54,6 +55,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('dishes/{slug}', ShowDish::class)->name('dishes.show');
     Route::get('dishes/{dish}/edit', EditDish::class)->name('dishes.edit');
 
+    // Coupon Route
+    Route::get('coupons', Coupons::class)->name('coupons.index');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

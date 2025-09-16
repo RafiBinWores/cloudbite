@@ -151,6 +151,22 @@
             </flux:navlist.group>
         </flux:navlist>
 
+         {{-- Promotion Management --}}
+        <flux:navlist variant="outline">
+            <flux:navlist.group :heading="__('Promotion Management')" class="grid">
+
+                {{-- Crusts --}}
+                <flux:navlist.item icon="Photo" :href="route('crusts.index')"
+                    :current="request()->routeIs('crusts.index')" wire:navigate>
+                    {{ __('Banner') }}</flux:navlist.item>
+
+                {{-- Coupons --}}
+                <flux:navlist.item icon="gift" :href="route('coupons.index')"
+                    :current="request()->routeIs('coupons.index')" wire:navigate>
+                    {{ __('Coupon') }}</flux:navlist.item>
+            </flux:navlist.group>
+        </flux:navlist>
+
         <flux:spacer />
 
         <!-- Desktop User Menu -->

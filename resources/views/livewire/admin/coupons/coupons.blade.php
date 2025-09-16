@@ -1,21 +1,26 @@
 <div>
     {{-- Page Heading --}}
     <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">{{ __('Dishes') }}</flux:heading>
-        <flux:subheading size="lg" class="mb-6">{{ __('Manage all of the dishes') }}</flux:subheading>
+        <flux:heading size="xl" class="mb-4 flex items-center gap-2" level="1"><img class="w-8"
+                src="{{ asset('assets/images/icons/coupon.png') }}" alt="Coupon Icon">{{ __('Coupons') }}</flux:heading>
         <flux:separator variant="subtle" />
     </div>
 
-    {{-- Create modal Button --}}
-    <flux:button :href="route('dishes.create')" wire:navigate class="cursor-pointer" icon="add-icon" variant="primary"
-        color="rose">
-        Create</flux:button>
+    {{-- Coupon Model Button --}}
+    <flux:modal.trigger name="coupon-modal">
+        <flux:button class="cursor-pointer" variant="primary" color="rose" icon="add-icon" wire:click="$dispatch('open-coupon-modal', {mode: 'create'})">
+            Add New</flux:button>
+    </flux:modal.trigger>
 
+
+    {{-- Model body --}}
+    <livewire:admin.coupons.coupon-form />
 
     {{-- Delete Confirmation Modal --}}
     <livewire:common.delete-confirmation />
 
 
+    {{-- Table --}}
     <div class="border dark:border-none bg-white dark:bg-neutral-700 mt-8 p-4 sm:p-6 rounded-2xl">
 
         <!-- Top controls -->
@@ -65,110 +70,82 @@
         </div>
 
         <!-- Desktop table (≥sm) -->
-        <div class="overflow-x-auto mt-2">
+        <div class="overflow-x-auto max-h-[50vh] mt-2 hidden sm:block">
             <table class="min-w-full text-left text-sm whitespace-nowrap">
                 <thead
                     class="uppercase tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
                     <tr>
-                        <th class="px-4 lg:px-6 py-3">#</th>
-                        <th class="px-4 lg:px-6 py-3">Image</th>
+                        <th scope="col" class="px-4 lg:px-6 py-3">#</th>
+                        <th scope="col" class="px-4 lg:px-6 py-3">Coupon</th>
+                        <th scope="col" class="px-4 lg:px-6 py-3">Discount</th>
                         @include('livewire.common.sortable-th', [
-                            'name' => 'title',
-                            'displayName' => 'Name',
-                        ])
-                        <th class="px-4 lg:px-6 py-3">Price</th>
-                        @include('livewire.common.sortable-th', [
-                            'name' => 'visibility',
-                            'displayName' => 'Visibility',
+                            'name' => 'status',
+                            'displayName' => 'Status',
                         ])
                         @include('livewire.common.sortable-th', [
                             'name' => 'created_at',
                             'displayName' => 'Created At',
                         ])
-                        <th class="px-4 lg:px-6 py-3">Actions</th>
+                        <th scope="col" class="px-4 lg:px-6 py-3">Actions</th>
                     </tr>
                 </thead>
-
                 <tbody>
-                    @forelse ($dishes as $dish)
-                        <tr wire:key="dish-{{ $dish->id }}" class="border-b dark:border-neutral-600">
-                            <th class="px-4 lg:px-6 py-3">
-                                {{ ($dishes->currentPage() - 1) * $dishes->perPage() + $loop->iteration }}
+                    @forelse ($coupons as $coupon)
+                        <tr wire:key="{{ $coupon->id }}" class="border-b dark:border-neutral-600">
+                            <th scope="row" class="px-4 lg:px-6 py-3">
+                                {{ ($coupons->currentPage() - 1) * $coupons->perPage() + $loop->iteration }}
                             </th>
-
                             <td class="px-4 lg:px-6 py-3">
-                                <img src="{{ asset($dish->thumbnail) }}" alt="{{ $dish->title }}"
-                                    class="h-12 w-12 rounded object-cover">
-                            </td>
-
-                            <td class="px-4 lg:px-6 py-3">
-                                <div class="font-medium">{{ $dish->title }}</div>
+                                <strong>Code: {{ $coupon->coupon_code }}</strong><br>
+                                <small>{{ $coupon->title }}</small>
                             </td>
                             <td class="px-4 lg:px-6 py-3">
-                                <div class="font-medium">
-                                    @php
-                                        $basePrice = (float) ($dish->price ?? 0);
+                                @if ($coupon->discount_type === 'percent')
+                                    <span class="text-yellow-500 font-medium">
+                                        {{ rtrim(rtrim(number_format($coupon->discount, 2, '.', ''), '0'), '.') }} %
+                                    </span>
+                                @elseif (intval($coupon->discount) == $coupon->discount)
+                                    <span class="text-yellow-500 font-medium">
+                                        {{ intval($coupon->discount) }}
+                                        <i class="fa-regular fa-bangladeshi-taka-sign ps-1"></i>
+                                    </span>
+                                @else
+                                    <span class="text-yellow-500 font-medium">
+                                        {{ rtrim(rtrim(number_format($coupon->discount, 2, '.', ''), '0'), '.') }}
+                                        <i class="fa-regular fa-bangladeshi-taka-sign ps-1"></i>
+                                    </span>
+                                @endif
 
-                                        // Apply discount
-                                        if ($dish->discount_type && $dish->discount > 0) {
-                                            if ($dish->discount_type === 'percent') {
-                                                $afterDiscount = max(
-                                                    0,
-                                                    $basePrice - $basePrice * ($dish->discount / 100),
-                                                );
-                                            } else {
-                                                $afterDiscount = max(0, $basePrice - (float) $dish->discount);
-                                            }
-                                        } else {
-                                            $afterDiscount = $basePrice;
-                                        }
-
-                                        // Apply VAT (assume $dish->vat = percent, e.g. 15)
-                                        $vatPercent = (float) ($dish->vat ?? 0);
-                                        $finalPrice = $afterDiscount + $afterDiscount * ($vatPercent / 100);
-
-                                        // Format function
-                                        $money = fn($v) => fmod($v, 1) == 0
-                                            ? number_format($v, 0)
-                                            : number_format($v, 2);
-                                    @endphp
-
-                                    <!-- Show price -->
-                                    <div class="text-lg font-semibold text-emerald-600">
-                                        ৳{{ $money($finalPrice) }}
-                                    </div>
-
-                                    @if ($dish->vat)
-                                        <div class="text-xs text-neutral-500">
-                                            (includes {{ $dish->vat }}% VAT)
-                                        </div>
-                                    @endif
-                                </div>
                             </td>
 
-                            <td class="px-4 lg:px-6 py-3" x-data="{ on: @js($dish->visibility === 'Yes') }">
-                                <flux:switch x-model="on" @change="$wire.setVisibility({{ $dish->id }}, on)" />
+                            <td class="px-4 lg:px-6 py-3 capitalize" x-data="{ on: @js($coupon->status === 'active') }">
+                                <flux:switch x-model="on" @change="$wire.setStatus({{ $coupon->id }}, on)" class="cursor-pointer" />
                             </td>
 
-                            <td class="px-4 lg:px-6 py-3">
-                                {{ $dish->created_at?->format('M d, Y') }}
-                            </td>
-
+                            <td class="px-4 lg:px-6 py-3">{{ $coupon->created_at->format('M d, Y') }}</td>
                             <td class="px-4 lg:px-6 py-3">
                                 <div class="flex gap-2">
-                                    <flux:button href="{{ route('dishes.show', $dish->slug) }}" wire:navigate class="min-h-[40px]"
-                                        icon="eye" variant="primary" color="yellow"></flux:button>
+                                    <flux:modal.trigger name="coupon-modal">
+                                        <flux:button
+                                            wire:click="$dispatch('open-coupon-modal', {mode: 'view', coupon: {{ $coupon }}})"
+                                            class="cursor-pointer min-h-[40px]" icon="eye" variant="primary"
+                                            color="yellow">
+                                        </flux:button>
+                                        <flux:button
+                                            wire:click="$dispatch('open-coupon-modal', {mode: 'edit', coupon: {{ $coupon }}})"
+                                            class="cursor-pointer min-h-[40px]" icon="pencil" variant="primary"
+                                            color="blue">
+                                        </flux:button>
+                                    </flux:modal.trigger>
 
-                                    <flux:button href="{{ route('dishes.edit', $dish->id) }}" wire:navigate class="min-h-[40px]"
-                                        icon="pencil" variant="primary" color="blue" />
                                     <flux:modal.trigger name="delete-confirmation-modal">
                                         <flux:button
                                             wire:click="$dispatch('confirm-delete', {
-                                                id: {{ $dish->id }},
-                                                dispatchAction: 'delete-dish',
+                                                id: {{ $coupon->id }},
+                                                dispatchAction: 'delete-coupon',
                                                 modalName: 'delete-confirmation-modal',
-                                                heading: 'Delete dish?',
-                                                message: 'You are about to delete this dish: <strong>{{ $dish->title }}</strong>. This action cannot be reversed.',
+                                                heading: 'Delete coupon?',
+                                                message: 'You are about to delete this coupon: <strong>{{ $coupon->title }}</strong>. This action cannot be reversed.',
                                                 })"
                                             class="cursor-pointer min-h-[40px]" icon="trash" variant="primary"
                                             color="red">
@@ -179,22 +156,22 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 lg:px-6 pt-4 text-center">No dishes found.</td>
+                            <td colspan="6" class="px-4 lg:px-6 pt-4 text-center">No coupons found.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-
         <!-- Pagination -->
         <nav class="mt-4">
             <div class="sm:hidden text-center">
-                {{ $dishes->onEachSide(0)->links() }}
+                {{ $coupons->onEachSide(0)->links() }}
             </div>
             <div class="hidden sm:block">
-                {{ $dishes->links() }}
+                {{ $coupons->links() }}
             </div>
         </nav>
     </div>
+
 </div>
