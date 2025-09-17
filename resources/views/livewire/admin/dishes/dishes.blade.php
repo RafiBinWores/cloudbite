@@ -1,15 +1,15 @@
 <div>
     {{-- Page Heading --}}
     <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">{{ __('Dishes') }}</flux:heading>
-        <flux:subheading size="lg" class="mb-6">{{ __('Manage all of the dishes') }}</flux:subheading>
+        <flux:heading size="xl" class="mb-4 flex items-center gap-2" level="1"><img class="w-8"
+                src="{{ asset('assets/images/icons/dishes.png') }}" alt="Coupon Icon">{{ __('Dishes') }}</flux:heading>
         <flux:separator variant="subtle" />
     </div>
 
     {{-- Create modal Button --}}
     <flux:button :href="route('dishes.create')" wire:navigate class="cursor-pointer" icon="add-icon" variant="primary"
         color="rose">
-        Create</flux:button>
+        Add New</flux:button>
 
 
     {{-- Delete Confirmation Modal --}}
@@ -68,7 +68,7 @@
         <div class="overflow-x-auto mt-2">
             <table class="min-w-full text-left text-sm whitespace-nowrap">
                 <thead
-                    class="uppercase tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
+                    class="tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
                     <tr>
                         <th class="px-4 lg:px-6 py-3">#</th>
                         <th class="px-4 lg:px-6 py-3">Image</th>

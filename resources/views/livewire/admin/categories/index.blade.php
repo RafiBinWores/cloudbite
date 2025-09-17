@@ -1,15 +1,15 @@
 <div>
     {{-- Page Heading --}}
     <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">{{ __('Categories') }}</flux:heading>
-        <flux:subheading size="lg" class="mb-6">{{ __('Manage all of the categories') }}</flux:subheading>
+        <flux:heading size="xl" class="mb-4 flex items-center gap-2" level="1"><img class="w-8"
+                src="{{ asset('assets/images/icons/categories.png') }}" alt="Coupon Icon">{{ __('Categories') }}</flux:heading>
         <flux:separator variant="subtle" />
     </div>
 
     {{-- Create modal Button --}}
     <flux:modal.trigger name="category-modal">
-        <flux:button class="cursor-pointer" icon="add-icon"
-            wire:click="$dispatch('open-category-modal', {mode: 'create'})">Create</flux:button>
+        <flux:button class="cursor-pointer" icon="add-icon" variant="primary" color="rose"
+            wire:click="$dispatch('open-category-modal', {mode: 'create'})">Add New</flux:button>
     </flux:modal.trigger>
 
     {{-- Create Modal --}}
@@ -145,7 +145,7 @@
         <div class="overflow-x-auto max-h-[50vh] mt-2 hidden sm:block">
             <table class="min-w-full text-left text-sm whitespace-nowrap">
                 <thead
-                    class="uppercase tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
+                    class="tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
                     <tr>
                         <th scope="col" class="px-4 lg:px-6 py-3">#</th>
                         <th scope="col" class="px-4 lg:px-6 py-3">Image</th>

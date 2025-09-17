@@ -106,11 +106,11 @@
                 <flux:spacer />
 
                 <flux:modal.close>
-                    <flux:button variant="ghost" icon="cross-icon" class="cursor-pointer me-2">Cancel</flux:button>
+                    <flux:button icon="cross-icon" class="cursor-pointer me-2">Cancel</flux:button>
                 </flux:modal.close>
 
                 @if (!$isView)
-                    <flux:button type="submit" icon="fileAdd-icon" class="cursor-pointer" color="rose"
+                    <flux:button type="submit" icon="fileAdd-icon" class="cursor-pointer" variant="primary" color="rose"
                         wire:loading.attr="disabled" wire:target="submit">
                         <span wire:loading.remove wire:target="submit">{{ $categoryId ? 'Update' : 'Create' }}</span>
                         <span wire:loading wire:target="submit">{{ $categoryId ? 'Updating...' : 'Creating...' }}</span>

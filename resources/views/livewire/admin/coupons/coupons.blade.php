@@ -69,14 +69,15 @@
             </div>
         </div>
 
-        <!-- Desktop table (≥sm) -->
-        <div class="overflow-x-auto max-h-[50vh] mt-2 hidden sm:block">
+        <!-- table-->
+        <div class="overflow-x-auto max-h-[50vh] mt-2">
             <table class="min-w-full text-left text-sm whitespace-nowrap">
                 <thead
-                    class="uppercase tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
+                    class="tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
                     <tr>
                         <th scope="col" class="px-4 lg:px-6 py-3">#</th>
                         <th scope="col" class="px-4 lg:px-6 py-3">Coupon</th>
+                        <th scope="col" class="px-4 lg:px-6 py-3">Discount Type</th>
                         <th scope="col" class="px-4 lg:px-6 py-3">Discount</th>
                         @include('livewire.common.sortable-th', [
                             'name' => 'status',
@@ -98,6 +99,10 @@
                             <td class="px-4 lg:px-6 py-3">
                                 <strong>Code: {{ $coupon->coupon_code }}</strong><br>
                                 <small>{{ $coupon->title }}</small>
+                            </td>
+                            <td class="px-4 lg:px-6 py-3">
+                                <x-badge label="{{ ucfirst($coupon->discount_type) }}" secondary outline />
+                                
                             </td>
                             <td class="px-4 lg:px-6 py-3">
                                 @if ($coupon->discount_type === 'percent')

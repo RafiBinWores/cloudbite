@@ -1,14 +1,15 @@
 <div>
     {{-- Page Heading --}}
     <div class="relative mb-6 w-full">
-        <flux:heading size="xl" class="mb-4" level="1">{{ __('Tags') }}</flux:heading>
+        <flux:heading size="xl" class="mb-4 flex items-center gap-2" level="1"><img class="w-8"
+                src="{{ asset('assets/images/icons/tags.png') }}" alt="Coupon Icon">{{ __('Tags') }}</flux:heading>
         <flux:separator variant="subtle" />
     </div>
 
     {{-- Create modal Button --}}
     <flux:modal.trigger name="tag-modal">
         <flux:button class="cursor-pointer" icon="add-icon" variant="primary" color="rose" wire:click="$dispatch('open-tag-modal', {mode: 'create'})">
-            Create</flux:button>
+            Add New</flux:button>
     </flux:modal.trigger>
 
     {{-- Create Modal --}}
@@ -130,7 +131,7 @@
         <div class="overflow-x-auto mt-2 hidden sm:block">
             <table class="min-w-full text-left text-sm whitespace-nowrap">
                 <thead
-                    class="uppercase tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
+                    class="tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
                     <tr>
                         <th scope="col" class="px-4 lg:px-6 py-3">#</th>
                         @include('livewire.common.sortable-th', [

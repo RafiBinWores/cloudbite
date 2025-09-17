@@ -40,7 +40,7 @@ class CouponForm extends Component
     // For generate code
     public function generateCouponCode()
     {
-        $this->coupon_code = Str::random(8); // e.g. 8 chars
+        $this->coupon_code = Str::random(8);
     }
 
     // For form submit

@@ -1,123 +1,8 @@
 <div>
     {{-- Page Heading --}}
     <div class="relative mb-6 w-full">
-        <div class="flex items-center justify-between mb-6">
-            <flux:heading class="grid-col-2" size="xl" level="1">{{ __('Add Ons') }}</flux:heading>
-
-            <div x-data="notificationMenu()" x-init="init()" class="relative">
-                <!-- Bell button -->
-                <button @click="toggle()" @keydown.escape.stop="open=false"
-                    class="relative inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none"
-                    aria-haspopup="menu" :aria-expanded="open">
-                    <i class="fa-regular fa-bell text-xl"></i>
-                    <!-- Unread badge -->
-                    <template x-if="unreadCount() > 0">
-                        <span
-                            class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center bg-rose-500 text-white shadow"
-                            x-text="unreadCount() > 9 ? '9+' : unreadCount()"></span>
-                    </template>
-                </button>
-
-                <!-- Dropdown -->
-                <div x-cloak x-show="open" x-transition.opacity.scale @click.outside="open=false"
-                    @keydown.escape.stop="open=false"
-                    class="absolute right-0 mt-2 w-[92vw] max-w-sm rounded-2xl shadow-lg border z-50 bg-white dark:bg-neutral-800 dark:border-neutral-700"
-                    role="menu" aria-label="Notifications">
-                    <!-- Header -->
-                    <div class="flex items-center justify-between px-4 py-3 border-b dark:border-neutral-700">
-                        <div class="font-semibold">Notifications</div>
-                        <div class="flex items-center gap-2">
-                            <button
-                                class="text-xs px-2 py-1 rounded bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600"
-                                @click="markAllRead()" x-bind:disabled="unreadCount() === 0"
-                                :class="{ 'opacity-50 cursor-not-allowed': unreadCount() === 0 }">
-                                Mark all read
-                            </button>
-                            <button
-                                class="text-xs px-2 py-1 rounded bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600"
-                                @click="clearAll()">
-                                Clear
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- List -->
-                    <div class="max-h-[70vh] overflow-auto" @scroll.passive="onScroll($event)">
-                        <template x-if="items.length === 0">
-                            <div class="px-4 py-8 text-center text-neutral-500">
-                                <i class="fa-regular fa-bell-slash text-2xl mb-2 block"></i>
-                                <div class="text-sm">No notifications</div>
-                            </div>
-                        </template>
-
-                        <ul>
-                            <template x-for="(n, idx) in visible" :key="n.id">
-                                <li class="px-4 py-3 flex gap-3 cursor-pointer focus:outline-none focus:bg-neutral-100 dark:focus:bg-neutral-700"
-                                    :class="n.read ? 'bg-white dark:bg-neutral-800' : 'bg-rose-50/60 dark:bg-rose-900/20'"
-                                    @click="openItem(n)" @keydown.enter.prevent="openItem(n)" tabindex="0"
-                                    role="menuitem">
-                                    <!-- Icon by type -->
-                                    <div class="shrink-0 mt-0.5">
-                                        <template x-if="n.type === 'order'">
-                                            <i class="fa-solid fa-bag-shopping text-rose-500"></i>
-                                        </template>
-                                        <template x-if="n.type === 'system'">
-                                            <i class="fa-solid fa-gear text-blue-500"></i>
-                                        </template>
-                                        <template x-if="n.type === 'promo'">
-                                            <i class="fa-solid fa-fire text-amber-500"></i>
-                                        </template>
-                                        <template x-if="!['order','system','promo'].includes(n.type)">
-                                            <i class="fa-regular fa-bell text-slate-500"></i>
-                                        </template>
-                                    </div>
-
-                                    <!-- Content -->
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center gap-2">
-                                            <div class="font-medium truncate" x-text="n.title"></div>
-                                            <span
-                                                class="inline-flex items-center rounded-full px-2 text-[10px] font-semibold"
-                                                :class="n.read ?
-                                                    'bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300' :
-                                                    'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200'"
-                                                x-text="n.read ? 'Read' : 'New'"></span>
-                                        </div>
-                                        <div class="text-sm text-neutral-600 dark:text-neutral-300 line-clamp-2"
-                                            x-text="n.message"></div>
-                                        <div class="text-xs text-neutral-500 mt-1" x-text="timeago(n.created_at)"></div>
-                                    </div>
-
-                                    <!-- Quick actions -->
-                                    <div class="shrink-0 flex items-center gap-2">
-                                        <button
-                                            class="text-[11px] px-2 py-1 rounded bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-700 dark:hover:bg-neutral-600"
-                                            @click.stop="toggleRead(n)" x-text="n.read ? 'Unread' : 'Read'"></button>
-                                        <button
-                                            class="text-[11px] px-2 py-1 rounded bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-700 dark:hover:bg-neutral-600"
-                                            @click.stop="remove(n.id)" aria-label="Remove">
-                                            <i class="fa-regular fa-trash-can"></i>
-                                        </button>
-                                    </div>
-                                </li>
-                            </template>
-
-                            <!-- Load more -->
-                            <template x-if="hasMore">
-                                <li class="p-3 text-center">
-                                    <button
-                                        class="text-sm px-3 py-2 rounded bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-700 dark:hover:bg-neutral-600"
-                                        @click="loadMore()">
-                                        Load more
-                                    </button>
-                                </li>
-                            </template>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+        <flux:heading size="xl" class="mb-4 flex items-center gap-2" level="1"><img class="w-8"
+                src="{{ asset('assets/images/icons/add-ons.png') }}" alt="Coupon Icon">{{ __('Add Ons') }}</flux:heading>
         <flux:separator variant="subtle" />
     </div>
 
@@ -125,7 +10,7 @@
     <flux:modal.trigger name="addOn-modal">
         <flux:button class="cursor-pointer" icon="add-icon" variant="primary" color="rose"
             wire:click="$dispatch('open-addOn-modal', {mode: 'create'})">
-            Create</flux:button>
+            Add New</flux:button>
     </flux:modal.trigger>
 
     {{-- Create Modal --}}
@@ -261,7 +146,7 @@
         <div class="overflow-x-auto max-h-[50vh] mt-2 hidden sm:block">
             <table class="min-w-full text-left text-sm whitespace-nowrap">
                 <thead
-                    class="uppercase tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
+                    class="tracking-wider sticky top-0 bg-white dark:bg-neutral-700 outline-2 outline-neutral-200 dark:outline-neutral-600">
                     <tr>
                         <th scope="col" class="px-4 lg:px-6 py-3">#</th>
                         @include('livewire.common.sortable-th', [

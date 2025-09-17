@@ -107,7 +107,6 @@ class Coupons extends Component
         $coupon->save();
 
         $this->dispatch('toast', type: 'success', message: 'Coupon updated to ' . $coupon->status . '.');
-        $this->dispatch('coupons:refresh');
     }
 
     #[On('delete-coupon')]
