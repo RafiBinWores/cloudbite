@@ -155,15 +155,15 @@
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Promotion Management')" class="grid">
 
-                {{-- Crusts --}}
-                <flux:navlist.item icon="Photo" :href="route('crusts.index')"
-                    :current="request()->routeIs('crusts.index')" wire:navigate>
-                    {{ __('Banner') }}</flux:navlist.item>
+                {{-- Banners --}}
+                <flux:navlist.item icon="Photo" :href="route('banners.index')"
+                    :current="request()->routeIs('banners.index')" wire:navigate>
+                    {{ __('Banners') }}</flux:navlist.item>
 
                 {{-- Coupons --}}
                 <flux:navlist.item icon="gift" :href="route('coupons.index')"
                     :current="request()->routeIs('coupons.index')" wire:navigate>
-                    {{ __('Coupon') }}</flux:navlist.item>
+                    {{ __('Coupons') }}</flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
 

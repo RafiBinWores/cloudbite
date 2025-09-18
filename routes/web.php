@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Admin\AddOns\AddOns;
+use App\Livewire\Admin\Banners\Banners;
 use App\Livewire\Admin\Buns\Buns;
 use App\Livewire\Admin\Categories\Index;
 use App\Livewire\Admin\Coupons\Coupons;
@@ -57,6 +58,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     // Coupon Route
     Route::get('coupons', Coupons::class)->name('coupons.index');
+
+    // Banner Route
+    Route::get('banners', Banners::class)->name('banners.index');
 });
 
 require __DIR__ . '/auth.php';

@@ -64,6 +64,12 @@ return [
             'url' => env('APP_URL') . '/storage/dishes',
             'visibility' => 'public',
         ],
+        'banners' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/banners'),
+            'url' => env('APP_URL') . '/storage/banners',
+            'visibility' => 'public',
+        ],
 
         's3' => [
             'driver' => 's3',
