@@ -2,7 +2,7 @@
     {{-- Page Heading --}}
     <div class="relative mb-6 w-full">
         <flux:heading size="xl" class="mb-4 flex items-center gap-2" level="1"><img class="w-8"
-                src="{{ asset('assets/images/icons/buns.png') }}" alt="Coupon Icon">{{ __('Buns') }}</flux:heading>
+                src="{{ asset('assets/images/icons/buns.png') }}" alt="Bun Icon">{{ __('Buns') }}</flux:heading>
         <flux:separator variant="subtle" />
     </div>
 
