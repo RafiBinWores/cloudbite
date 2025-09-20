@@ -81,6 +81,8 @@
                             'name' => 'title',
                             'displayName' => 'Title'
                         ])
+                        <th scope="col" class="px-4 lg:px-6 py-3">Item Type</th>
+                        <th scope="col" class="px-4 lg:px-6 py-3">Item</th>
                         @include('livewire.common.sortable-th', [
                             'name' => 'status',
                             'displayName' => 'Status'
@@ -108,6 +110,17 @@
                                 @endif
                             </td>
                             <td class="px-4 lg:px-6 py-3">{{ $cat->title }}</td>
+                            <td class="px-4 lg:px-6 py-3">{{ ucfirst($cat->item_type) }}</td>
+                            <td class="px-4 lg:px-6 py-3">
+                                @if ($cat->item_type === 'category')
+                                    <flux:link href="{{ route('categories.index') }}" variant="ghost" wire:navigate>
+                                    {{ ucfirst($cat->item_name ) }}
+                                </flux:link>
+                                @elseif ($cat->item_type === 'dish')
+                                <flux:link href="{{ route('dishes.show', $cat->item_slug ) }}" variant="ghost" wire:navigate>{{ ucfirst($cat->item_name ) }}</flux:link>
+                                    
+                                @endif
+                            </td>
                             <td class="px-4 lg:px-6 py-3 capitalize">
                                 <flux:badge variant="solid" size="sm"
                                     color="{{ $cat->status === 'active' ? 'green' : 'red' }}">{{ $cat->status }}
