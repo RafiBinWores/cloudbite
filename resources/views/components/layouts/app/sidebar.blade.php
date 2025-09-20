@@ -7,6 +7,8 @@
 
 <body class="min-h-screen bg-white dark:bg-zinc-800">
 
+    <x-toast />
+
     <flux:header container
         class="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700 hidden lg:block">
 
@@ -166,6 +168,43 @@
                     {{ __('Coupons') }}</flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
+        
+         {{-- Report And Analytics --}}
+        <flux:navlist variant="outline">
+            <flux:navlist.group :heading="__('Report And Analytics')" class="grid">
+
+                {{-- Earning Report --}}
+                <flux:navlist.item icon="presentation-chart-line" :href="route('banners.index')"
+                    :current="request()->routeIs('banners.index')" wire:navigate>
+                    {{ __('Earning Report') }}</flux:navlist.item>
+
+                {{-- Order Report --}}
+                <flux:navlist.item icon="chart-pie" :href="route('coupons.index')"
+                    :current="request()->routeIs('coupons.index')" wire:navigate>
+                    {{ __('Order Report') }}</flux:navlist.item>
+            </flux:navlist.group>
+        </flux:navlist>
+
+         {{-- User Management --}}
+        <flux:navlist variant="outline">
+            <flux:navlist.group :heading="__('User Management')" class="grid">
+
+                {{-- Customers --}}
+                <flux:navlist.item icon="user-group" :href="route('banners.index')"
+                    :current="request()->routeIs('banners.index')" wire:navigate>
+                    {{ __('Customers') }}</flux:navlist.item>
+
+                {{-- Deliveryman --}}
+                <flux:navlist.item icon="delivery-icon" :href="route('coupons.index')"
+                    :current="request()->routeIs('coupons.index')" wire:navigate>
+                    {{ __('Deliveryman') }}</flux:navlist.item>
+
+                    {{-- Employees --}}
+                <flux:navlist.item icon="employee-icon" :href="route('coupons.index')"
+                    :current="request()->routeIs('coupons.index')" wire:navigate>
+                    {{ __('Employees') }}</flux:navlist.item>
+            </flux:navlist.group>
+        </flux:navlist>
 
         <flux:spacer />
 
@@ -262,129 +301,6 @@
 
 
     {{ $slot }}
-
-
-    <!-- TOASTS with icons, labels, and decreasing progress -->
-    <div x-data="toastHub()" @toast.window="push($event.detail)"
-        class="fixed top-4 right-4 z-50 space-y-2 w-[92vw] max-w-sm" aria-live="polite" aria-atomic="true">
-        <template x-for="t in toasts" :key="t.id">
-            <div x-init="start(t)" @mouseenter="pause(t)" @mouseleave="resume(t)" x-show="t.visible"
-                x-transition.opacity.scale class="overflow-hidden rounded-xl shadow-lg text-white"
-                :class="{
-                    'bg-emerald-600': t.type === 'success',
-                    'bg-red-600': t.type === 'error',
-                    'bg-amber-600': t.type === 'warning',
-                    'bg-slate-800': !['success', 'error', 'warning'].includes(t.type)
-                }"
-                role="status">
-                <!-- Body -->
-                <div class="px-4 py-3 flex items-start gap-3">
-                    <!-- Icon -->
-                    <div class="shrink-0 mt-0.5">
-                        <template x-if="t.type === 'success'">
-                            <i class="fa-solid fa-circle-check text-xl"></i>
-                        </template>
-                        <template x-if="t.type === 'error'">
-                            <i class="fa-solid fa-circle-xmark text-xl"></i>
-                        </template>
-                        <template x-if="t.type === 'warning'">
-                            <i class="fa-solid fa-triangle-exclamation text-xl"></i>
-                        </template>
-                        <template x-if="!['success','error','warning'].includes(t.type)">
-                            <i class="fa-solid fa-circle-info text-xl"></i>
-                        </template>
-                    </div>
-
-                    <!-- Text -->
-                    <div class="flex-1">
-                        {{-- <div class="font-semibold capitalize text-sm" x-text="t.type || 'info'"></div> --}}
-                        <div class="text-sm/6" x-text="t.message"></div>
-                    </div>
-
-                    <!-- Dismiss button -->
-                    <button class="ml-2 shrink-0 px-1 rounded hover:bg-white/10 focus:outline-none"
-                        @click="close(t.id)" aria-label="Dismiss notification">✕</button>
-                </div>
-
-                <!-- Progress bar (decreasing) -->
-                <div class="h-1 bg-black/20">
-                    <div class="h-full"
-                        :class="{
-                            'bg-emerald-300': t.type === 'success',
-                            'bg-red-300': t.type === 'error',
-                            'bg-amber-300': t.type === 'warning',
-                            'bg-slate-300': !['success', 'error', 'warning'].includes(t.type)
-                        }"
-                        :style="`width:${progressPct(t)}%`">
-                    </div>
-                </div>
-            </div>
-        </template>
-    </div>
-
-    <script src="./node_modules/preline/dist/preline.js"></script>
-    <script>
-        function toastHub() {
-            return {
-                toasts: [],
-                push({
-                    type = 'info',
-                    message = '',
-                    duration = 3000
-                } = {}) {
-                    const id = Date.now() + Math.random();
-                    this.toasts.push({
-                        id,
-                        type,
-                        message,
-                        duration,
-                        remaining: duration,
-                        startedAt: null,
-                        raf: null,
-                        paused: false,
-                        visible: true,
-                    });
-                },
-                start(t) {
-                    t.startedAt = performance.now();
-                    const tick = (now) => {
-                        if (t.paused) {
-                            t.raf = requestAnimationFrame(tick);
-                            return;
-                        }
-                        const elapsed = now - t.startedAt;
-                        t.remaining -= elapsed;
-                        t.startedAt = now;
-                        if (t.remaining <= 0) {
-                            this.close(t.id);
-                            return;
-                        }
-                        t.raf = requestAnimationFrame(tick);
-                    };
-                    t.raf = requestAnimationFrame(tick);
-                },
-                pause(t) {
-                    t.paused = true;
-                },
-                resume(t) {
-                    t.paused = false;
-                    t.startedAt = performance.now();
-                },
-                progressPct(t) {
-                    return Math.max(0, Math.min(100, (t.remaining / t.duration) * 100));
-                },
-                close(id) {
-                    const i = this.toasts.findIndex(x => x.id === id);
-                    if (i !== -1) {
-                        const t = this.toasts[i];
-                        if (t.raf) cancelAnimationFrame(t.raf);
-                        t.visible = false;
-                        setTimeout(() => this.toasts.splice(i, 1), 180);
-                    }
-                },
-            };
-        }
-    </script>
 
     @stack('scripts')
 

@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Banners;
 use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Dish;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\On;
@@ -14,6 +15,7 @@ use Livewire\WithFileUploads;
 class BannerForm extends Component
 {
     use WithFileUploads;
+    use WithTcToast;
 
     public $bannerId = null;
     public $isView = false;
@@ -58,7 +60,12 @@ class BannerForm extends Component
 
             $banner = Banner::find($this->bannerId);
             if (!$banner) {
-                $this->dispatch('toast', type: 'error', message: 'Banner not found.');
+                $this->error(
+                title: 'Banner not found!',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
                 return;
             }
 
@@ -78,7 +85,12 @@ class BannerForm extends Component
             $hasImageChange = (bool) $this->image;
 
             if (!$hasFieldChanges && !$hasImageChange) {
-                $this->dispatch('toast', type: 'warning', message: 'Nothing to update.');
+                $this->warning(
+                title: 'Nothing to update.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
                 $this->dispatch('banners:refresh');
                 Flux::modal('banner-modal')->close();
                 return;
@@ -110,7 +122,12 @@ class BannerForm extends Component
                 $this->reset('image');
             }
 
-            $this->dispatch('toast', type: 'success', message: 'Banner updated successfully.');
+            $this->success(
+                title: 'Banner updated successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         } else {
 
             Banner::create([
