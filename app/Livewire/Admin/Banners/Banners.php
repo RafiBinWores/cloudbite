@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Banners;
 
 use App\Models\Banner;
 use Carbon\Carbon;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\On;
@@ -14,6 +15,7 @@ use Livewire\WithPagination;
 class Banners extends Component
 {
     use WithPagination;
+    use WithTcToast;
 
     #[Url(history: true)]
     public $search = '';
@@ -108,11 +110,21 @@ class Banners extends Component
 
             $banner->delete();
             $this->dispatch('banners:deleted');
-            $this->dispatch('toast', type: 'success', message: 'Banner deleted successfully.');
+            $this->success(
+                title: 'Banner deleted successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
 
             Flux::modal('delete-confirmation-modal')->close();
         } else {
-            $this->dispatch('toast', type: 'success', message: 'Banner not found!');
+            $this->success(
+                title: 'Banner not found!',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
     }
 }

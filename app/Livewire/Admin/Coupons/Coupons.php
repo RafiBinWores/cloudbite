@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Coupons;
 
 use App\Models\Coupon;
 use Carbon\Carbon;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
@@ -13,6 +14,7 @@ use Livewire\WithPagination;
 class Coupons extends Component
 {
     use WithPagination;
+    use WithTcToast;
 
     #[Url(history: true)]
     public $search = '';
@@ -99,14 +101,24 @@ class Coupons extends Component
     {
         $coupon = Coupon::find($id);
         if (!$coupon) {
-            $this->dispatch('toast', type: 'error', message: 'Coupon not found.');
+             $this->error(
+                title: 'Coupon not found.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
             return;
         }
 
         $coupon->status = $on ? 'active' : 'disable';
         $coupon->save();
 
-        $this->dispatch('toast', type: 'success', message: 'Coupon updated to ' . $coupon->status . '.');
+          $this->success(
+                title: 'Coupon updated to ' . $coupon->status . '.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
     }
 
     #[On('delete-coupon')]
@@ -118,11 +130,21 @@ class Coupons extends Component
 
             $coupon->delete();
             $this->dispatch('coupons:deleted');
-            $this->dispatch('toast', type: 'success', message: 'Coupon deleted successfully.');
+              $this->success(
+                title: 'Coupon deleted successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
 
             Flux::modal('delete-confirmation-modal')->close();
         } else {
-            $this->dispatch('toast', type: 'success', message: 'Coupon not found!');
+              $this->success(
+                title: 'Coupon not found!',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
     }
 }

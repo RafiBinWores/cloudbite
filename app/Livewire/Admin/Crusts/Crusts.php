@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Crusts;
 
 use App\Models\Crust;
 use Carbon\Carbon;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
@@ -13,6 +14,7 @@ use Livewire\WithPagination;
 class Crusts extends Component
 {
     use WithPagination;
+    use WithTcToast;
 
     #[Url(history: true)]
     public $search = '';
@@ -76,7 +78,7 @@ class Crusts extends Component
         return view('livewire.admin.crusts.crusts', compact('crusts'));
     }
 
-        /**
+    /**
      * Map filter key -> [from, to] Carbon ranges (inclusive day window).
      */
     private function dateBounds(string $key): array
@@ -102,12 +104,22 @@ class Crusts extends Component
         if ($crust) {
 
             $crust->delete();
-            $this->dispatch('categories:deleted');
-            $this->dispatch('toast', type: 'success', message: 'Crust deleted successfully.');
+            $this->dispatch('crusts:deleted');
+            $this->success(
+                title: 'Crust deleted successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
 
             Flux::modal('delete-confirmation-modal')->close();
         } else {
-            $this->dispatch('toast', type: 'success', message: 'Crust not found!');
+              $this->success(
+                title: 'Could not found!',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
     }
 }

@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Buns;
 
 use App\Models\Bun;
 use Carbon\Carbon;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
@@ -13,6 +14,7 @@ use Livewire\WithPagination;
 class Buns extends Component
 {
     use WithPagination;
+    use WithTcToast;
 
     #[Url(history: true)]
     public $search = '';

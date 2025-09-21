@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Crusts;
 
 use App\Models\Crust;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -12,6 +13,7 @@ use Livewire\Attributes\On;
 class CrustForm extends Component
 {
     use WithPagination;
+    use WithTcToast;
 
     public $crustId = null;
     public $isView = false;
@@ -43,7 +45,12 @@ class CrustForm extends Component
             // UPDATE
             $crust = Crust::find($this->crustId);
             if (!$crust) {
-                $this->dispatch('toast', type: 'error', message: 'Crust not found.');
+                $this->warning(
+                    title: 'Could not found!',
+                    position: 'top-right',
+                    showProgress: true,
+                    showCloseIcon: true,
+                );
                 return;
             }
 
@@ -57,8 +64,13 @@ class CrustForm extends Component
             }
 
             if (!$hasChanges) {
-                $this->dispatch('toast', type: 'warning', message: 'Nothing to update.');
-                $this->dispatch('crusts:refresh'); // was categories:refresh
+                $this->warning(
+                    title: 'Noting found!',
+                    position: 'top-right',
+                    showProgress: true,
+                    showCloseIcon: true,
+                );
+                $this->dispatch('crusts:refresh');
                 Flux::modal('crust-modal')->close();
                 return;
             }
@@ -67,7 +79,12 @@ class CrustForm extends Component
             $crust->fill($payload);
             $crust->save();
 
-            $this->dispatch('toast', type: 'success', message: 'Crust updated successfully.');
+            $this->success(
+                title: 'Crust updated successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         } else {
             // CREATE
             Crust::create($payload);
@@ -76,7 +93,12 @@ class CrustForm extends Component
             $this->reset(['crustId', 'name']);
             $this->status = 'active';
 
-            $this->dispatch('toast', type: 'success', message: 'Crust created successfully.');
+            $this->success(
+                title: 'Crust created successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
 
         $this->dispatch('crusts:refresh');

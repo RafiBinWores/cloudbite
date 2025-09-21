@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Categories;
 
 use App\Models\Category;
 use Carbon\Carbon;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\On;
@@ -14,6 +15,7 @@ use Livewire\WithPagination;
 class Index extends Component
 {
     use WithPagination;
+    use WithTcToast;
 
     #[Url(history:true)]
     public $search = '';
@@ -111,11 +113,21 @@ class Index extends Component
 
             $category->delete();
             $this->dispatch('categories:deleted');
-            $this->dispatch('toast', type: 'success', message: 'Category deleted successfully.');
+              $this->success(
+                title: 'Category deleted successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
 
             Flux::modal('delete-confirmation-modal')->close();
         } else {
-            $this->dispatch('toast', type: 'success', message: 'Category not found!');
+              $this->error(
+                title: 'Category not found.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
     }
 }

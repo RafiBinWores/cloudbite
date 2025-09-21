@@ -195,8 +195,8 @@
                     {{ __('Customers') }}</flux:navlist.item>
 
                 {{-- Deliveryman --}}
-                <flux:navlist.item icon="delivery-icon" :href="route('coupons.index')"
-                    :current="request()->routeIs('coupons.index')" wire:navigate>
+                <flux:navlist.item icon="delivery-icon" :href="route('delivery.index')"
+                    :current="request()->routeIs('delivery.index')" wire:navigate>
                     {{ __('Deliveryman') }}</flux:navlist.item>
 
                     {{-- Employees --}}

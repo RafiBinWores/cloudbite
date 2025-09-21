@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Buns;
 
 use App\Models\Bun;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -12,6 +13,7 @@ use Livewire\Attributes\On;
 class BunForm extends Component
 {
     use WithPagination;
+    use WithTcToast;
 
     public $bunId = null;
     public $isView = false;
@@ -41,7 +43,12 @@ class BunForm extends Component
             // UPDATE
             $bun = Bun::find($this->bunId);
             if (!$bun) {
-                $this->dispatch('toast', type: 'error', message: 'bun not found.');
+                $this->error(
+                    title: 'Bun not found!',
+                    position: 'top-right',
+                    showProgress: true,
+                    showCloseIcon: true,
+                );
                 return;
             }
 
@@ -55,7 +62,12 @@ class BunForm extends Component
             }
 
             if (!$hasChanges) {
-                $this->dispatch('toast', type: 'warning', message: 'Nothing to update.');
+                $this->warning(
+                    title: 'Noting to found!',
+                    position: 'top-right',
+                    showProgress: true,
+                    showCloseIcon: true,
+                );
                 $this->dispatch('buns:refresh');
                 Flux::modal('bun-modal')->close();
                 return;
@@ -65,7 +77,12 @@ class BunForm extends Component
             $bun->fill($payload);
             $bun->save();
 
-            $this->dispatch('toast', type: 'success', message: 'Bun updated successfully.');
+            $this->success(
+                title: 'Bun updated successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         } else {
             // CREATE
             bun::create($payload);
@@ -74,7 +91,12 @@ class BunForm extends Component
             $this->reset(['bunId', 'name']);
             $this->status = 'active';
 
-            $this->dispatch('toast', type: 'success', message: 'Bun created successfully.');
+            $this->success(
+                title: 'Bun created successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
 
         $this->dispatch('buns:refresh');

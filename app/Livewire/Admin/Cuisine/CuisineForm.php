@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Cuisine;
 
 use App\Models\Cuisine;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -15,6 +16,7 @@ class CuisineForm extends Component
 {
     use WithPagination;
     use WithFileUploads;
+    use WithTcToast;
 
     public $cuisineId = null;
     public $isView = false;
@@ -45,23 +47,26 @@ class CuisineForm extends Component
         $this->resetErrorBag('image');
     }
 
-     // Submit the form data
+    // Submit the form data
     public function submit()
     {
         $this->validate();
 
         $imagePath = null;
         if ($this->image) {
-            $imagePath = $this->image->store('cuisine', 'public'); // => storage/app/public/cuisine/...
-            // (Optional) optimize here with spatie/laravel-image-optimizer if you installed it:
-            // \Spatie\LaravelImageOptimizer\Facades\ImageOptimizer::optimize(storage_path('app/public/'.$imagePath));
+            $imagePath = $this->image->store('cuisine', 'public');
         }
 
         if ($this->cuisineId) {
 
             $cuisine = Cuisine::find($this->cuisineId);
             if (!$cuisine) {
-                $this->dispatch('toast', type: 'error', message: 'Cuisine not found.');
+                $this->error(
+                    title: 'Cuisines not found!',
+                    position: 'top-right',
+                    showProgress: true,
+                    showCloseIcon: true,
+                );
                 return;
             }
 
@@ -83,7 +88,12 @@ class CuisineForm extends Component
             $hasImageChange = (bool) $this->image;
 
             if (!$hasFieldChanges && !$hasImageChange) {
-                $this->dispatch('toast', type: 'warning', message: 'Nothing to update.');
+                $this->warning(
+                    title: 'Noting to update.',
+                    position: 'top-right',
+                    showProgress: true,
+                    showCloseIcon: true,
+                );
                 $this->dispatch('cuisines:refresh');
                 Flux::modal('cuisine-modal')->close();
                 return;
@@ -115,7 +125,12 @@ class CuisineForm extends Component
                 $this->reset('image');
             }
 
-            $this->dispatch('toast', type: 'success', message: 'Cuisine updated successfully.');
+              $this->success(
+                title: 'Cuisine updated successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         } else {
 
             cuisine::create([
@@ -131,7 +146,12 @@ class CuisineForm extends Component
             $this->reset();
             $this->status = 'active';
 
-            $this->dispatch('toast', type: 'success', message: 'Cuisine created successfully.');
+            $this->success(
+                title: 'Cuisine created successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
 
         $this->dispatch('cuisines:refresh');

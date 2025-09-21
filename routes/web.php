@@ -7,6 +7,8 @@ use App\Livewire\Admin\Categories\Index;
 use App\Livewire\Admin\Coupons\Coupons;
 use App\Livewire\Admin\Crusts\Crusts;
 use App\Livewire\Admin\Cuisine\Cuisines;
+use App\Livewire\Admin\Delivery\CreateDeliveryMan;
+use App\Livewire\Admin\Delivery\Delivery;
 use App\Livewire\Admin\Dishes\CreateDish;
 use App\Livewire\Admin\Dishes\Dishes;
 use App\Livewire\Admin\Dishes\EditDish;
@@ -61,6 +63,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     // Banner Route
     Route::get('banners', Banners::class)->name('banners.index');
+
+    // Delivery Man route
+    Route::get('delivery', Delivery::class)->name('delivery.index');
+    Route::get('delivery/create', CreateDeliveryMan::class)->name('delivery.create');
 });
 
 require __DIR__ . '/auth.php';

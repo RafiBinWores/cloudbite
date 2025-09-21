@@ -61,11 +61,11 @@ class BannerForm extends Component
             $banner = Banner::find($this->bannerId);
             if (!$banner) {
                 $this->error(
-                title: 'Banner not found!',
-                position: 'top-right',
-                showProgress: true,
-                showCloseIcon: true,
-            );
+                    title: 'Banner not found!',
+                    position: 'top-right',
+                    showProgress: true,
+                    showCloseIcon: true,
+                );
                 return;
             }
 
@@ -86,11 +86,11 @@ class BannerForm extends Component
 
             if (!$hasFieldChanges && !$hasImageChange) {
                 $this->warning(
-                title: 'Nothing to update.',
-                position: 'top-right',
-                showProgress: true,
-                showCloseIcon: true,
-            );
+                    title: 'Nothing to update.',
+                    position: 'top-right',
+                    showProgress: true,
+                    showCloseIcon: true,
+                );
                 $this->dispatch('banners:refresh');
                 Flux::modal('banner-modal')->close();
                 return;
@@ -141,7 +141,12 @@ class BannerForm extends Component
             $this->reset();
             $this->status = 'active';
 
-            $this->dispatch('toast', type: 'success', message: 'Banner created successfully.');
+            $this->success(
+                title: 'Banner created successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
 
         $this->dispatch('banners:refresh');

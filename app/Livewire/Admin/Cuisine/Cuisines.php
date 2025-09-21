@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Cuisine;
 
 use App\Models\Cuisine;
 use Carbon\Carbon;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\On;
@@ -14,6 +15,7 @@ use Livewire\WithPagination;
 class Cuisines extends Component
 {
     use WithPagination;
+    use WithTcToast;
 
     #[Url(history: true)]
     public $search = '';
@@ -100,18 +102,26 @@ class Cuisines extends Component
     {
         $cuisine = \App\Models\Cuisine::find($id);
         if (!$cuisine) {
-            $this->dispatch('toast', type: 'error', message: 'Cuisine not found.');
+            $this->success(
+                title: 'Cuisine not found!',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
             return;
         }
 
         $cuisine->status = $on ? 'active' : 'disable';
         $cuisine->save();
 
-        // Optional: toast/refresh if your table needs it
-        // $this->dispatch('cuisines:refresh');
-        $this->dispatch('toast', type: 'success', message: 'Status updated to ' . $cuisine->status . '.');
+        $this->dispatch('cuisines:refresh');
+        $this->success(
+            title: 'Status updated to ' . $cuisine->status . '.',
+            position: 'top-right',
+            showProgress: true,
+            showCloseIcon: true,
+        );
     }
-
 
     #[On('delete-cuisine')]
     public function deleteCuisine($id)
@@ -123,10 +133,14 @@ class Cuisines extends Component
                 Storage::disk('cuisine')->delete($cuisine->image);
             }
 
-
             $cuisine->delete();
             $this->dispatch('cuisines:deleted');
-            $this->dispatch('toast', type: 'success', message: 'Cuisine deleted successfully.');
+            $this->success(
+                title: 'Cuisine deleted successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
 
             Flux::modal('delete-confirmation-modal')->close();
         } else {

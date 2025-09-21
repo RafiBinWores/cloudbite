@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\AddOns;
 
 use App\Models\AddOn;
 use Carbon\Carbon;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
@@ -13,6 +14,7 @@ use Livewire\WithPagination;
 class AddOns extends Component
 {
     use WithPagination;
+    use WithTcToast;
 
     #[Url(history: true)]
     public $search = '';
@@ -103,11 +105,21 @@ class AddOns extends Component
 
             $addOns->delete();
             $this->dispatch('addOns:deleted');
-            $this->dispatch('toast', type: 'success', message: 'Add-Ons deleted successfully.');
+            $this->success(
+                title: 'Add-ons deleted successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
 
             Flux::modal('delete-confirmation-modal')->close();
         } else {
-            $this->dispatch('toast', type: 'success', message: 'Add-Ons not found!');
+            $this->success(
+                title: 'Add-ons not found!',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
     }
 }

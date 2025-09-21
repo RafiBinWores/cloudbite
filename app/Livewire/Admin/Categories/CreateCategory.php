@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Categories;
 
 use App\Models\Category;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -17,6 +18,7 @@ class CreateCategory extends Component
 {
     use WithPagination;
     use WithFileUploads;
+    use WithTcToast;
 
     public $categoryId = null;
     public $isView = false;
@@ -64,7 +66,12 @@ class CreateCategory extends Component
 
             $category = Category::find($this->categoryId);
             if (!$category) {
-                $this->dispatch('toast', type: 'error', message: 'Category not found.');
+                $this->error(
+                    title: 'Category not found!',
+                    position: 'top-right',
+                    showProgress: true,
+                    showCloseIcon: true,
+                );
                 return;
             }
 
@@ -86,7 +93,12 @@ class CreateCategory extends Component
             $hasImageChange = (bool) $this->image;
 
             if (!$hasFieldChanges && !$hasImageChange) {
-                $this->dispatch('toast', type: 'warning', message: 'Nothing to update.');
+                $this->warning(
+                    title: 'Noting to found!',
+                    position: 'top-right',
+                    showProgress: true,
+                    showCloseIcon: true,
+                );
                 $this->dispatch('categories:refresh');
                 Flux::modal('category-modal')->close();
                 return;
@@ -118,7 +130,12 @@ class CreateCategory extends Component
                 $this->reset('image');
             }
 
-            $this->dispatch('toast', type: 'success', message: 'Category updated successfully.');
+            $this->success(
+                title: 'Category updated successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         } else {
 
             Category::create([
@@ -134,7 +151,12 @@ class CreateCategory extends Component
             $this->reset();
             $this->status = 'active';
 
-            $this->dispatch('toast', type: 'success', message: 'Category created successfully.');
+              $this->success(
+                title: 'Category created successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
 
         $this->dispatch('categories:refresh');

@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\AddOns;
 
 use App\Models\AddOn;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -12,6 +13,7 @@ use Livewire\Attributes\On;
 class AddOnForm extends Component
 {
     use WithPagination;
+    use WithTcToast;
 
     public $addOnId = null;
     public $isView = false;
@@ -42,7 +44,12 @@ class AddOnForm extends Component
             // UPDATE
             $addOn = AddOn::find($this->addOnId);
             if (!$addOn) {
-                $this->dispatch('toast', type: 'error', message: 'Add-Ons not found.');
+                $this->error(
+                    title: 'Add-ons not found!',
+                    position: 'top-right',
+                    showProgress: true,
+                    showCloseIcon: true,
+                );
                 return;
             }
 
@@ -56,7 +63,12 @@ class AddOnForm extends Component
             }
 
             if (!$hasChanges) {
-                $this->dispatch('toast', type: 'warning', message: 'Nothing to update.');
+                $this->warning(
+                    title: 'Noting to update.',
+                    position: 'top-right',
+                    showProgress: true,
+                    showCloseIcon: true,
+                );
                 $this->dispatch('addOns:refresh');
                 Flux::modal('addOns-modal')->close();
                 return;
@@ -66,7 +78,12 @@ class AddOnForm extends Component
             $addOn->fill($payload);
             $addOn->save();
 
-            $this->dispatch('toast', type: 'success', message: 'Add-Ons updated successfully.');
+            $this->success(
+                title: 'Add-ons updated successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         } else {
             // CREATE
             AddOn::create($payload);
@@ -75,7 +92,12 @@ class AddOnForm extends Component
             $this->reset(['addOnId', 'name']);
             $this->status = 'active';
 
-            $this->dispatch('toast', type: 'success', message: 'Add-Ons created successfully.');
+            $this->success(
+                title: 'Add-ons created successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
 
         $this->dispatch('addOns:refresh');

@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Coupons;
 
 use App\Models\Coupon;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Flux\Flux;
 use Livewire\Component;
 use Illuminate\support\Str;
@@ -12,6 +13,7 @@ use Livewire\WithPagination;
 class CouponForm extends Component
 {
     use WithPagination;
+    use WithTcToast;
 
     public $couponId = null;
     public $isView = false;
@@ -65,7 +67,12 @@ class CouponForm extends Component
             // UPDATE
             $coupon = Coupon::find($this->couponId);
             if (!$coupon) {
-                $this->dispatch('toast', type: 'error', message: 'Coupon not found.');
+                  $this->error(
+                title: 'Coupon not found.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
                 return;
             }
 
@@ -79,7 +86,12 @@ class CouponForm extends Component
             }
 
             if (!$hasChanges) {
-                $this->dispatch('toast', type: 'warning', message: 'Nothing to update.');
+                  $this->warning(
+                title: 'Noting to found.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
                 $this->dispatch('coupons:refresh');
                 Flux::modal('coupon-modal')->close();
                 return;
@@ -89,7 +101,12 @@ class CouponForm extends Component
             $coupon->fill($payload);
             $coupon->save();
 
-            $this->dispatch('toast', type: 'success', message: 'Coupon updated successfully.');
+              $this->success(
+                title: 'Coupon updated successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         } else {
             // CREATE
             Coupon::create($payload);
@@ -98,7 +115,12 @@ class CouponForm extends Component
             $this->reset(['couponId', 'title', 'coupon_type', 'coupon_code', 'same_user_limit', 'discount_type', 'discount', 'start_date', 'expire_date', 'minimum_purchase', 'status']);
             $this->status = 'active';
 
-            $this->dispatch('toast', type: 'success', message: 'Coupon created successfully.');
+              $this->success(
+                title: 'Coupon created successfully.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
 
         $this->dispatch('coupons:refresh');
