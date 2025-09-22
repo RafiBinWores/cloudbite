@@ -1,4 +1,4 @@
-@import './tallcraftui.css';
+@import "./tallcraftui.css";
 @plugin '@tailwindcss/forms';
 @source '../../vendor/developermithu/tallcraftui/src/**/*.php';
 
@@ -36,8 +36,16 @@
     --color-accent-content: var(--color-rose-500);
     --color-accent-foreground: var(--color-white);
 
-        --color-primary: var(--color-rose-500);
+    --color-primary: var(--color-rose-500);
     --color-secondary: var(--color-rose-500);
+
+    --font-jost: "Jost", "sans-serif";
+    --font-oswald: "Oswald", "sans-serif";
+
+    --color-customRed-100: #e80f3a;
+    --color-customRed-200: #c40d31;
+
+    --color-customSlate-100: #072b31;
 }
 
 @layer theme {

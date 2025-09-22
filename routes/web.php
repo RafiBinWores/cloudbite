@@ -14,20 +14,19 @@ use App\Livewire\Admin\Dishes\Dishes;
 use App\Livewire\Admin\Dishes\EditDish;
 use App\Livewire\Admin\Dishes\ShowDish;
 use App\Livewire\Admin\Tags\Tags;
+use App\Livewire\Frontend\Home;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+    Route::get('/', Home::class)->name('home');
 
-Route::view('admin/dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
+// Admin Dashboard Route Starts
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::view('dashboard', 'dashboard')
     ->name('dashboard');
 
-Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::redirect('settings', 'settings/profile');
 
     Route::get('settings/profile', Profile::class)->name('settings.profile');
@@ -68,5 +67,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('delivery', Delivery::class)->name('delivery.index');
     Route::get('delivery/create', CreateDeliveryMan::class)->name('delivery.create');
 });
+// Admin Dashboard Route Ends
 
+// User Routes
+
+
+// Auth Routes
 require __DIR__ . '/auth.php';
