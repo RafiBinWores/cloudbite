@@ -14,6 +14,7 @@ use App\Livewire\Admin\Dishes\Dishes;
 use App\Livewire\Admin\Dishes\EditDish;
 use App\Livewire\Admin\Dishes\ShowDish;
 use App\Livewire\Admin\Tags\Tags;
+use App\Livewire\Frontend\Cart\CartPage;
 use App\Livewire\Frontend\Home;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
@@ -21,6 +22,8 @@ use App\Livewire\Settings\Profile;
 use Illuminate\Support\Facades\Route;
 
     Route::get('/', Home::class)->name('home');
+    // cart page
+    Route::get('/cart', CartPage::class)->name('cart.page');
 
 // Admin Dashboard Route Starts
 Route::middleware(['auth'])->prefix('admin')->group(function () {

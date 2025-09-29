@@ -3,6 +3,7 @@
 namespace App\Livewire\Frontend;
 
 use App\Models\Category;
+use App\Models\Dish;
 use Livewire\Component;
 
 class Home extends Component
@@ -12,8 +13,15 @@ class Home extends Component
         $categories = Category::where('status', 'active')
         ->orderByDesc('created_at')
         ->get();
+
+        $now = now();
+        $dishes = Dish::where('visibility', 'Yes')
+            ->where('available_from', '<=', $now)
+            ->where('available_till', '>=', $now)
+            ->orderByDesc('created_at')
+            ->get();
         
-        return view('livewire.frontend.home', compact('categories'))
-            ->layout('components.layouts.frontend', ['title' => 'Home']);
+        return view('livewire.frontend.home', compact('categories', 'dishes'))
+            ->layout('components.layouts.front-home', ['title' => 'Home | Cloudbite']);
     }
 }

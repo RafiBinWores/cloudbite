@@ -13,6 +13,10 @@
 @source '../../vendor/rappasoft/laravel-livewire-tables/resources/views/*.blade.php';
 @source '../../vendor/rappasoft/laravel-livewire-tables/resources/views/**/*.blade.php';
 
+@plugin "daisyui" {
+  themes: light --default;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
@@ -39,8 +43,8 @@
     --color-primary: var(--color-rose-500);
     --color-secondary: var(--color-rose-500);
 
-    --font-jost: "Jost", "sans-serif";
-    --font-oswald: "Oswald", "sans-serif";
+    --font-jost: "Jost", sans-serif;
+    --font-oswald: "Oswald", sans-serif;
 
     --color-customRed-100: #e80f3a;
     --color-customRed-200: #c40d31;

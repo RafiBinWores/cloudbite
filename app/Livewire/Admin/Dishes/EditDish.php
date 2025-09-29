@@ -96,8 +96,8 @@ class EditDish extends Component
 
             'track_stock'   => 'required|in:Yes,No',
             'daily_stock'   => 'required_if:track_stock,Yes|nullable|integer|min:0',
-            'available_from' => 'required',
-            'available_till' => 'required|after_or_equal:available_from',
+            'available_from' => 'nullable',
+            'available_till' => 'nullable|after_or_equal:available_from',
             'visibility'    => 'required|in:Yes,No',
 
             // On update, images are optional:

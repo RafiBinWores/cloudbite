@@ -44,7 +44,7 @@
             ? Carbon::createFromFormat('H:i:s', $dish->available_till)->format('g:i A')
             : null;
 
-        // --- Availability (robust for TIME columns, incl. overnight) ---
+        // --- Availability ---
         $now24 = Carbon::now()->format('H:i:s');
         $from24 = $dish->available_from
             ? Carbon::createFromFormat('H:i:s', $dish->available_from)->format('H:i:s')

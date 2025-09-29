@@ -34,12 +34,12 @@ class Dish extends Model
     ];
 
     protected $casts = [
-            'available_from' => 'string',
-    'available_till' => 'string',
+        'available_from' => 'string',
+        'available_till' => 'string',
         'tags' => 'array',
         'gallery' => 'array',
     ];
-    
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
@@ -52,12 +52,14 @@ class Dish extends Model
 
     public function buns()
     {
-        return $this->belongsToMany(Bun::class, 'bun_dish')->withTimestamps();
+        return $this->belongsToMany(Bun::class, 'bun_dish')
+            ->withTimestamps();
     }
 
     public function crusts()
     {
-        return $this->belongsToMany(Crust::class, 'crust_dish')->withTimestamps();
+        return $this->belongsToMany(Crust::class, 'crust_dish')
+            ->withTimestamps();
     }
 
     public function addOns()
@@ -77,17 +79,26 @@ class Dish extends Model
         $query->where('title', 'like', "%{$value}%")->orWhere('visibility', 'like', "%{$value}%")->orWhere('created_at', 'like', "%{$value}%");
     }
 
-    // public function getIsAvailableAttribute(): bool
-    // {
-    //     if ($this->visibility !== 'Yes') return false;
+    public function getPriceWithDiscountAttribute(): string
+    {
+        $value = $this->price;
+        if ($this->discount && $this->discount_type) {
+            if ($this->discount_type === 'percent') {
+                $value = $this->price * (1 - ($this->discount / 100));
+            } elseif ($this->discount_type === 'amount') {
+                $value = max(0, $this->price - $this->discount);
+            }
+        }
+        return $this->formatPrice($value);
+    }
 
-    //     // If times aren’t set, treat as available
-    //     if (!$this->available_from || !$this->available_till) return true;
+    public function getDisplayPriceAttribute(): string
+    {
+        return $this->formatPrice($this->price);
+    }
 
-    //     // Build today’s times (since you store time-of-day)
-    //     $from = Carbon::today()->setTimeFromTimeString($this->available_from->format('H:i:s'));
-    //     $till = Carbon::today()->setTimeFromTimeString($this->available_till->format('H:i:s'));
-
-    //     return Carbon::now()->between($from, $till);
-    // }
+    protected function formatPrice($value): string
+    {
+        return (string) round($value);
+    }
 }

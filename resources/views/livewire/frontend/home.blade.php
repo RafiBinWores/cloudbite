@@ -128,7 +128,7 @@
                 <h3 class="capitalize font-medium text-4xl md:text-5xl lg:text-6xl">Our Popular category</h3>
             </div>
 
-            <div class="swiper mySwiper mt-10">
+            <div class="swiper categoriesSwiper mt-10">
                 <div class="swiper-wrapper">
                     @foreach ($categories as $cat)
                         <div class="swiper-slide">
@@ -479,30 +479,322 @@
         <img src="./assets/images/border-bttom.png" alt="brush"
             class="absolute -bottom-0.5 left-0 bg-center object-cover bg-no-repeat z-10">
     </section>
+
+    <!-- All dishes -->
+    <section class="relative w-full py-16 lg:py-28 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center font-oswald animate__animated animate__fadeInDown">
+                <div class="flex items-center justify-center gap-3">
+                    <img src="./assets/images/icons/arrow.png" alt="Arrow icon" class="h-3 rotate-180" />
+                    <p class="uppercase text-lg md:text-xl text-customRed-100 font-medium">Best deal</p>
+                    <img src="./assets/images/icons/arrow.png" alt="Arrow icon" class="h-3" />
+                </div>
+                <h3 class="capitalize font-medium text-4xl md:text-5xl lg:text-6xl">Our Popular Dishes</h3>
+            </div>
+
+            {{-- Dishes Slider --}}
+            <div class="swiper dishesSwiper mt-10">
+                <div class="swiper-wrapper pb-5">
+                    @foreach ($dishes as $dish)
+                        <div class="swiper-slide">
+                            <div class="card bg-base-100 shadow-sm rounded-xl">
+                                <figure class="relative">
+                                    <img src="{{ asset($dish->thumbnail) }}" alt="{{ $dish->title }}"
+                                        class="w-full h-48 object-cover rounded-t-xl" />
+                                    @if ($dish->discount && $dish->discount_type)
+                                        <span
+                                            class="absolute top-2 left-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-customRed-100/80 text-white z-10">
+                                            @php
+                                                $discountValue =
+                                                    fmod($dish->discount, 1) === 0.0
+                                                        ? intval($dish->discount)
+                                                        : number_format($dish->discount, 2, '.', '');
+                                            @endphp
+                                            @if ($dish->discount_type === 'percent')
+                                                {{ $discountValue }} <span class="ps-1 font-jost">&#x25; OFF</span>
+                                            @elseif($dish->discount_type === 'amount')
+                                                {{ $discountValue }} <span class="font-normal font-oswald ps-1">&#2547;
+                                                </span> <span class="ps-1">OFF</span>
+                                            @endif
+                                        </span>
+                                    @endif
+                                </figure>
+                                <div class="card-body p-3">
+                                    <h2 class="card-title font-medium font-oswald line-clamp-1 text-slate-900">
+                                        {{ $dish->title }}
+                                    </h2>
+                                    <p class="font-jost line-clamp-1">{{ $dish->short_description }}</p>
+
+                                    <div class="flex items-center justify-between mt-2">
+                                        <div class="font-oswald text-customRed-100 flex items-center gap-2">
+                                            <p class="font-medium text-lg">
+                                                <span class="font-bold">&#2547;</span> {{ $dish->price_with_discount }}
+                                            </p>
+                                            @if ($dish->price_with_discount < $dish->display_price)
+                                                <p class="font-medium line-through text-gray-500">
+                                                    <span class="font-bold">&#2547;</span> {{ $dish->display_price }}
+                                                </p>
+                                            @endif
+                                        </div>
+
+                                        <button
+                                            wire:click="$dispatch('open-add-to-cart', { dishId: {{ $dish->id }} })"
+                                            class="inline-block relative isolate rounded px-5 py-2 mt-1 overflow-hidden cursor-pointer bg-customRed-100 font-medium text-white group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60">
+                                            <span
+                                                class="pointer-events-none absolute w-64 h-0 rotate-45 -translate-x-20 bg-slate-900 top-1/2 transition-all duration-300 ease-out group-hover:h-64 group-hover:-translate-y-32"></span>
+                                            <span
+                                                class="relative z-10 transition-colors font-medium font-oswald duration-300 group-hover:text-white">
+                                                Add to Cart
+                                            </span>
+                                        </button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Circular nav buttons -->
+                <div class="hidden lg:block">
+                    <div class="swiper-button-prev hidden !left-6 sm:!left-10 !right-auto"></div>
+                    <div class="swiper-button-next hidden !right-6 sm:!right-10 !left-auto"></div>
+                </div>
+            </div>
+    </section>
+
+
+    {{-- cart modal --}}
+    <livewire:frontend.cart.add-to-cart-modal />
+
+    <!-- Offer promotion section -->
+    <section class="relative bg-[url(/assets/images/discount-bg.jpg)] w-full bg-no-repeat bg-center object-cover">
+
+        <!-- Brush -->
+        <img src="./assets/images/border-bttom.png" alt="" class="rotate-180 absolute top-0">
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 lg:py-24">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+
+                <!-- LEFT: Text -->
+                <div class="text-white text-center lg:text-left">
+                    <!-- Badge -->
+                    <div
+                        class="inline-flex items-center gap-2 rounded-md border border-white/50 px-4 py-2 mb-6 font-oswald animate__animated animate__fadeInDown">
+                        <span class="tracking-widest text-[22px]">LIMITED OFFER</span>
+                    </div>
+
+                    <!-- Title -->
+                    <h1
+                        class="text-7xl md:text-7xl lg:text-[110px] font-extrabold bg-clip-text text-transparent bg-[url(/assets/images/pattern.png)] bg-cover bg-center uppercase font-oswald lg:leading-[110px] lg:w-[500px] animate__animated animate__fadeInDown">
+                        Delicious Burger
+                    </h1>
+
+                    <!-- Paragraph -->
+                    <p
+                        class="font-jost text-white text-lg leading-7 max-w-xl mx-auto mt-6 animate__animated animate__fadeInDown">
+                        It is a long established fact that a reader will be distracted lorem the
+                        readable content of a page when looking
+                    </p>
+
+                    <!-- Countdown -->
+                    <div id="deal-countdown" data-deadline="2025-08-31T23:59:59+06:00"
+                        class="mt-10 flex flex-wrap justify-center lg:justify-start gap-1 font-oswald animate__animated animate__fadeInDown">
+
+                        <!-- Days -->
+                        <div
+                            class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                            <div class="text-center">
+                                <div class="text-xl md:text-2xl font-bold" data-days>05</div>
+                                <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Days</div>
+                            </div>
+                        </div>
+
+                        <!-- Hours -->
+                        <div
+                            class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                            <div class="text-center">
+                                <div class="text-xl md:text-2xl font-bold" data-hours>12</div>
+                                <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Hours</div>
+                            </div>
+                        </div>
+
+                        <!-- Minutes -->
+                        <div
+                            class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                            <div class="text-center">
+                                <div class="text-xl md:text-2xl font-bold" data-minutes>30</div>
+                                <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Minutes</div>
+                            </div>
+                        </div>
+
+                        <!-- Seconds -->
+                        <div
+                            class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                            <div class="text-center">
+                                <div class="text-xl md:text-2xl font-bold" data-seconds>40</div>
+                                <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Seconds</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT: Burger visual -->
+                <div class="relative">
+                    <!-- splash/offer badge (optional) -->
+                    <div
+                        class="absolute right-0 lg:-top-2 md:top-5 md:right-10 lg:right-0 block z-40 animate__animated animate__fadeInRight">
+                        <img src="/assets/images/discount-50.png" alt="Save 50%"
+                            class="w-32 md:w-48 h-auto select-none pointer-events-none">
+                    </div>
+                    <!-- burger -->
+                    <img src="/assets/images/discount-burger.png" alt="Delicious Burger"
+                        class="relative w-full max-w-[680px] mx-auto drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)] z-10 animate__animated animate__fadeInUp" />
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    {{-- testimonial --}}
+    <section class="relative bg-[url('/assets/images/testimonial-bg.jpg')] bg-center bg-cover overflow-hidden w-full">
+        <!-- brush top -->
+        <img src="/assets/images/border-bttom.png" alt=""
+            class="rotate-180 absolute top-0 left-0 w-full pointer-events-none select-none">
+
+        <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
+            <div class="swiper myHeroSwiper">
+                <div class="swiper-wrapper">
+                    <!-- Slide 1 -->
+                    <div class="swiper-slide">
+                        <div class="mx-auto grid place-items-center pb-28 gap-6 font-oswald">
+                            <!-- stars -->
+                            <div class="flex gap-2 justify-center">
+                                <i class="fa-solid fa-star text-amber-500"></i>
+                                <i class="fa-solid fa-star text-amber-500"></i>
+                                <i class="fa-solid fa-star text-amber-500"></i>
+                                <i class="fa-solid fa-star text-amber-500"></i>
+                                <i class="fa-solid fa-star text-amber-500"></i>
+                            </div>
+
+                            <h3 class="text-3xl md:text-4xl capitalize font-medium">Best Chicken fry</h3>
+
+                            <p
+                                class="text-center font-jost text-lg sm:text-xl lg:text-2xl text-gray-500 leading-8 sm:leading-9 max-w-3xl">
+                                “Thanks to your web agency team for their professional work. The website they created
+                                for my business
+                                exceeded my expectations, and my clients have given positive feedback about its design
+                                and user-friendliness.”
+                            </p>
+
+                            <!-- avatars -->
+                            <div class="mt-8 sm:mt-10 relative h-24 sm:h-36">
+                                <img src="./assets/images/feature-dish.jpg" alt="Burger"
+                                    class="size-28 md:size-[190px] left-1/2 -translate-x-1/2 top-0 object-cover bg-center border-4 border-white rotate-10">
+                                <img src="./assets/images/user.jpg" alt="Burger"
+                                    class="size-28 md:size-[190px] md:left-[30%] left-[20%] absolute top-10 md:top-14  object-cover bg-center border-4 border-white -rotate-2">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="mx-auto grid place-items-center pb-28 gap-6 font-oswald">
+                            <!-- stars -->
+                            <div class="flex gap-2 justify-center">
+                                <i class="fa-solid fa-star text-amber-500"></i>
+                                <i class="fa-solid fa-star text-amber-500"></i>
+                                <i class="fa-solid fa-star text-amber-500"></i>
+                                <i class="fa-solid fa-star text-amber-500"></i>
+                                <i class="fa-solid fa-star text-amber-500"></i>
+                            </div>
+
+                            <h3 class="text-3xl md:text-4xl capitalize font-medium">Best pizza fry</h3>
+
+                            <p
+                                class="text-center font-jost text-lg sm:text-xl lg:text-2xl text-gray-500 leading-8 sm:leading-9 max-w-3xl">
+                                “Thanks to your web agency team for their professional work. The website they created
+                                for my business
+                                exceeded my expectations, and my clients have given positive feedback about its design
+                                and user-friendliness.”
+                            </p>
+
+                            <!-- avatars -->
+                            <div class="mt-8 sm:mt-10 relative h-24 sm:h-36">
+                                <img src="./assets/images/feature-dish.jpg" alt="Burger"
+                                    class="size-28 md:size-[190px] left-1/2 -translate-x-1/2 top-0 object-cover bg-center border-4 border-white rotate-10">
+                                <img src="./assets/images/user.jpg" alt="Burger"
+                                    class="size-28 md:size-[190px] md:left-[30%] left-[20%] absolute top-10 md:top-14  object-cover bg-center border-4 border-white -rotate-2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Duplicate slides as needed ... -->
+                </div>
+
+            </div>
+        </div>
+    </section>
+
 </div>
 
 
 @push('scripts')
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            new Swiper(".mySwiper", {
+            // Categories slider
+            new Swiper(".categoriesSwiper", {
                 slidesPerView: 4,
                 spaceBetween: 20,
                 loop: false,
+                // autoplay: {
+                //     delay: 2500,
+                //     disableOnInteraction: false
+                // },
                 pagination: {
-                    el: ".swiper-pagination",
-                    clickable: true,
+                    el: ".categoriesSwiper .swiper-pagination",
+                    clickable: true
                 },
                 navigation: {
-                    nextEl: ".swiper-button-next",
-                    prevEl: ".swiper-button-prev",
+                    nextEl: ".categoriesSwiper .swiper-button-next",
+                    prevEl: ".categoriesSwiper .swiper-button-prev",
                 },
                 breakpoints: {
                     320: {
-                        slidesPerView: 1
+                        slidesPerView: 2
                     },
                     640: {
+                        slidesPerView: 3
+                    },
+                    1024: {
+                        slidesPerView: 4
+                    },
+                },
+            });
+
+            // Dishes slider
+            new Swiper(".dishesSwiper", {
+                slidesPerView: 3,
+                spaceBetween: 20,
+                loop: false,
+                // autoplay: {
+                //     delay: 3000,
+                //     disableOnInteraction: false
+                // },
+                pagination: {
+                    el: ".dishesSwiper .swiper-pagination",
+                    clickable: true
+                },
+                navigation: {
+                    nextEl: ".dishesSwiper .swiper-button-next",
+                    prevEl: ".dishesSwiper .swiper-button-prev",
+                },
+                breakpoints: {
+                    320: {
                         slidesPerView: 2
+                    },
+                    640: {
+                        slidesPerView: 3
                     },
                     1024: {
                         slidesPerView: 4
