@@ -57,6 +57,6 @@ class CartItem extends Model
         $ids = array_filter((array) $this->addon_ids, fn($v) => is_numeric($v));
         if (empty($ids)) return collect();
 
-        return \App\Models\AddOn::whereIn('id', $ids)->get();
+        return AddOn::whereIn('id', $ids)->get();
     }
 }

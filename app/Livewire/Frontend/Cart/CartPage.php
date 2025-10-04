@@ -17,22 +17,6 @@ class CartPage extends Component
     public string $coupon_code = '';
     public ?string $coupon_feedback = null;
 
-    // public function mount(CartRepository $repo): void
-    // {
-    //     $this->loadCart($repo);
-    // }
-
-    // #[On('cart-updated')]
-    // public function refreshCart(CartRepository $repo): void
-    // {
-    //     $this->loadCart($repo);
-    // }
-
-    // protected function loadCart(CartRepository $repo): void
-    // {
-    //     $this->cart = $repo->loadCart(['items.dish', 'items.crust', 'items.bun']);
-    // }
-
     public function mount(CartRepository $repo): void
     {
         $this->loadCart($repo);
@@ -122,17 +106,25 @@ class CartPage extends Component
     {
         $repo->removeItem($itemId);
         $this->loadCart($repo);
-        $this->dispatch('toast', type: 'info', message: 'Item removed');
+        $this->success(
+            title: 'Item removed.',
+            position: 'top-right',
+            showProgress: true,
+            showCloseIcon: true,
+        );
     }
 
     public function clearCart(CartRepository $repo): void
     {
         $repo->clear();
         $this->loadCart($repo);
-        $this->dispatch('toast', type: 'info', message: 'Cart cleared');
+        $this->success(
+            title: 'Cart cleared.',
+            position: 'top-right',
+            showProgress: true,
+            showCloseIcon: true,
+        );
     }
-
-    /** ================== Summary breakdown ================== */
 
     /** Sum of base product prices (discounted unit base), excludes crust/add-ons */
     public function getProductPriceSubtotalProperty(): float
@@ -141,16 +133,8 @@ class CartPage extends Component
 
         $sum = 0.0;
         foreach ($this->cart->items as $item) {
-            $crustExtra  = (float) data_get($item->meta, 'crust_extra', 0);
-            $addonsExtra = (float) data_get($item->meta, 'addons_extra', 0);
-
-            // Prefer saved 'base' (discounted unit base). If missing, approximate:
-            $base = data_get($item->meta, 'base');
-            if ($base === null) {
-                $base = (float) $item->unit_price - $crustExtra - $addonsExtra; // bun_extra is 0 for now
-            }
-
-            $sum += ((float) $base) * (int) $item->qty;
+            $originalBase = (float) data_get($item->meta, 'base', $item->unit_price);
+            $sum += $originalBase * (int) $item->qty;
         }
         return round($sum, 2);
     }
@@ -162,14 +146,16 @@ class CartPage extends Component
 
         $sum = 0.0;
         foreach ($this->cart->items as $item) {
-            $base = (float) (data_get($item->meta, 'base', $item->unit_price));
-            // Original/current list price from the Dish model
-            $original = (float) ($item->dish->price ?? $base);
-            $discountPerUnit = max(0.0, $original - $base);
-            $sum += $discountPerUnit * (int) $item->qty;
+            $originalBase  = (float) data_get($item->meta, 'base', $item->unit_price);
+            $discountBase  = data_get($item->meta, 'display_price_with_discount');
+            $discountBase  = is_null($discountBase) ? $originalBase : (float) $discountBase;
+
+            $perUnit = max(0.0, $originalBase - $discountBase);
+            $sum += $perUnit * (int) $item->qty;
         }
         return round($sum, 2);
     }
+
 
     /** Add-ons bucket = crust extra + add-on extras (all options) */
     public function getAddonsSubtotalProperty(): float

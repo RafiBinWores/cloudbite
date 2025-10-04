@@ -4,8 +4,8 @@
     <div
         class="bg-[url(/assets/images/breadcrumb-bg.jpg)] py-20 md:py-32 bg-no-repeat bg-cover bg-center text-center text-white grid place-items-center font-oswald">
         <h4 class="text-4xl md:text-6xl font-medium">Cart</h4>
-        <div class="breadcrumbs text-sm mt-3 font-oswald font-medium">
-            <ul class="flex items-center gap-2">
+        <div class="breadcrumbs text-sm mt-3 font-medium">
+            <ul class="flex items-center">
                 <li>
                     <a>
                         <i class="fa-regular fa-house"></i>
@@ -22,9 +22,11 @@
         <h1 class="text-2xl font-semibold mb-4">Your Cart</h1>
 
         @if (!$cart || $cart->items->isEmpty())
-            <div class="rounded-xl border p-6 text-center">
-                <p class="opacity-70">Your cart is empty.</p>
-                <a href="{{ url('/') }}" class="btn btn-primary mt-4">Continue Shopping</a>
+            <div class="rounded-xl border p-6 text-center bg-customRed-100/10">
+                <i class="fa-regular fa-box-open text-8xl mb-4 text-neutral-500"></i>
+                <p class="opacity-90 text-lg font-medium mb-2">Your cart is empty!</p>
+                <p class="text-sm opacity-70">Please add some dishes from menu.</p>
+                <a href="{{ url('/') }}" class="btn bg-customRed-100 text-white mt-4">Explore Our Dishes</a>
             </div>
         @else
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -92,13 +94,59 @@
 
                                     <!-- Price + Qty + Line total -->
                                     <div class="mt-4 flex flex-wrap items-center justify-between gap-4">
-                                        <div class="text-sm">
+                                        {{-- <div class="text-sm">
                                             <div class="opacity-70">Unit price</div>
                                             <div class="font-medium">
-                                                {{ number_format($item->unit_price, 2) }} <span
-                                                    class="font-oswald">৳</span>
+                                                <span
+                                                    class="font-oswald">৳</span> 
+                                                {{ number_format($item->unit_price, 2) }} 
+                                            </div>
+                                        </div> --}}
+
+                                        @php
+                                            $crustExtra = (float) data_get($item->meta, 'crust_extra', 0);
+                                            $addonsExtra = (float) data_get($item->meta, 'addons_extra', 0);
+                                            $extrasTotal = $crustExtra + $addonsExtra;
+
+                                            // Original (no-discount) base the repo saved
+                                            $originalBase = (float) data_get(
+                                                $item->meta,
+                                                'base',
+                                                $item->unit_price - $extrasTotal,
+                                            );
+
+                                            // Discounted base (if present)
+                                            $discountBase = data_get($item->meta, 'display_price_with_discount');
+                                            $discountBase = is_null($discountBase) ? null : (float) $discountBase;
+
+                                            $hasDiscount = !is_null($discountBase) && $discountBase < $originalBase;
+
+                                            $originalUnit = $originalBase + $extrasTotal;
+                                            $discountedUnit =
+                                                ($hasDiscount ? $discountBase : $originalBase) + $extrasTotal;
+                                        @endphp
+
+                                        <div class="text-sm">
+                                            <div class="opacity-70">Price:</div>
+                                            <div class="font-medium flex items-center gap-2">
+                                                @if ($hasDiscount)
+                                                    <span class="text-lg">
+                                                        {{ number_format($discountedUnit, 2) }} <span
+                                                            class="font-oswald">৳</span>
+                                                    </span>
+                                                    <del class="opacity-60">
+                                                        {{ number_format($originalUnit, 2) }} <span
+                                                            class="font-oswald">৳</span>
+                                                    </del>
+                                                @else
+                                                    <span class="text-lg">
+                                                        {{ number_format($originalUnit, 2) }} <span
+                                                            class="font-oswald">৳</span>
+                                                    </span>
+                                                @endif
                                             </div>
                                         </div>
+
 
                                         <div class="flex items-center gap-2">
                                             <button class="btn btn-circle btn-ghost"
@@ -148,7 +196,16 @@
                             </div>
                         @else
                             <div class="flex items-center border rounded-lg gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="size-10 ps-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ticket-percent-icon lucide-ticket-percent"><path d="M2 9a3 3 0 1 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 1 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M9 9h.01"/><path d="m15 9-6 6"/><path d="M15 15h.01"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-10 ps-3" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="lucide lucide-ticket-percent-icon lucide-ticket-percent">
+                                    <path
+                                        d="M2 9a3 3 0 1 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 1 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+                                    <path d="M9 9h.01" />
+                                    <path d="m15 9-6 6" />
+                                    <path d="M15 15h.01" />
+                                </svg>
                                 <input type="text"
                                     class="border-0 ring-0 focus:ring-0 focus:outline-none focus:border-0 outline-none w-full"
                                     placeholder="Enter coupon code" wire:model.defer="coupon_code" />

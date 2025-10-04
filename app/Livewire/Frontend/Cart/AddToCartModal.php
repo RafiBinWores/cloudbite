@@ -11,7 +11,7 @@ use Livewire\Component;
 class AddToCartModal extends Component
 {
     use WithTcToast;
-    
+
     public ?Dish $dish = null;
 
     public int $qty = 1;
@@ -103,17 +103,20 @@ class AddToCartModal extends Component
             'addon_ids.*' => 'integer',
         ]);
 
+        $rules = [
+            'crust_id' => ($this->crust_required && $this->dish->crusts->count() > 0) ? 'required|integer' : 'nullable',
+            'bun_id'   => ($this->bun_required   && $this->dish->buns->count()   > 0) ? 'required|integer' : 'nullable',
+        ];
+
+        $messages = [
+            'crust_id.required' => 'Please select one crust option.',
+            'bun_id.required'   => 'Please select one bun option.',
+        ];
+
+        $this->validate($rules, $messages);
+
         if (!$this->dish) {
             $this->addError('dish', 'Dish not loaded.');
-            return;
-        }
-
-        if ($this->crust_required && $this->dish->crusts->count() > 0 && !$this->crust_id) {
-            $this->addError('crust_id', 'Please select one crust option.');
-            return;
-        }
-        if ($this->bun_required && $this->dish->buns->count() > 0 && !$this->bun_id) {
-            $this->addError('bun_id', 'Please select one bun option.');
             return;
         }
 

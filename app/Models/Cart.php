@@ -38,29 +38,37 @@ class Cart extends Model
     }
 
 public function refreshTotals(): void
-    {
-        // sum line totals
-        $subtotal = (float) $this->items()->sum('line_total');
+{
+    // Subtotal = sum of pre-discount line totals
+    $subtotal = (float) $this->items()->sum('line_total');
 
-        // compute tax from each line using dish VAT%
-        $items = $this->items()->with('dish')->get();
-        $tax = 0.0;
-        foreach ($items as $item) {
-            $vatPercent = (float) ($item->dish->vat ?? 0);
-            if ($vatPercent <= 0) continue;
+    // Compute tax per line using dish VAT%
+    $items = $this->items()->with('dish')->get();
+    $tax = 0.0;
 
-            // VAT on whole unit (base + extras). If VAT only on base, use meta['base'] instead.
-            $taxableUnit = (float) $item->unit_price;
-            $tax += $taxableUnit * ($vatPercent / 100) * (int) $item->qty;
-        }
+    foreach ($items as $item) {
+        $vatPercent = (float) ($item->dish->vat ?? 0);
+        if ($vatPercent <= 0) continue;
 
-        // keep any previously set coupon discount
-        $discount = (float) ($this->discount_total ?? 0);
-
-        $this->subtotal    = round($subtotal, 2);
-        $this->tax_total   = round($tax, 2);
-        $this->grand_total = round($this->subtotal - $discount + $this->tax_total, 2);
-
-        $this->save();
+        // If VAT should apply only on base (without extras), use ($item->meta['base'] ?? $item->unit_price)
+        $taxableUnit = (float) $item->unit_price;
+        $tax += $taxableUnit * ($vatPercent / 100) * (int) $item->qty;
     }
+
+    $discount = max(0, (float) ($this->discount_total ?? 0));
+    $shipping = (float) ($this->shipping_total ?? 0);
+    $tax      = round($tax, 2);
+    $subtotal = round($subtotal, 2);
+
+    // Subtotal stays raw (no discount subtracted here)
+    $grand = round($subtotal - $discount + $tax + $shipping, 2);
+    if ($grand < 0) $grand = 0.00;
+
+    $this->subtotal     = $subtotal;
+    $this->tax_total    = $tax;
+    $this->grand_total  = $grand;
+
+    $this->save();
+}
+
 }

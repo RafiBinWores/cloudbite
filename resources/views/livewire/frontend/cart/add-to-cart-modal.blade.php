@@ -106,10 +106,10 @@
                 @endif
 
                 {{-- Bun (single-select, optional; free) --}}
+                {{-- Bun (single-select, required if exists) --}}
                 @if ($dish && $dish->buns->count())
                     <section class="rounded-xl border">
                         <header class="flex items-center justify-between px-4 py-3 border-b">
-
                             <div>
                                 <h4 class="font-medium">Bun</h4>
                                 <p class="text-xs opacity-60">Please select 1 option</p>
@@ -117,6 +117,7 @@
                             <span
                                 class="badge badge-error badge-soft text-red-500 bg-red-50 border-red-200">Required</span>
                         </header>
+
                         <div class="p-2">
                             <ul class="divide-y">
                                 @foreach ($dish->buns as $b)
@@ -130,9 +131,15 @@
                                     </li>
                                 @endforeach
                             </ul>
+
+                            {{-- Bun validation message --}}
+                            @error('bun_id')
+                                <div class="px-2 pb-2 text-xs text-error">{{ $message }}</div>
+                            @enderror
                         </div>
                     </section>
                 @endif
+
 
                 {{-- Add-ons (multiple & optional) --}}
                 @if ($dish && $dish->addOns->count())
