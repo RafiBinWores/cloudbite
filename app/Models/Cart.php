@@ -39,34 +39,64 @@ class Cart extends Model
 
     public function refreshTotals(): void
     {
-        // Subtotal = sum of pre-discount line totals
-        $subtotal = (float) $this->items()->sum('line_total');
-
-        // Compute tax per line using dish VAT%
         $items = $this->items()->with('dish')->get();
-        $tax = 0.0;
 
+        // Default TRUE because you mentioned you've already added VAT in cart lines.
+        $pricesIncludeTax = (bool) data_get($this->meta, 'prices_include_tax', true);
+
+        $rawSubtotal = 0.0;
+        $displayTax  = 0.0;  // always for UI/reporting
+        $discount    = max(0.0, (float) ($this->discount_total ?? 0.0));
+
+        // First pass: subtotal & (preliminary) tax for display
         foreach ($items as $item) {
-            $vatPercent = (float) ($item->dish->vat ?? 0);
-            if ($vatPercent <= 0) continue;
+            $lineTotal = (float) $item->line_total;                    // what you already store
+            $vat       = (float) (optional($item->dish)->vat ?? 0.0);  // per-item VAT %
 
-            // If VAT should apply only on base (without extras), use ($item->meta['base'] ?? $item->unit_price)
-            $taxableUnit = (float) $item->unit_price;
-            $tax += $taxableUnit * ($vatPercent / 100) * (int) $item->qty;
+            $rawSubtotal += $lineTotal;
+
+            if ($vat > 0) {
+                if ($pricesIncludeTax) {
+                    // Extract included VAT from a gross line:
+                    // tax = gross - gross/(1+r)
+                    $rate      = 1 + ($vat / 100);
+                    $baseExVat = $lineTotal / $rate;
+                    $displayTax += ($lineTotal - $baseExVat);
+                } else {
+                    // Compute VAT from a net line:
+                    $displayTax += $lineTotal * ($vat / 100);
+                }
+            }
         }
 
-        $discount = max(0, (float) ($this->discount_total ?? 0));
-        $shipping = (float) ($this->shipping_total ?? 0);
-        $tax      = round($tax, 2);
-        $subtotal = round($subtotal, 2);
+        $subtotal   = round($rawSubtotal, 2);
+        $displayTax = round($displayTax);
 
-        // Subtotal stays raw (no discount subtracted here)
-        $grand = round($subtotal - $discount + $tax + $shipping, 2);
-        if ($grand < 0) $grand = 0.00;
+        // Clamp discount
+        if ($discount > $subtotal) {
+            $discount = $subtotal;
+        }
+        $discount = round($discount, 2);
 
-        $this->subtotal     = $subtotal;
-        $this->tax_total    = $tax;
-        $this->grand_total  = $grand;
+        // GRAND TOTAL (no shipping)
+        if ($pricesIncludeTax) {
+            // VAT is already inside subtotal → don't add again
+            $grand = round($subtotal - $discount, 2);
+        } else {
+            // VAT not in subtotal → add it
+            // (Optional improvement: recompute tax after discount by prorating discount per line)
+            $grand = round($subtotal - $discount + $displayTax, 2);
+        }
+
+        if ($grand < 0) {
+            $grand = 0.00;
+        }
+
+        // Persist
+        $this->subtotal       = $subtotal;
+        $this->discount_total = $discount;
+        $this->tax_total      = $displayTax;   // display/report only if prices include tax
+        $this->grand_total    = $grand;
 
         $this->save();
     }

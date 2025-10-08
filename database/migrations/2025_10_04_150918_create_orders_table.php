@@ -32,12 +32,12 @@ return new class extends Migration
             $table->string('contact_name');
             $table->string('phone', 50);
             $table->string('email')->nullable();
-
+            
             $table->json('shipping_address')->nullable();
             $table->text('customer_note')->nullable();
 
             // Payment & status
-            $table->enum('payment_method', ['cod','bkash','sslcommerz'])->default('cod');
+            $table->enum('payment_method', ['cod','sslcommerz'])->default('cod');
             $table->enum('payment_status', ['unpaid','paid','refunded'])->default('unpaid');
             $table->enum('order_status', ['pending','processing','completed','cancelled'])->default('pending');
 

@@ -260,9 +260,9 @@
                             </span>
                         </div>
 
-                        <button class="btn bg-customRed-100 text-white w-full h-12 rounded-xl">
+                        <a href="{{ route('checkout') }}" class="btn bg-customRed-100 text-white w-full h-12 rounded-xl">
                             Checkout
-                        </button>
+                        </a>
                     </div>
                 </div>
 

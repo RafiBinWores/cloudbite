@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Models\{Cart, CartItem, Dish, Coupon, CouponUsage};
+use App\Models\{Cart, CartItem, Dish, Coupon, CouponUsage, Order};
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -232,17 +232,17 @@ class CartRepository
             return ['ok' => false, 'message' => 'You have reached the usage limit for this coupon.'];
         }
 
-        // if ($coupon->coupon_type === 'first_order') {
-        //     $hasAnyOrder = false;
-        //     if ($userId && class_exists(\App\Models\Order::class)) {
-        //         $hasAnyOrder = \App\Models\Order::where('user_id', $userId)->exists();
-        //     } else {
-        //         $hasAnyOrder = CouponUsage::when($userId, fn($q) => $q->where('user_id', $userId))
-        //                                   ->when(!$userId, fn($q) => $q->where('session_id', $sessionId))
-        //                                   ->exists();
-        //     }
-        //     if ($hasAnyOrder) return ['ok' => false, 'message' => 'This coupon is only for your first order.'];
-        // }
+        if ($coupon->coupon_type === 'first_order') {
+            $hasAnyOrder = false;
+            if ($userId && class_exists(Order::class)) {
+                $hasAnyOrder = Order::where('user_id', $userId)->exists();
+            } else {
+                $hasAnyOrder = CouponUsage::when($userId, fn($q) => $q->where('user_id', $userId))
+                                          ->when(!$userId, fn($q) => $q->where('session_id', $sessionId))
+                                          ->exists();
+            }
+            if ($hasAnyOrder) return ['ok' => false, 'message' => 'This coupon is only for your first order.'];
+        }
 
         $discount = $coupon->discount_type === 'percent'
             ? round($subtotal * ((float) $coupon->discount / 100), 2)

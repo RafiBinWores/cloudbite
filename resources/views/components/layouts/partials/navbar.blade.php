@@ -29,6 +29,9 @@
                     <ul
                         class="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-50">
                         <li>
+                            <a href="/categories/pizza" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">All</a>
+                        </li>
+                        <li>
                             <a href="/categories/pizza" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">Pizza</a>
                         </li>
                         <li>

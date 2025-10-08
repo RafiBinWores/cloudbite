@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrderThankYouController;
 use App\Livewire\Admin\AddOns\AddOns;
 use App\Livewire\Admin\Banners\Banners;
 use App\Livewire\Admin\Buns\Buns;
@@ -15,21 +16,29 @@ use App\Livewire\Admin\Dishes\EditDish;
 use App\Livewire\Admin\Dishes\ShowDish;
 use App\Livewire\Admin\Tags\Tags;
 use App\Livewire\Frontend\Cart\CartPage;
+use App\Livewire\Frontend\Checkout\CheckoutPage;
 use App\Livewire\Frontend\Home;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use Illuminate\Support\Facades\Route;
 
-    Route::get('/', Home::class)->name('home');
-    
-    // cart page
-    Route::get('/cart', CartPage::class)->name('cart.page');
+Route::get('/', Home::class)->name('home');
+
+// cart page
+Route::get('/cart', CartPage::class)->name('cart.page');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/checkout', CheckoutPage::class)->name('checkout');
+    Route::get('/order/thank-you/{code}', OrderThankYouController::class)->name('orders.thankyou');
+});
+
+
 
 // Admin Dashboard Route Starts
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::view('dashboard', 'dashboard')
-    ->name('dashboard');
+        ->name('dashboard');
 
     Route::redirect('settings', 'settings/profile');
 
