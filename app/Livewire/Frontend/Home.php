@@ -22,6 +22,6 @@ class Home extends Component
             ->get();
         
         return view('livewire.frontend.home', compact('categories', 'dishes'))
-            ->layout('components.layouts.front-home', ['title' => 'Home | Cloudbite']);
+            ->layout('components.layouts.front-home', ['title' => 'Home - CloudBite']);
     }
 }

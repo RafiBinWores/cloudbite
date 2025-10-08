@@ -45,10 +45,8 @@ class CartPage extends Component
         $this->loadCart($repo);
 
         // Keep input synced with applied one or clear on failure
-        if (!$res['ok']) {
-            // do not clear so user can fix typo
-        } else {
-            $this->coupon_code = (string) data_get($this->cart?->meta, 'coupon.code', $this->coupon_code);
+        if ($res['ok']) {
+             $this->coupon_code = (string) data_get($this->cart?->meta, 'coupon.code', $this->coupon_code);
         }
     }
 
@@ -199,6 +197,6 @@ class CartPage extends Component
     public function render()
     {
         return view('livewire.frontend.cart.cart-page')
-            ->layout('components.layouts.frontend', ['title' => 'Home | Cart']);
+            ->layout('components.layouts.frontend', ['title' => 'Cart - CloudBite']);
     }
 }

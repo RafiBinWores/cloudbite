@@ -20,7 +20,8 @@
                                     </svg>
                                 </button>
                             </div>
-                            <p>{{ $dish?->short_description }}</p>
+                            <p class="text-base md:text-lg text-slate-600 font-jost leading-relaxed">
+                                {{ $dish?->short_description }}</p>
                             <div class="mt-2">
                                 <span class="text-lg font-semibold">
                                     {{ number_format($this->base_price, 2) }} <span
@@ -33,19 +34,21 @@
             </div>
 
             {{-- Body --}}
-            <div class="px-5 py-4 space-y-5 overflow-y-scroll max-h-[50vh]">
+            <div class="px-5 py-3 space-y-5 overflow-y-scroll max-h-[50vh]">
 
-                {{-- Crust (single-select, required if exists) --}}
+                {{-- Crust select (if have any) --}}
                 @if ($dish && $dish->crusts->count())
-                    <section class="rounded-xl border">
-                        <header class="flex items-center justify-between px-4 py-3 border-b">
+                    <div class="bg-customRed-100/15 shadow mt-2 md:p-5 rounded-lg @error('crust_id') border border-customRed-100 @enderror">
+                        <div class="flex items-center justify-between mb-4">
                             <div>
-                                <h4 class="font-medium">Crust</h4>
-                                <p class="text-xs opacity-60">Please select 1 option</p>
+                                <h4 class="font-oswald font-medium text-lg">Crust</h4>
+                                <p class="text-xs opacity-60">Please select one</p>
                             </div>
-                            <span
-                                class="badge badge-error badge-soft text-red-500 bg-red-50 border-red-200">Required</span>
-                        </header>
+
+                            <p class="bg-customRed-100 font-jost px-3 py-1 rounded-full text-xs text-white">
+                                Required
+                            </p>
+                        </div>
 
                         @php
                             $crusts = $dish->crusts;
@@ -53,96 +56,142 @@
                             $rest = $crusts->skip(3);
                         @endphp
 
-                        <div class="p-2">
-                            <ul class="divide-y">
-                                @foreach ($first as $c)
-                                    <li class="flex items-center justify-between px-2 py-2">
-                                        <label class="flex items-center gap-3 cursor-pointer">
-                                            <input type="radio" class="radio radio-sm" name="crust"
-                                                value="{{ $c->id }}" wire:model.live="crust_id" />
-                                            <span>{{ $c->name }}</span>
-                                        </label>
-                                        <span class="text-sm opacity-80">
-                                            {{ number_format($c->price ?? 0, 2) }} <span
-                                                class="font-oswald">&#2547;</span>
-                                        </span>
-                                    </li>
-                                @endforeach
-                            </ul>
+                        <div class="font-jost text-gray-600 space-y-3 pe-2">
+                            @foreach ($first as $c)
+                                <div class="flex items-center justify-between">
+                                    <label class="label text-gray-600 font-jost">
+                                        <input type="radio" class="radio radio-error radio-sm" name="crust"
+                                            value="{{ $c->id }}" wire:model.live="crust_id" />
+                                        {{ $c->name }}
+                                    </label>
+                                    <p>Tk {{ number_format($c->price ?? 0, 2) }}</p>
+                                </div>
+                            @endforeach
 
-                            @if ($rest->count())
-                                <details class="px-2 py-2">
-                                    <summary class="text-sm text-red-500 cursor-pointer flex items-center gap-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                        View {{ $rest->count() }} more
-                                    </summary>
-                                    <ul class="mt-2 divide-y">
+                            {{-- Additional crust options (hidden by default) --}}
+                            @if ($rest->count() > 0)
+                                <div x-data="{ showMore: false }">
+                                    <div x-show="showMore" x-collapse>
                                         @foreach ($rest as $c)
-                                            <li class="flex items-center justify-between px-2 py-2">
-                                                <label class="flex items-center gap-3 cursor-pointer">
-                                                    <input type="radio" class="radio radio-sm" name="crust"
-                                                        value="{{ $c->id }}" wire:model.live="crust_id" />
-                                                    <span>{{ $c->name }}</span>
+                                            <div class="flex items-center justify-between">
+                                                <label class="label text-gray-600 font-jost">
+                                                    <input type="radio" class="radio radio-error radio-sm"
+                                                        name="crust" value="{{ $c->id }}"
+                                                        wire:model.live="crust_id" />
+                                                    {{ $c->name }}
                                                 </label>
-                                                <span class="text-sm opacity-80">
-                                                    {{ number_format($c->price ?? 0, 2) }} <span
-                                                        class="font-oswald">&#2547;</span>
-                                                </span>
-                                            </li>
+                                                <p>Tk {{ number_format($c->price ?? 0, 2) }}</p>
+                                            </div>
                                         @endforeach
-                                    </ul>
-                                </details>
+                                    </div>
+
+                                    {{-- View More / View Less button --}}
+                                    <button type="button" x-on:click="showMore = !showMore"
+                                        class="mt-0.5 cursor-pointer text-customRed-100 font-jost font-medium text-sm transition-colors">
+                                        <span x-text="showMore ? 'View Less' : 'View More'"></span>
+                                        <span> ({{ $rest->count() }})</span>
+                                    </button>
+                                </div>
                             @endif
-
-                            @error('crust_id')
-                                <div class="px-2 pb-2 text-xs text-error">{{ $message }}</div>
-                            @enderror
                         </div>
-                    </section>
+                    </div>
                 @endif
 
-                {{-- Bun (single-select, optional; free) --}}
-                {{-- Bun (single-select, required if exists) --}}
+                {{-- Bun select (if have any) --}}
                 @if ($dish && $dish->buns->count())
-                    <section class="rounded-xl border">
-                        <header class="flex items-center justify-between px-4 py-3 border-b">
+                    <div class="bg-customRed-100/15 shadow mt-2 md:p-5 rounded-lg  @error('bun_id') border border-customRed-100 @enderror">
+                        <div class="flex items-center justify-between mb-4">
                             <div>
-                                <h4 class="font-medium">Bun</h4>
-                                <p class="text-xs opacity-60">Please select 1 option</p>
+                                <h4 class="font-oswald font-medium text-lg">Bun</h4>
+                                <p class="text-xs opacity-60">Please select one</p>
                             </div>
-                            <span
-                                class="badge badge-error badge-soft text-red-500 bg-red-50 border-red-200">Required</span>
-                        </header>
 
-                        <div class="p-2">
-                            <ul class="divide-y">
-                                @foreach ($dish->buns as $b)
-                                    <li class="flex items-center justify-between px-2 py-2">
-                                        <label class="flex items-center gap-3 cursor-pointer">
-                                            <input type="radio" class="radio radio-sm" name="bun"
-                                                value="{{ $b->id }}" wire:model.live="bun_id" />
-                                            <span>{{ $b->name }}</span>
-                                        </label>
-                                        <span class="text-sm opacity-80">Free</span>
-                                    </li>
-                                @endforeach
-                            </ul>
-
-                            {{-- Bun validation message --}}
-                            @error('bun_id')
-                                <div class="px-2 pb-2 text-xs text-error">{{ $message }}</div>
-                            @enderror
+                            <p class="bg-customRed-100 font-jost px-3 py-1 rounded-full text-xs text-white">
+                                Required
+                            </p>
                         </div>
-                    </section>
+
+                        @php
+                            $buns = $dish->buns;
+                            $first = $buns->take(3);
+                            $rest = $buns->skip(3);
+                        @endphp
+
+                        <div class="font-jost text-gray-600 space-y-3 pe-2">
+                            @foreach ($first as $b)
+                                <div class="flex items-center justify-between">
+                                    <label class="label text-gray-600 font-jost">
+                                        <input type="radio" class="radio radio-error radio-sm" name="bun"
+                                            value="{{ $b->id }}" wire:model.live="bun_id" />
+                                        {{ $b->name }}
+                                    </label>
+                                    <p>Tk {{ number_format($b->price ?? 0, 2) }}</p>
+                                </div>
+                            @endforeach
+
+                            {{-- Additional bun options (hidden by default) --}}
+                            @if ($rest->count() > 0)
+                                <div x-data="{ showMore: false }">
+                                    <div x-show="showMore" x-collapse>
+                                        @foreach ($rest as $b)
+                                            <div class="flex items-center justify-between">
+                                                <label class="label text-gray-600 font-jost">
+                                                    <input type="radio" class="radio radio-error radio-sm"
+                                                        name="bun" value="{{ $b->id }}"
+                                                        wire:model.live="bun_id" />
+                                                    {{ $b->name }}
+                                                </label>
+                                                <p>Tk {{ number_format($b->price ?? 0, 2) }}</p>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                    {{-- View More / View Less button --}}
+                                    <button type="button" x-on:click="showMore = !showMore"
+                                        class="mt-0.5 cursor-pointer text-customRed-100 font-jost font-medium text-sm transition-colors">
+                                        <span x-text="showMore ? 'View Less' : 'View More'"></span>
+                                        <span> ({{ $rest->count() }})</span>
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
                 @endif
 
+                <!-- Add ones -->
+                @if ($dish && $dish->addOns->count())
+          <div class="bg-customRed-100/15 mt-5 md:p-6 rounded-md">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="font-oswald font-medium text-lg">Add Ons</h4>
+
+              <p
+                class="bg-white text-gray-500 font-jost px-3 py-1 rounded-full text-xs"
+              >
+                Optional
+              </p>
+            </div>
+
+            <div class="font-jost text-gray-600 space-y-3 pe-2">
+
+                @foreach ($dish->addOns as $a)
+                                @php $inputId = 'addon_'.$a->id; @endphp
+              <div class="flex items-center justify-between">
+                <label for="{{ $inputId }}" class="label text-gray-600 font-jost">
+                  <input id="{{ $inputId }}" value="{{ $a->id }}" wire:model.live="addon_ids"
+                    type="checkbox"
+                    class="checkbox checkbox-error checkbox-sm"
+                  />
+                  Extra Cheese
+                </label>
+                <p>TK {{ number_format($a->price ?? 0, 2) }}</p>
+              </div>
+              @endforeach
+            </div>
+          </div>
+          @endif
 
                 {{-- Add-ons (multiple & optional) --}}
-                @if ($dish && $dish->addOns->count())
+                {{-- @if ($dish && $dish->addOns->count())
                     <section class="rounded-xl border">
                         <header class="flex items-center justify-between px-4 py-3 border-b">
                             <h4 class="font-medium">Add-ons</h4>
@@ -159,13 +208,14 @@
                                         <span>{{ $a->name }}</span>
                                     </label>
                                     <span class="text-sm opacity-80">
-                                        {{ number_format($a->price ?? 0, 2) }} <span class="font-oswald">&#2547;</span>
+                                        {{ number_format($a->price ?? 0, 2) }} <span
+                                            class="font-oswald">&#2547;</span>
                                     </span>
                                 </li>
                             @endforeach
                         </ul>
                     </section>
-                @endif
+                @endif --}}
             </div>
 
             {{-- Price breakdown + Total --}}

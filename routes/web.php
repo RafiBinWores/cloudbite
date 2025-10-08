@@ -22,6 +22,7 @@ use App\Livewire\Settings\Profile;
 use Illuminate\Support\Facades\Route;
 
     Route::get('/', Home::class)->name('home');
+    
     // cart page
     Route::get('/cart', CartPage::class)->name('cart.page');
 

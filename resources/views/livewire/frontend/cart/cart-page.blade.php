@@ -127,7 +127,7 @@
                                         @endphp
 
                                         <div class="text-sm">
-                                            <div class="opacity-70">Price:</div>
+                                            <div class="opacity-70">Unit Price:</div>
                                             <div class="font-medium flex items-center gap-2">
                                                 @if ($hasDiscount)
                                                     <span class="text-lg">
