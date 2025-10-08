@@ -1,7 +1,7 @@
     <!-- Header -->
-    <header class="lg:max-w-7xl mx-auto lg:pt-1 absolute inset-x-0 lg:top-4 z-50">
+    <header class="lg:max-w-7xl mx-auto lg:pt-1 fixed inset-x-0 lg:top-2 z-50">
         <nav id="siteNav"
-            class="sticky top-0 z-40 h-20 px-4 sm:px-6 bg-white lg:h-24 lg:px-12 lg:bg-[linear-gradient(0deg,rgba(255,255,255,0.8)_0%,#ECF0F3_100%)] lg:rounded-2xl shadow-md flex items-center justify-between lg:opacity-90">
+            class="sticky top-0 z-40 h-20 px-4 sm:px-6 bg-white lg:h-24 lg:px-12 lg:bg-[linear-gradient(0deg,rgba(255,255,255,0.8)_0%,#ECF0F3_100%)] lg:rounded-2xl shadow-md flex items-center justify-between lg:opacity-95">
             <!-- Hamburger (sm & md) -->
             <button id="menuToggle" aria-label="Toggle menu"
                 class="lg:hidden inline-flex items-center gap-2 p-2 rounded-lg">
