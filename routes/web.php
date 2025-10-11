@@ -30,28 +30,23 @@ Route::get('/', Home::class)->name('home');
 // cart page
 Route::get('/cart', CartPage::class)->name('cart.page');
 
+Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', CheckoutPage::class)->name('checkout');
     Route::get('/order/thank-you/{code}', OrderThankYouController::class)->name('orders.thankyou');
 
+    // SSl Payment routes
     Route::get('/payment/ssl/init/{order}', [SslCommerzController::class, 'init'])->name('ssl.init');
-
-    // Success/Fail/Cancel come from SSLCommerz (often POST). They don’t include a session cookie reliably,
-    // so don’t depend on auth here; identify the order by tran_id.
     Route::post('/payment/ssl/success', [SslCommerzController::class, 'success'])->name('ssl.success')->withoutMiddleware([VerifyCsrfToken::class]);
     Route::post('/payment/ssl/fail', [SslCommerzController::class, 'fail'])->name('ssl.fail')->withoutMiddleware([VerifyCsrfToken::class]);
     Route::post('/payment/ssl/cancel', [SslCommerzController::class, 'cancel'])->name('ssl.cancel')->withoutMiddleware([VerifyCsrfToken::class]);
 
     // IPN (server-to-server) — optional but recommended
     Route::post('/payment/ssl/ipn', [SslCommerzController::class, 'ipn'])->name('ssl.ipn')->withoutMiddleware([VerifyCsrfToken::class]);
-
-Route::middleware(['auth'])->group(function () {
-
 });
 
 
-
 // Admin Dashboard Route Starts
-Route::middleware(['auth'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::view('dashboard', 'dashboard')
         ->name('dashboard');
 
@@ -95,10 +90,6 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('delivery', Delivery::class)->name('delivery.index');
     Route::get('delivery/create', CreateDeliveryMan::class)->name('delivery.create');
 });
-// Admin Dashboard Route Ends
-
-// User Routes
-
 
 // Auth Routes
 require __DIR__ . '/auth.php';

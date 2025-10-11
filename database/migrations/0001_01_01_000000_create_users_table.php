@@ -21,7 +21,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->string('avatar')->nullable();
             $table->timestamp('last_login_at')->nullable();
-            $table->enum('role', ['user', 'manager', 'admin'])->default('user')->index();
+            $table->enum('role', ['user', 'manager', 'admin'])->default('user');
             $table->timestamps();
         });
 

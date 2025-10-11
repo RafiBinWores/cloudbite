@@ -44,6 +44,12 @@
                 <li><a href="shop.html" class="hover:text-customRed-200">Shop</a></li>
                 <li><a href="#" class="hover:text-customRed-200">Contact</a></li>
                 <li><a href="#" class="hover:text-customRed-200">About</a></li>
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    @csrf
+                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
+                        {{ __('Log Out') }}
+                    </flux:menu.item>
+                </form>
             </ul>
 
             <div class="flex items-center gap-3 ml-auto lg:ml-0">
