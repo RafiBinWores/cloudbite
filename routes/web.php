@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\OrderThankYouController;
+use App\Http\Controllers\SslCommerzController;
 use App\Livewire\Admin\AddOns\AddOns;
 use App\Livewire\Admin\Banners\Banners;
 use App\Livewire\Admin\Buns\Buns;
@@ -21,6 +22,7 @@ use App\Livewire\Frontend\Home;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
@@ -28,9 +30,22 @@ Route::get('/', Home::class)->name('home');
 // cart page
 Route::get('/cart', CartPage::class)->name('cart.page');
 
-Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', CheckoutPage::class)->name('checkout');
     Route::get('/order/thank-you/{code}', OrderThankYouController::class)->name('orders.thankyou');
+
+    Route::get('/payment/ssl/init/{order}', [SslCommerzController::class, 'init'])->name('ssl.init');
+
+    // Success/Fail/Cancel come from SSLCommerz (often POST). They don’t include a session cookie reliably,
+    // so don’t depend on auth here; identify the order by tran_id.
+    Route::post('/payment/ssl/success', [SslCommerzController::class, 'success'])->name('ssl.success')->withoutMiddleware([VerifyCsrfToken::class]);
+    Route::post('/payment/ssl/fail', [SslCommerzController::class, 'fail'])->name('ssl.fail')->withoutMiddleware([VerifyCsrfToken::class]);
+    Route::post('/payment/ssl/cancel', [SslCommerzController::class, 'cancel'])->name('ssl.cancel')->withoutMiddleware([VerifyCsrfToken::class]);
+
+    // IPN (server-to-server) — optional but recommended
+    Route::post('/payment/ssl/ipn', [SslCommerzController::class, 'ipn'])->name('ssl.ipn')->withoutMiddleware([VerifyCsrfToken::class]);
+
+Route::middleware(['auth'])->group(function () {
+
 });
 
 

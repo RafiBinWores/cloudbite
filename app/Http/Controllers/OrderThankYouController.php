@@ -9,7 +9,8 @@ class OrderThankYouController extends Controller
 {
     public function __invoke(string $code)
     {
-        $order = Order::where('order_code', $code)->firstOrFail();
+         $order = Order::with(['items.dish'])->where('order_code', $code)->firstOrFail();
+            
         return view('livewire.frontend.orders.thank-you', compact('order'));
     }
 }

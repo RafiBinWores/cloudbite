@@ -23,4 +23,9 @@ class OrderItem extends Model
         'addon_ids' => 'array',
         'meta' => 'array',
     ];
+
+     public function dish()
+    {
+        return $this->belongsTo(Dish::class);
+    }
 }

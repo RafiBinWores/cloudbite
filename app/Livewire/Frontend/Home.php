@@ -4,8 +4,10 @@ namespace App\Livewire\Frontend;
 
 use App\Models\Category;
 use App\Models\Dish;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+#[Layout('components.layouts.front-home')]
 class Home extends Component
 {
     public function render()
@@ -22,6 +24,6 @@ class Home extends Component
             ->get();
         
         return view('livewire.frontend.home', compact('categories', 'dishes'))
-            ->layout('components.layouts.front-home', ['title' => 'Home - CloudBite']);
+            ->title('Home - CloudBite');
     }
 }

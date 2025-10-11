@@ -38,7 +38,8 @@
 
                 {{-- Crust select (if have any) --}}
                 @if ($dish && $dish->crusts->count())
-                    <div class="bg-customRed-100/15 shadow mt-2 md:p-5 rounded-lg @error('crust_id') border border-customRed-100 @enderror">
+                    <div
+                        class="bg-customRed-100/15 shadow mt-2 md:p-5 rounded-lg @error('crust_id') border border-customRed-100 @enderror">
                         <div class="flex items-center justify-between mb-4">
                             <div>
                                 <h4 class="font-oswald font-medium text-lg">Crust</h4>
@@ -99,7 +100,8 @@
 
                 {{-- Bun select (if have any) --}}
                 @if ($dish && $dish->buns->count())
-                    <div class="bg-customRed-100/15 shadow mt-2 md:p-5 rounded-lg  @error('bun_id') border border-customRed-100 @enderror">
+                    <div
+                        class="bg-customRed-100/15 shadow mt-2 md:p-5 rounded-lg  @error('bun_id') border border-customRed-100 @enderror">
                         <div class="flex items-center justify-between mb-4">
                             <div>
                                 <h4 class="font-oswald font-medium text-lg">Bun</h4>
@@ -160,35 +162,32 @@
 
                 <!-- Add ones -->
                 @if ($dish && $dish->addOns->count())
-          <div class="bg-customRed-100/15 mt-5 md:p-6 rounded-md">
-            <div class="flex items-center justify-between mb-4">
-              <h4 class="font-oswald font-medium text-lg">Add Ons</h4>
+                    <div class="bg-customRed-100/15 mt-5 md:p-6 rounded-md">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-oswald font-medium text-lg">Add Ons</h4>
 
-              <p
-                class="bg-white text-gray-500 font-jost px-3 py-1 rounded-full text-xs"
-              >
-                Optional
-              </p>
-            </div>
+                            <p class="bg-white text-gray-500 font-jost px-3 py-1 rounded-full text-xs">
+                                Optional
+                            </p>
+                        </div>
 
-            <div class="font-jost text-gray-600 space-y-3 pe-2">
+                        <div class="font-jost text-gray-600 space-y-3 pe-2">
 
-                @foreach ($dish->addOns as $a)
+                            @foreach ($dish->addOns as $a)
                                 @php $inputId = 'addon_'.$a->id; @endphp
-              <div class="flex items-center justify-between">
-                <label for="{{ $inputId }}" class="label text-gray-600 font-jost">
-                  <input id="{{ $inputId }}" value="{{ $a->id }}" wire:model.live="addon_ids"
-                    type="checkbox"
-                    class="checkbox checkbox-error checkbox-sm"
-                  />
-                  Extra Cheese
-                </label>
-                <p>TK {{ number_format($a->price ?? 0, 2) }}</p>
-              </div>
-              @endforeach
-            </div>
-          </div>
-          @endif
+                                <div class="flex items-center justify-between">
+                                    <label for="{{ $inputId }}" class="label text-gray-600 font-jost">
+                                        <input id="{{ $inputId }}" value="{{ $a->id }}"
+                                            wire:model.live="addon_ids" type="checkbox"
+                                            class="checkbox checkbox-error checkbox-sm" />
+                                        {{ $a->name }}
+                                    </label>
+                                    <p>TK {{ number_format($a->price ?? 0, 2) }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
 
                 {{-- Add-ons (multiple & optional) --}}
                 {{-- @if ($dish && $dish->addOns->count())

@@ -11,8 +11,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 
+#[Layout('components.layouts.frontend')]
 class CheckoutPage extends Component
 {
 
@@ -22,7 +24,6 @@ class CheckoutPage extends Component
     public ?string $email = null;
 
     public string $address_line1 = '';
-    public ?string $address_line2 = null;
     public string $city = '';
     public string $postcode = '';
 
@@ -54,10 +55,12 @@ class CheckoutPage extends Component
     {
         return [
             'contact_name'   => 'required|string|max:191',
-            'phone'          => 'required|string|max:50',
+            'phone'          => [
+                'required',
+                'regex:/^(?:\+?88)?01[3-9]\d{8}$/',
+            ],
             'email'          => 'nullable|email',
             'address_line1'  => 'required|string|max:255',
-            'address_line2'  => 'nullable|string|max:255',
             'city'           => 'required|string|max:120',
             'postcode'       => 'required|string|max:20',
             'customer_note'  => 'nullable|string|max:1000',
@@ -112,7 +115,7 @@ class CheckoutPage extends Component
     public function updated($field): void
     {
         // If you later apply zone-based shipping, re-hydrate on address changes
-        if (in_array($field, ['address_line1', 'address_line2', 'city', 'postcode'])) {
+        if (in_array($field, ['address_line1', 'city', 'postcode'])) {
             $this->hydrateTotals();
         }
     }
@@ -131,20 +134,19 @@ class CheckoutPage extends Component
 
         return DB::transaction(function () {
             $user = Auth::user();
+            $code = 'ORD-' . now()->format('Y') . '-' . Str::upper(Str::random(6));
 
-            $code = 'ORD-' . now()->format('Ymd') . '-' . Str::upper(Str::random(6));
-
-            $order = Order::create([
+            // Common order payload (buckets from cart; NO placed_at yet)
+            $orderPayload = [
                 'user_id'        => $user?->id,
                 'session_id'     => Session::getId(),
                 'order_code'     => $code,
 
-                // Persist the exact buckets (no recomputation to avoid drift / double tax)
                 'subtotal'       => $this->subtotal,
                 'discount_total' => $this->discount_total,
                 'tax_total'      => $this->tax_total,
                 'shipping_total' => $this->shipping_total,
-                'grand_total'    => $this->grand_total, // cart grand + shipping
+                'grand_total'    => $this->grand_total,
 
                 'coupon_code'    => data_get($this->cart->meta, 'coupon.code'),
                 'coupon_value'   => (float) data_get($this->cart->meta, 'coupon.calculated', 0),
@@ -155,7 +157,6 @@ class CheckoutPage extends Component
 
                 'shipping_address' => [
                     'line1'    => $this->address_line1,
-                    'line2'    => $this->address_line2,
                     'city'     => $this->city,
                     'postcode' => $this->postcode,
                 ],
@@ -164,15 +165,45 @@ class CheckoutPage extends Component
 
                 'payment_method' => $this->payment_method,
                 'payment_status' => 'unpaid',
-                'order_status'   => 'pending',
+                'order_status'   => 'pending',  // stays pending until paid
+                'placed_at'      => null,       // set only after successful payment
+                'meta'           => ['cart_id' => $this->cart->id],
+            ];
+
+            if ($this->payment_method === 'sslcommerz') {
+                // 1) Create a shell order for tracking; DO NOT clear the cart yet
+                $tranId = 'CB-' . now()->format('YmdHis') . '-' . Str::random(6);
+                $order = Order::create(array_merge($orderPayload, [
+                    'meta' => array_merge($orderPayload['meta'], ['tran_id' => $tranId]),
+                ]));
+
+                // 2) (Optional) copy items now so you have a snapshot even if cart changes
+                foreach ($this->cart->items as $ci) {
+                    OrderItem::create([
+                        'order_id'   => $order->id,
+                        'dish_id'    => $ci->dish_id,
+                        'qty'        => $ci->qty,
+                        'crust_id'   => $ci->crust_id,
+                        'bun_id'     => $ci->bun_id,
+                        'addon_ids'  => $ci->addon_ids,
+                        'unit_price' => $ci->unit_price,
+                        'line_total' => $ci->line_total,
+                        'meta'       => $ci->meta,
+                    ]);
+                }
+
+                // 3) IMPORTANT: DO NOT clear the cart yet. Wait for success callback.
+                // 4) Redirect to gateway init
+                return redirect()->route('ssl.init', ['order' => $order->id]);
+            }
+
+            // COD flow — create full order and clear cart now
+            $order = Order::create(array_merge($orderPayload, [
+                'payment_status' => 'unpaid',
+                'order_status'   => 'processing', // or 'pending' if you verify later
                 'placed_at'      => now(),
+            ]));
 
-                'meta'           => [
-                    'cart_id' => $this->cart->id,
-                ],
-            ]);
-
-            // Copy cart items → order_items
             foreach ($this->cart->items as $ci) {
                 OrderItem::create([
                     'order_id'   => $order->id,
@@ -187,7 +218,7 @@ class CheckoutPage extends Component
                 ]);
             }
 
-            // Clear cart (soft reset)
+            // Clear cart only for COD (paid on delivery, but you lock items)
             $this->cart->items()->delete();
             $this->cart->update([
                 'subtotal' => 0,
@@ -197,22 +228,16 @@ class CheckoutPage extends Component
                 'meta' => null,
             ]);
 
-
-            if ($this->payment_method === 'sslcommerz') {
-                // TODO: integrate SSLCommerz
-                return redirect()->route('orders.thankyou', ['code' => $order->order_code]);
-            }
-
-            // COD
             return redirect()->route('orders.thankyou', ['code' => $order->order_code]);
         });
     }
+
 
     public function render()
     {
         return view('livewire.frontend.checkout.checkout-page', [
             'cart' => $this->cart,
             'shipSetting' => $this->shipSetting,
-        ])->layout('components.layouts.frontend', ['title' => 'Checkout - CloudBite']);
+        ])->title('Checkout - CloudBite');
     }
 }

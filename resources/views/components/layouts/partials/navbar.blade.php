@@ -10,12 +10,12 @@
 
             <!-- Logo (centered on sm & md) -->
             <a href="/" class="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
-                <img src="./assets/images/logos/logo.png" alt="Logo" class="h-10 md:h-12" />
+                <img src="{{ asset('assets/images/logos/logo.png') }}" alt="Logo" class="h-10 md:h-12" />
             </a>
 
             <!-- Desktop Menu -->
             <ul class="hidden lg:flex items-center gap-10 font-oswald text-lg font-medium text-slate-900">
-                <li><a href="#" class="hover:opacity-80">Home</a></li>
+                <li><a href="/" class="hover:opacity-80">Home</a></li>
                 <li class="relative group">
                     <a href="#" class="hover:opacity-80 flex items-center gap-1">
                         Categories
@@ -80,7 +80,7 @@
             <!-- Menu Items -->
             <ul class="flex flex-col font-oswald text-lg font-medium text-slate-900 mt-4">
                 <li>
-                    <a href="#" class="block px-5 py-4 hover:bg-slate-100">Home</a>
+                    <a href="/" class="block px-5 py-4 hover:bg-slate-100">Home</a>
                 </li>
 
                 <!-- Dropdown -->

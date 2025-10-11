@@ -5,9 +5,11 @@ namespace App\Livewire\Frontend\Cart;
 use App\Models\Cart;
 use App\Repositories\CartRepository;
 use Developermithu\Tallcraftui\Traits\WithTcToast;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+#[Layout('components.layouts.frontend')]
 class CartPage extends Component
 {
     use WithTcToast;
@@ -197,6 +199,6 @@ class CartPage extends Component
     public function render()
     {
         return view('livewire.frontend.cart.cart-page')
-            ->layout('components.layouts.frontend', ['title' => 'Cart - CloudBite']);
+            ->title('Cart - CloudBite');
     }
 }

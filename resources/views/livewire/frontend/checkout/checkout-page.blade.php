@@ -17,6 +17,13 @@
         </style>
     @endpush
 
+    <!-- Breadcrumb -->
+    <div
+        class="bg-[url(/assets/images/breadcrumb-bg.jpg)] py-20 md:py-32 bg-no-repeat bg-cover bg-center text-center text-white grid place-items-center font-oswald">
+        <h4 class="text-4xl md:text-6xl font-medium">Cart</h4>
+    </div>
+
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
         <h1 class="text-2xl font-semibold mb-6">Checkout</h1>
 
@@ -35,7 +42,7 @@
                         </div>
                         <div>
                             <label class="text-sm font-medium">Phone</label>
-                            <input type="text" class="input input-bordered w-full" wire:model.defer="phone">
+                            <input type="number" class="input input-bordered w-full" wire:model.defer="phone">
                             @error('phone')
                                 <p class="text-error text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -53,34 +60,65 @@
                 <div class="rounded-xl border p-6">
                     <h2 class="text-lg font-semibold mb-4">Shipping address</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="md:col-span-2">
-                            <label class="text-sm font-medium">Address line 1</label>
-                            <input type="text" class="input input-bordered w-full" wire:model.defer="address_line1">
-                            @error('address_line1')
-                                <p class="text-error text-xs mt-1">{{ $message }}</p>
-                            @enderror
+
+
+
+                        <div x-data="mapPicker({
+                            wire: $wire,
+                            initialLat: @js($lat ?? 23.8103),
+                            initialLng: @js($lng ?? 90.4125),
+                            initialZoom: 13
+                        })" x-init="init($refs.mapEl)" class="space-y-3 md:col-span-2"
+                            wire:ignore.self>
+                            <div class="flex items-center justify-between">
+                                <div class="w-full">
+                                    <label class="text-sm font-medium">Search location</label>
+                                    <div class="flex gap-2">
+                                        <input x-model="query" @keydown.enter.prevent="search()" type="text"
+                                            placeholder="Type area/road/landmark and press Enter"
+                                            class="input input-bordered w-full" />
+                                        <button type="button" class="btn btn-outline" @click="search()">Search</button>
+                                    </div>
+                                    <p class="text-xs opacity-60 mt-1">Tip: drag the marker to fine-tune the location.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {{-- NOTE: use x-ref + wire:ignore on the actual map container --}}
+                            <div x-ref="mapEl" id="address-map" class="w-full" wire:ignore></div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="text-sm font-medium">Address line 1 (autofilled)</label>
+                                    <input type="text" class="input input-bordered w-full"
+                                        :disabled="!manualOverride" :class="manualOverride ? '' : 'opacity-80'"
+                                        x-model="addressLine1" @input="wire.set('address_line1', addressLine1)" />
+                                    <div class="mt-2 flex items-center gap-2">
+                                        <input id="manual_override" type="checkbox" class="checkbox"
+                                            x-model="manualOverride"
+                                            @change="!manualOverride && (addressLine1 = savedAddressLine1); wire.set('address_line1', addressLine1)" />
+                                        <label for="manual_override" class="text-sm">Edit address manually</label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="text-sm font-medium">City (auto)</label>
+                                    <input type="text" class="input input-bordered w-full" x-model="city"
+                                        @input="wire.set('city', city)" />
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium">Postcode (auto)</label>
+                                    <input type="text" class="input input-bordered w-full" x-model="postcode"
+                                        @input="wire.set('postcode', postcode)" />
+                                </div>
+                            </div>
+
+                            <template x-if="lat && lng">
+                                <p class="text-xs opacity-60">Lat: <span x-text="lat.toFixed(6)"></span>,
+                                    Lng: <span x-text="lng.toFixed(6)"></span></p>
+                            </template>
                         </div>
-                        <div class="md:col-span-2">
-                            <label class="text-sm font-medium">Address line 2 (optional)</label>
-                            <input type="text" class="input input-bordered w-full" wire:model.defer="address_line2">
-                            @error('address_line2')
-                                <p class="text-error text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        <div>
-                            <label class="text-sm font-medium">City</label>
-                            <input type="text" class="input input-bordered w-full" wire:model.defer="city">
-                            @error('city')
-                                <p class="text-error text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        <div>
-                            <label class="text-sm font-medium">Postcode</label>
-                            <input type="text" class="input input-bordered w-full" wire:model.defer="postcode">
-                            @error('postcode')
-                                <p class="text-error text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+
                         <div class="md:col-span-2">
                             <label class="text-sm font-medium">Note to rider (optional)</label>
                             <textarea class="textarea textarea-bordered w-full" rows="3" wire:model.defer="customer_note"></textarea>
@@ -91,66 +129,7 @@
                     </div>
                 </div>
 
-                <div 
-  x-data="mapPicker({
-    wire: $wire,
-    initialLat: @js($lat ?? 23.8103),
-    initialLng: @js($lng ?? 90.4125),
-    initialZoom: 13
-  })"
-  x-init="init($refs.mapEl)"
-  class="space-y-3"
-  wire:ignore.self
->
-  <div class="flex items-center justify-between">
-    <div class="w-full">
-      <label class="text-sm font-medium">Search location</label>
-      <div class="flex gap-2">
-        <input x-model="query" @keydown.enter.prevent="search()" type="text"
-               placeholder="Type area/road/landmark and press Enter"
-               class="input input-bordered w-full" />
-        <button type="button" class="btn btn-outline" @click="search()">Search</button>
-      </div>
-      <p class="text-xs opacity-60 mt-1">Tip: drag the marker to fine-tune the location.</p>
-    </div>
-  </div>
 
-  {{-- NOTE: use x-ref + wire:ignore on the actual map container --}}
-  <div x-ref="mapEl" id="address-map" class="w-full" wire:ignore></div>
-
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="md:col-span-2">
-      <label class="text-sm font-medium">Address line 1 (autofilled)</label>
-      <input type="text" class="input input-bordered w-full"
-             :disabled="!manualOverride"
-             :class="manualOverride ? '' : 'opacity-80'"
-             x-model="addressLine1"
-             @input="wire.set('address_line1', addressLine1)" />
-      <div class="mt-2 flex items-center gap-2">
-        <input id="manual_override" type="checkbox" class="checkbox"
-               x-model="manualOverride"
-               @change="!manualOverride && (addressLine1 = savedAddressLine1); wire.set('address_line1', addressLine1)" />
-        <label for="manual_override" class="text-sm">Edit address manually</label>
-      </div>
-    </div>
-
-    <div>
-      <label class="text-sm font-medium">City (auto)</label>
-      <input type="text" class="input input-bordered w-full" x-model="city"
-             @input="wire.set('city', city)" />
-    </div>
-    <div>
-      <label class="text-sm font-medium">Postcode (auto)</label>
-      <input type="text" class="input input-bordered w-full" x-model="postcode"
-             @input="wire.set('postcode', postcode)" />
-    </div>
-  </div>
-
-  <template x-if="lat && lng">
-    <p class="text-xs opacity-60">Lat: <span x-text="lat.toFixed(6)"></span>,
-       Lng: <span x-text="lng.toFixed(6)"></span></p>
-  </template>
-</div>
 
                 <div class="rounded-xl border p-6">
                     <h2 class="text-lg font-semibold mb-4">Payment method</h2>
