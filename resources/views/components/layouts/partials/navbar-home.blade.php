@@ -44,12 +44,6 @@
                 <li><a href="shop.html" class="hover:text-customRed-200">Shop</a></li>
                 <li><a href="#" class="hover:text-customRed-200">Contact</a></li>
                 <li><a href="#" class="hover:text-customRed-200">About</a></li>
-                <form method="POST" action="{{ route('logout') }}" class="w-full">
-                    @csrf
-                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
-                        {{ __('Log Out') }}
-                    </flux:menu.item>
-                </form>
             </ul>
 
             <div class="flex items-center gap-3 ml-auto lg:ml-0">
@@ -139,7 +133,7 @@
                 </div>
 
                 <!-- Account icon -->
-                <a href="#"
+                <a href="{{ route('account') }}" wire:navigate
                     class="grid border rounded-full border-slate-900 w-10 h-10 sm:w-12 sm:h-12 place-items-center hover:bg-slate-900 group duration-200 flex-none">
                     <i class="fa-regular fa-user group-hover:text-white"></i>
                 </a>

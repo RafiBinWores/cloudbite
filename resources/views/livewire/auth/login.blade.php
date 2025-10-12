@@ -47,10 +47,10 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2">
                     <!-- Left: Image -->
                     <div class="relative">
-                        <img src="/assets/images/login.jpg" alt="People dining"
+                        <img src="{{ asset('assets/images/login.jpg') }}" alt="People dining"
                             class="w-full h-[260px] sm:h-[340px] lg:h-full object-cover" />
                         <!-- Logo on image -->
-                        <img src="/assets/images/logos/logo-light.png" alt="FOODU"
+                        <img src="{{ asset('assets/images/logos/logo-light.png') }}" alt="FOODU"
                             class="absolute left-6 top-6 h-10 sm:h-12" />
                     </div>
 

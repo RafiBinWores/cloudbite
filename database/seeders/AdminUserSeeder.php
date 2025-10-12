@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -19,7 +20,7 @@ class AdminUserSeeder extends Seeder
             [
                 'name' => 'CloudBite Admin',
                 'password' => Hash::make('password'),
-                'role' => 'admin',
+                'role' => UserRole::Admin,
             ]
         );
     }

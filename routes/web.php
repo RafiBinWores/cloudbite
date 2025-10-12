@@ -16,6 +16,7 @@ use App\Livewire\Admin\Dishes\Dishes;
 use App\Livewire\Admin\Dishes\EditDish;
 use App\Livewire\Admin\Dishes\ShowDish;
 use App\Livewire\Admin\Tags\Tags;
+use App\Livewire\Frontend\Account\Account;
 use App\Livewire\Frontend\Cart\CartPage;
 use App\Livewire\Frontend\Checkout\CheckoutPage;
 use App\Livewire\Frontend\Home;
@@ -30,8 +31,8 @@ Route::get('/', Home::class)->name('home');
 // cart page
 Route::get('/cart', CartPage::class)->name('cart.page');
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/checkout', CheckoutPage::class)->name('checkout');
+Route::middleware(['auth', 'role:user,manager,admin'])->group(function () {
+    Route::get('checkout', CheckoutPage::class)->name('checkout');
     Route::get('/order/thank-you/{code}', OrderThankYouController::class)->name('orders.thankyou');
 
     // SSl Payment routes
@@ -42,8 +43,11 @@ Route::middleware(['auth'])->group(function () {
 
     // IPN (server-to-server) — optional but recommended
     Route::post('/payment/ssl/ipn', [SslCommerzController::class, 'ipn'])->name('ssl.ipn')->withoutMiddleware([VerifyCsrfToken::class]);
-});
 
+    // Account Routes
+    Route::get('account', Account::class)->name('account');
+    Route::get('account/profile', Profile::class)->name('account.profile');
+});
 
 // Admin Dashboard Route Starts
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {

@@ -4,37 +4,47 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
+use BackedEnum;
+use UnitEnum;
 
 class EnsureRole
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        $user = $request->user();
-
-        if (!$user) {
-            // Not logged in
-            return redirect()->route('login');
+        if (! Auth::check()) {
+            return redirect()->guest(route('login'));
         }
 
-        // if no roles passed, allow any authenticated user
-        if (empty($roles)) {
-            return $next($request);
-        }
+        // Allowed roles from route: 'role:admin' or 'role:admin,manager'
+        $allowedRoles = collect($roles)
+            ->flatMap(fn($r) => explode(',', $r))
+            ->map(fn($r) => strtolower(trim($r)))
+            ->filter()
+            ->values();
 
-        // Support enum or string
-        $userRole = is_object($user->role) && method_exists($user->role, 'value') ? $user->role->value : $user->role;
+        // Normalize the user's role to a lowercase string
+        $userRole = $this->normalizeRole(Auth::user()->role);
 
-        if (! in_array($userRole, $roles, true)) {
-            // You can redirect to a “no access” page instead of aborting
-            abort(403, 'Unauthorized.');
+        if ($allowedRoles->isNotEmpty() && ! $allowedRoles->contains($userRole)) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Forbidden'], 403);
+            }
+            abort(403, 'Unauthorized. Tui K vai?');
         }
 
         return $next($request);
+    }
+
+    private function normalizeRole(mixed $role): string
+    {
+        if ($role instanceof BackedEnum) {
+            return strtolower((string) $role->value);
+        }
+        if ($role instanceof UnitEnum) {
+            return strtolower($role->name);
+        }
+        return strtolower((string) $role);
     }
 }

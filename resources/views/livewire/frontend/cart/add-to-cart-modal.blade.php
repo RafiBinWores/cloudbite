@@ -1,7 +1,7 @@
 <div>
     <input type="checkbox" class="modal-toggle" {{ $open ? 'checked' : '' }} />
-    <div class="modal">
-        <div class="modal-box max-w-3xl p-0 rounded-2xl overflow-hidden">
+    <div class="modal ">
+        <div class="modal-box max-w-3xl p-0 rounded-2xl overflow-hidden bg-white">
 
             {{-- Header --}}
             <div class="p-5 flex gap-4 items-start border-b">
