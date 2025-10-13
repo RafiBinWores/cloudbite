@@ -101,4 +101,9 @@ class Dish extends Model
     {
         return (string) round($value);
     }
+
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(\App\Models\User::class, 'favorites')->withTimestamps();
+    }
 }

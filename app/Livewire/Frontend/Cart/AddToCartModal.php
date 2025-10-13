@@ -5,6 +5,7 @@ namespace App\Livewire\Frontend\Cart;
 use App\Models\Dish;
 use App\Repositories\CartRepository;
 use Developermithu\Tallcraftui\Traits\WithTcToast;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -17,15 +18,17 @@ class AddToCartModal extends Component
     public ?Dish $dish = null;
 
     public int $qty = 1;
-    public ?int $crust_id = null;     // single
-    public ?int $bun_id = null;       // optional, free for now
-    public array $addon_ids = [];     // multiple
+    public ?int $crust_id = null;
+    public ?int $bun_id = null;
+    public array $addon_ids = [];
 
     public bool $open = false;
-    public bool $crust_required = true; // force a crust if dish has any
-    public bool $bun_required = true; // force a bun if dish has any
+    public bool $crust_required = true;
+    public bool $bun_required = true;
 
-    #[On('open-add-to-cart')] // emit('open-add-to-cart', dishId)
+    public bool $isFavorited = false;
+
+    #[On('open-add-to-cart')]
     public function open(int $dishId): void
     {
         $this->resetValidation();
@@ -37,6 +40,54 @@ class AddToCartModal extends Component
 
         $this->dish = Dish::with(['crusts', 'buns', 'addOns'])->findOrFail($dishId);
         $this->open = true;
+
+        $this->isFavorited = Auth::check() && Auth::user()->hasFavorited($this->dish->id);
+    }
+
+    // 👇 Add this
+    public function toggleFavorite(): void
+    {
+        if (!Auth::check()) {
+            // If you have a login modal, trigger it; otherwise redirect
+            $this->dispatch('open-login'); // optional custom event if you use a login modal
+            // return redirect()->route('login'); // or redirect if you prefer
+            $this->warning(
+                title: 'Please log in to save favorites.',
+                position: 'top-right',
+                showProgress: true
+            );
+            return;
+        }
+
+        $user = Auth::user();
+        $dishId = $this->dish?->id;
+
+        if (!$dishId) {
+            $this->addError('dish', 'Dish not loaded.');
+            return;
+        }
+
+        if ($user->favorites()->where('dish_id', $dishId)->exists()) {
+            $user->favorites()->detach($dishId);
+            $this->isFavorited = false;
+            $this->info(
+                title: 'Removed from Favorites',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
+        } else {
+            // Optional guard
+            Dish::query()->findOrFail($dishId);
+            $user->favorites()->attach($dishId);
+            $this->isFavorited = true;
+            $this->success(
+                title: 'Added to Favorites',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
+        }
     }
 
     public function incrementQty(): void
@@ -50,7 +101,6 @@ class AddToCartModal extends Component
     }
 
     /** ================= Live preview helpers ================= */
-
     public function getBasePriceProperty(): float
     {
         if (!$this->dish) return 0.0;

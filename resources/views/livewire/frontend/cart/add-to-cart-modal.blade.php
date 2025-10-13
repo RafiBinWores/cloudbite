@@ -12,13 +12,25 @@
                         <div>
                             <div class="flex items-center gap-3">
                                 <h3 class="text-xl font-semibold">{{ $dish?->title }}</h3>
-                                <button class="btn btn-ghost btn-circle">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                            d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.312-2.733C5.099 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+
+                                {{-- Favorites --}}
+                                <button wire:click="toggleFavorite" wire:loading.attr="disabled"
+                                    aria-pressed="{{ $isFavorited ? 'true' : 'false' }}"
+                                    title="{{ $isFavorited ? 'Remove from Favorites' : 'Add to Favorites' }}"
+                                    class="inline-flex items-center justify-center rounded-full p-2 transition cursor-pointer
+               {{ $isFavorited ? 'bg-red-500/10' : 'bg-slate-200/70 hover:bg-slate-300/70' }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="size-5 {{ $isFavorited ? 'text-red-500 fill-red-500' : 'text-slate-700' }}"
+                                        viewBox="0 0 24 24" fill="{{ $isFavorited ? 'currentColor' : 'none' }}"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path
+                                            d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
                                     </svg>
+                                    <span
+                                        class="sr-only">{{ $isFavorited ? 'Remove from Favorites' : 'Add to Favorites' }}</span>
                                 </button>
+
                             </div>
                             <p class="text-base md:text-lg text-slate-600 font-jost leading-relaxed">
                                 {{ $dish?->short_description }}</p>

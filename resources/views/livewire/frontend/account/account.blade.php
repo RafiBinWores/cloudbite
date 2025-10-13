@@ -11,11 +11,11 @@
                     </div>
                 </div>
                 <div class="border-e pe-10 ps-4 border-e-customRed-200 hidden md:block">
-                    <p class="text-slate-900"> 0{{ $totalOrders }}</p>
+                    <p class="text-slate-900"> {{ str_pad($totalOrders, 2, '0', STR_PAD_LEFT) }}</p>
                     <p class="text-gray-600 text-sm font-medium">Total Orders</p>
                 </div>
                 <div class="hidden ps-4 md:block">
-                    <p class="text-slate-900"> 0{{ $totalOrders }}</p>
+                    <p class="text-slate-900"> {{ str_pad($favoriteCount, 2, '0', STR_PAD_LEFT) }}</p>
                     <p class="text-gray-600 text-sm font-medium">Favorites</p>
                 </div>
             </div>

@@ -12,7 +12,11 @@ class Account extends Component
 {
     public function render()
     {
-        $totalOrders = Order::where('user_id', Auth::user()->id)->count();
-        return view('livewire.frontend.account.account', compact('totalOrders'));
+        $user = Auth::user();
+
+        $totalOrders = Order::where('user_id', $user->id)->count();
+        $favoriteCount = $user->favorites()->count();
+
+        return view('livewire.frontend.account.account', compact('totalOrders', 'favoriteCount'));
     }
 }
