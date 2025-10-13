@@ -44,7 +44,7 @@ class CheckoutPage extends Component
     public float $discount_total = 0;
     public float $tax_total = 0;
     public float $shipping_total = 0;
-    public float $grand_total = 0; 
+    public float $grand_total = 0;
 
     public ?Cart $cart = null;
     public ?ShippingSetting $shipSetting = null;
@@ -130,7 +130,25 @@ class CheckoutPage extends Component
 
         return DB::transaction(function () {
             $user = Auth::user();
-            $code = 'ORD-' . now()->format('Y') . '-' . Str::upper(Str::random(6));
+
+            // Current year
+            $year = now()->format('Y');
+
+            // Find last order of this year
+            $lastOrder = Order::whereYear('created_at', $year)
+                ->where('order_code', 'like', "{$year}%")
+                ->orderByDesc('id')
+                ->first();
+
+            // Extract last 4 digits (sequence number)
+            if ($lastOrder && preg_match('/' . $year . '(\d{4})$/', $lastOrder->order_code, $matches)) {
+                $nextNumber = (int) $matches[1] + 1;
+            } else {
+                $nextNumber = 1;
+            }
+
+            // Final code format: YYYY0001
+            $code = $year . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
             // Common order payload (buckets from cart; NO placed_at yet)
             $orderPayload = [
