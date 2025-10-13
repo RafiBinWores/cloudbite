@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Dishes;
 
 use App\Models\Dish;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -11,7 +12,7 @@ use Illuminate\Support\Str;
 
 class CreateDish extends Component
 {
-    use WithFileUploads;
+    use WithFileUploads, WithTcToast;
 
     // Form properties
     public $title = null, $short_description = null, $description = null;
@@ -27,11 +28,11 @@ class CreateDish extends Component
     public $meta_title, $meta_description, $meta_keyword;
 
     // Arrays
-    public $tags = [];           // JSON via cast
-    public $buns = [];           // pivot IDs
-    public $crusts = [];         // pivot IDs
-    public $addOns = [];         // pivot IDs
-    public $related_dishes = []; // pivot IDs (dishes)
+    public $tags = [];
+    public $buns = [];
+    public $crusts = []; 
+    public $addOns = [];
+    public $related_dishes = [];
 
     // Validation rules
     public function rules(): array
@@ -39,7 +40,7 @@ class CreateDish extends Component
         return [
             'title' => 'required|string|max:255|unique:dishes,title',
             'short_description' => 'required|string',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'category_id' => 'required|numeric',
             'related_dish_id' => 'nullable',
             'cuisine_id' => 'required|numeric',
@@ -223,7 +224,13 @@ class CreateDish extends Component
             $this->tags = [];
             $this->buns = $this->crusts = $this->addOns = $this->related_dishes = [];
 
-            $this->dispatch('toast', type: 'success', message: 'Cuisine created successfully.');
+            // $this->dispatch('toast', type: 'success', message: 'Cuisine created successfully.');
+            $this->success(
+            title: 'Dish created successfully',
+            position: 'top-right',
+            showProgress: true,
+            showCloseIcon: true,
+        );
         } catch (\Throwable $e) {
             if ($storedThumb) Storage::disk('public')->delete($storedThumb);
             if (!empty($storedGallery)) Storage::disk('public')->delete($storedGallery);
@@ -231,7 +238,13 @@ class CreateDish extends Component
             report($e);
             // Temporarily show the actual reason while debugging:
             // $this->dispatch('toast', type: 'error', message: 'Failed: '.$e->getMessage());
-            $this->dispatch('toast', type: 'error', message: 'Failed to create dish. Please try again.');
+            // $this->dispatch('toast', type: 'error', message: 'Failed to create dish. Please try again.');
+            $this->error(
+            title: 'Failed to create dish. Please try again.',
+            position: 'top-right',
+            showProgress: true,
+            showCloseIcon: true,
+        );
         }
     }
 

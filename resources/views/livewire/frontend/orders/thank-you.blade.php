@@ -48,6 +48,12 @@
                     @endforeach
                 </div>
 
+                {{-- <div class="px-6 py-4 flex items-center justify-between">
+                    <span class="font-semibold">Delivery Charge</span>
+                    <span class="font-semibold">
+                        {{ number_format($order->grand_total, 2) }} <span class="font-oswald">৳</span>
+                    </span>
+                </div> --}}
                 <div class="px-6 py-4 flex items-center justify-between">
                     <span class="font-semibold">Total</span>
                     <span class="font-semibold">

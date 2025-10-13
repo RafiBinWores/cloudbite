@@ -14,7 +14,7 @@
 @source '../../vendor/rappasoft/laravel-livewire-tables/resources/views/**/*.blade.php';
 
 @plugin "daisyui" {
-  themes: false;
+themes: light --default;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));

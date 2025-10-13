@@ -17,6 +17,7 @@ use App\Livewire\Admin\Dishes\EditDish;
 use App\Livewire\Admin\Dishes\ShowDish;
 use App\Livewire\Admin\Tags\Tags;
 use App\Livewire\Frontend\Account\Account;
+use App\Livewire\Frontend\Account\Favorites;
 use App\Livewire\Frontend\Cart\CartPage;
 use App\Livewire\Frontend\Checkout\CheckoutPage;
 use App\Livewire\Frontend\Home;
@@ -31,22 +32,23 @@ Route::get('/', Home::class)->name('home');
 // cart page
 Route::get('/cart', CartPage::class)->name('cart.page');
 
-Route::middleware(['auth', 'role:user,manager,admin'])->group(function () {
+// SSl Payment routes
+Route::get('/payment/ssl/init/{order}', [SslCommerzController::class, 'init'])->name('ssl.init');
+Route::post('/payment/ssl/success', [SslCommerzController::class, 'success'])->name('ssl.success');
+Route::post('/payment/ssl/fail', [SslCommerzController::class, 'fail'])->name('ssl.fail');
+Route::post('/payment/ssl/cancel', [SslCommerzController::class, 'cancel'])->name('ssl.cancel');
+
+// IPN (server-to-server) — optional but recommended
+Route::post('/payment/ssl/ipn', [SslCommerzController::class, 'ipn'])->name('ssl.ipn');
+
+Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('checkout', CheckoutPage::class)->name('checkout');
     Route::get('/order/thank-you/{code}', OrderThankYouController::class)->name('orders.thankyou');
-
-    // SSl Payment routes
-    Route::get('/payment/ssl/init/{order}', [SslCommerzController::class, 'init'])->name('ssl.init');
-    Route::post('/payment/ssl/success', [SslCommerzController::class, 'success'])->name('ssl.success')->withoutMiddleware([VerifyCsrfToken::class]);
-    Route::post('/payment/ssl/fail', [SslCommerzController::class, 'fail'])->name('ssl.fail')->withoutMiddleware([VerifyCsrfToken::class]);
-    Route::post('/payment/ssl/cancel', [SslCommerzController::class, 'cancel'])->name('ssl.cancel')->withoutMiddleware([VerifyCsrfToken::class]);
-
-    // IPN (server-to-server) — optional but recommended
-    Route::post('/payment/ssl/ipn', [SslCommerzController::class, 'ipn'])->name('ssl.ipn')->withoutMiddleware([VerifyCsrfToken::class]);
 
     // Account Routes
     Route::get('account', Account::class)->name('account');
     Route::get('account/profile', Profile::class)->name('account.profile');
+    Route::get('/account/favorites', Favorites::class)->name('account.favorites');
 });
 
 // Admin Dashboard Route Starts

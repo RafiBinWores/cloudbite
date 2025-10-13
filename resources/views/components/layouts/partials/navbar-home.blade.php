@@ -9,13 +9,13 @@
             </button>
 
             <!-- Logo (centered on sm & md) -->
-            <a href="/" wire:navigate class="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
+            <a href="/" class="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
                 <img src="{{ asset('assets/images/logos/logo.png') }}" alt="Logo" class="h-10" />
             </a>
 
             <!-- Desktop Menu -->
             <ul class="hidden lg:flex items-center gap-10 font-oswald text-lg font-medium text-slate-900">
-                <li><a href="/" wire:navigate class="hover:text-customRed-200">Home</a></li>
+                <li><a href="/" class="hover:text-customRed-200">Home</a></li>
                 <li class="relative group">
                     <a href="#" class="hover:text-customRed-200 flex items-center gap-1">
                         Categories

@@ -17,7 +17,6 @@ use Livewire\Attributes\On;
 #[Layout('components.layouts.frontend')]
 class CheckoutPage extends Component
 {
-
     // Contact & shipping
     public string $contact_name = '';
     public string $phone = '';
@@ -30,15 +29,14 @@ class CheckoutPage extends Component
     public ?string $customer_note = null;
 
     // Payment
-    public string $payment_method = 'cod'; // cod|sslcommerz
+    public string $payment_method = 'cod';
 
-    // Add these public properties at the top with your other fields:
     public ?float $lat = null;
     public ?float $lng = null;
     public ?string $city_from_map = null;
     public ?string $postcode_from_map = null;
 
-    // (Optional) helper: allow overriding address if user wants to type
+
     public bool $manual_address_override = false;
 
     // Totals (read from cart; no re-taxing)
@@ -46,7 +44,7 @@ class CheckoutPage extends Component
     public float $discount_total = 0;
     public float $tax_total = 0;
     public float $shipping_total = 0;
-    public float $grand_total = 0; // = cart.grand_total + shipping_total (to avoid double tax)
+    public float $grand_total = 0; 
 
     public ?Cart $cart = null;
     public ?ShippingSetting $shipSetting = null;
@@ -106,8 +104,6 @@ class CheckoutPage extends Component
 
         $this->shipping_total = ($free && $this->subtotal >= $min) ? 0.0 : $base;
 
-        // IMPORTANT: avoid double-tax — assume cart.grand_total ALREADY includes subtotal - discount + tax
-        // If your cart.grand_total already included shipping, then just set grand_total = cart.grand_total.
         $cartGrand = (float) ($this->cart->grand_total ?? 0);
         $this->grand_total = max(0, $cartGrand + $this->shipping_total);
     }
@@ -165,8 +161,8 @@ class CheckoutPage extends Component
 
                 'payment_method' => $this->payment_method,
                 'payment_status' => 'unpaid',
-                'order_status'   => 'pending',  // stays pending until paid
-                'placed_at'      => null,       // set only after successful payment
+                'order_status'   => 'pending',
+                'placed_at'      => null,
                 'meta'           => ['cart_id' => $this->cart->id],
             ];
 
@@ -192,8 +188,6 @@ class CheckoutPage extends Component
                     ]);
                 }
 
-                // 3) IMPORTANT: DO NOT clear the cart yet. Wait for success callback.
-                // 4) Redirect to gateway init
                 return redirect()->route('ssl.init', ['order' => $order->id]);
             }
 
