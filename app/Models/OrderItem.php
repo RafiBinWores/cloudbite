@@ -28,4 +28,14 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Dish::class);
     }
+
+     public function crust()
+    {
+        return $this->belongsTo(Crust::class);
+    }
+
+     public function bun()
+    {
+        return $this->belongsTo(Bun::class);
+    }
 }

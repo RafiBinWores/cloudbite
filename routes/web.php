@@ -18,6 +18,8 @@ use App\Livewire\Admin\Dishes\ShowDish;
 use App\Livewire\Admin\Tags\Tags;
 use App\Livewire\Frontend\Account\Account;
 use App\Livewire\Frontend\Account\Favorites;
+use App\Livewire\Frontend\Account\OrderDetails;
+use App\Livewire\Frontend\Account\OrdersPage;
 use App\Livewire\Frontend\Cart\CartPage;
 use App\Livewire\Frontend\Checkout\CheckoutPage;
 use App\Livewire\Frontend\Home;
@@ -49,6 +51,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('account', Account::class)->name('account');
     Route::get('account/profile', Profile::class)->name('account.profile');
     Route::get('/account/favorites', Favorites::class)->name('account.favorites');
+    Route::get('/account/orders', OrdersPage::class)->name('account.orders');
+    Route::get('/account/orders/{code}', OrderDetails::class)->name('account.orders.show');
 });
 
 // Admin Dashboard Route Starts

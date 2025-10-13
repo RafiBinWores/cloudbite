@@ -41,4 +41,14 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function scopeOngoing($q)
+    {
+        return $q->whereIn('order_status', ['pending', 'processing', 'confirmed', 'out_for_delivery']);
+    }
+
+    public function scopeDelivered($q)
+    {
+        return $q->where('order_status', 'delivered');
+    }
 }

@@ -1,3 +1,27 @@
+<div>
+        <!-- Breadcrumb -->
+    <div
+        class="bg-[url(/assets/images/breadcrumb-bg.jpg)] py-20 md:py-32 bg-no-repeat bg-cover bg-center text-center text-white grid place-items-center font-oswald">
+        <h4 class="text-4xl md:text-6xl font-medium">Favorites</h4>
+        <div class="breadcrumbs text-sm mt-3 font-medium">
+            <ul class="flex items-center">
+                <li>
+                    <a href="/">
+                        <i class="fa-regular fa-house"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('account') }}">
+                        <i class="fa-regular fa-user"></i>
+                        Account
+                    </a>
+                </li>
+                <li>Favorites</li>
+            </ul>
+        </div>
+    </div>
+    
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
     <div class="flex items-center justify-between gap-4 mb-6">
         <div>
@@ -97,4 +121,6 @@
 
     {{-- cart modal --}}
     <livewire:frontend.cart.add-to-cart-modal />
+</div>
+
 </div>
