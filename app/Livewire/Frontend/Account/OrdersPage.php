@@ -16,14 +16,27 @@ class OrdersPage extends Component
     public string $tab = 'ongoing'; // 'ongoing' | 'delivered'
     public int $perPage = 10;
 
-    // Exact filters you requested
     protected array $ongoingStatuses   = ['pending', 'processing', 'confirmed', 'out_for_delivery'];
     protected array $deliveredStatuses = ['delivered'];
+
+    public ?Order $selected = null;
 
     public function setTab(string $tab): void
     {
         $this->tab = in_array($tab, ['ongoing', 'delivered']) ? $tab : 'ongoing';
         $this->resetPage();
+    }
+
+    public function view(int $orderId): void
+    {
+        $this->selected = Order::with([
+            'items.dish', // make sure relations exist in your models
+        ])
+            ->where('user_id', Auth::id())
+            ->findOrFail($orderId);
+
+        // open the Alpine modal
+        $this->dispatch('open-order-modal');
     }
 
     public function render()
@@ -32,11 +45,9 @@ class OrdersPage extends Component
             ->where('user_id', Auth::id())
             ->select(['id', 'order_code', 'grand_total', 'payment_status', 'order_status', 'created_at']);
 
-        // counts for badges
-        $ongoingCount = (clone $base)->whereIn('order_status', $this->ongoingStatuses)->count();
+        $ongoingCount   = (clone $base)->whereIn('order_status', $this->ongoingStatuses)->count();
         $deliveredCount = (clone $base)->whereIn('order_status', $this->deliveredStatuses)->count();
 
-        // paginated list for current tab
         $listQuery = (clone $base)->latest('id');
         if ($this->tab === 'delivered') {
             $listQuery->whereIn('order_status', $this->deliveredStatuses);
