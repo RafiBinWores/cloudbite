@@ -41,6 +41,8 @@ return new class extends Migration
             $table->enum('payment_status', ['unpaid','paid','refunded'])->default('unpaid');
             $table->enum('order_status', ['pending','processing','confirmed','out_for_delivery', 'delivered', 'cancelled', 'returned', 'failed_to_deliver'])->default('pending');
 
+            $table->timestamp('cancelled_at')->nullable();
+            $table->text('cancelled_reason')->nullable();
             $table->timestamp('placed_at')->nullable();
             $table->json('meta')->nullable();
             $table->timestamps();

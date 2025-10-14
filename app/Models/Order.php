@@ -26,6 +26,8 @@ class Order extends Model
         'payment_status',
         'order_status',
         'placed_at',
+        'cancelled_at',
+        'cancelled_reason',
         'meta'
     ];
 
@@ -34,6 +36,7 @@ class Order extends Model
         'shipping_address' => 'array',
         'meta' => 'array',
         'placed_at' => 'datetime',
+        'cancelled_at' => 'datetime',
     ];
 
 
