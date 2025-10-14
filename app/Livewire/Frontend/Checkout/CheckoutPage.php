@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Frontend\Checkout;
 
+use App\Mail\OrderPlacedMail;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ShippingSetting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 use Illuminate\Support\Str;
@@ -116,6 +118,26 @@ class CheckoutPage extends Component
         }
     }
 
+    protected function sendOrderPlacedMail(?Order $order): void
+    {
+        if (! $order || empty($order->email)) {
+            return;
+        }
+
+        DB::afterCommit(function () use ($order) {
+            try {
+                Mail::to($order->email)->queue(new OrderPlacedMail($order));
+                // If not using queue yet, use ->send(...) instead of ->queue(...)
+            } catch (\Throwable $e) {
+                logger()->warning('OrderPlacedMail failed', [
+                    'order_id' => $order->id ?? null,
+                    'error'    => $e->getMessage(),
+                ]);
+            }
+        });
+    }
+
+
     #[On('shipping-settings-updated')]
     public function refreshShipping(): void
     {
@@ -206,6 +228,7 @@ class CheckoutPage extends Component
                     ]);
                 }
 
+
                 return redirect()->route('ssl.init', ['order' => $order->id]);
             }
 
@@ -240,6 +263,7 @@ class CheckoutPage extends Component
                 'meta' => null,
             ]);
 
+            $this->sendOrderPlacedMail($order);
             return redirect()->route('orders.thankyou', ['code' => $order->order_code]);
         });
     }

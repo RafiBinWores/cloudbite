@@ -193,9 +193,20 @@
                         </span>
                     </div>
 
-                    <button wire:click="placeOrder"
-                        class="btn bg-customRed-100 text-white w-full h-12 rounded-xl">Place
-                        order</button>
+                    <button wire:click="placeOrder" wire:loading.attr="disabled" wire:target="placeOrder"
+                        class="btn bg-customRed-100 text-white w-full h-12 rounded-xl disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                        <span wire:loading.remove wire:target="placeOrder">Place order</span>
+
+                        <span wire:loading wire:target="placeOrder" class="inline-flex items-center gap-2">
+                            <svg class="animate-spin size-4" viewBox="0 0 24 24" fill="none">
+                                <circle class="opacity-25" cx="12" cy="12" r="10"
+                                    stroke="currentColor" stroke-width="4" />
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z" />
+                            </svg>
+                            Placing…
+                        </span>
+                    </button>
 
                     <p class="text-xs opacity-60">By placing this order, you agree to our Terms & Refund Policy.</p>
                 </div>

@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderPlacedMail;
 use App\Models\Cart;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 
 class SslCommerzController extends Controller
 {
@@ -139,6 +142,10 @@ class SslCommerzController extends Controller
                     'meta' => null,
                 ]);
             }
+
+            DB::afterCommit(function () use ($order) {
+                Mail::to($order->email)->queue(new OrderPlacedMail($order));
+            });
 
             return redirect()->route('orders.thankyou', ['code' => $order->order_code]);
         }
