@@ -68,6 +68,17 @@ class CheckoutPage extends Component
         ];
     }
 
+public function messages(): array
+{
+    return [
+        'phone.required'          => 'A phone number is required.',
+        'phone.regex'             => 'Enter a valid Bangladeshi mobile number.',
+        'email.email'             => 'Please enter a valid email address.',
+        'address_line1.required'  => 'The delivery address field is required.',
+    ];
+}
+
+
     public function mount()
     {
         $user = Auth::user();
@@ -89,7 +100,7 @@ class CheckoutPage extends Component
             $this->email = $user->email ?? null;
         }
 
-        $this->hydrateTotals(); // reads cart buckets, then adds shipping
+        $this->hydrateTotals();
     }
 
     public function hydrateTotals(): void
@@ -195,6 +206,8 @@ class CheckoutPage extends Component
                     'line1'    => $this->address_line1,
                     'city'     => $this->city,
                     'postcode' => $this->postcode,
+                    'lat'      => $this->lat,
+                    'lng'      => $this->lng,
                 ],
 
                 'customer_note'  => $this->customer_note,

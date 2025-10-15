@@ -36,7 +36,7 @@
                 <button
                     type="button"
                     @click="showCancel = !showCancel"
-                    class="inline-flex items-center rounded-lg bg-red-600 text-white text-xs font-medium px-3 py-2 hover:bg-red-700"
+                    class="inline-flex items-center rounded-lg bg-red-600 text-white text-xs font-medium px-3 py-2 hover:bg-red-700 cursor-pointer"
                 >
                     Cancel Order
                 </button>
@@ -73,7 +73,7 @@
                                 type="submit"
                                 wire:loading.attr="disabled"
                                 wire:target="cancel"
-                                class="inline-flex items-center rounded-lg bg-red-600 text-white text-sm font-medium px-4 py-2 hover:bg-red-700 disabled:opacity-60"
+                                class="inline-flex items-center rounded-lg bg-red-600 text-white text-sm font-medium px-4 py-2 hover:bg-red-700 disabled:opacity-60 cursor-pointer"
                             >
                                 <span wire:loading.remove wire:target="cancel">Confirm Cancel</span>
                                 <span wire:loading wire:target="cancel">Cancelling…</span>
@@ -82,7 +82,7 @@
                             <button
                                 type="button"
                                 @click="showCancel = false"
-                                class="inline-flex items-center rounded-lg bg-white border text-slate-700 text-sm font-medium px-4 py-2 hover:bg-slate-50"
+                                class="inline-flex items-center cursor-pointer rounded-lg bg-white border text-slate-700 text-sm font-medium px-4 py-2 hover:bg-slate-50"
                             >
                                 Keep Order
                             </button>
