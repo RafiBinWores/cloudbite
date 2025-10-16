@@ -68,15 +68,15 @@ class CheckoutPage extends Component
         ];
     }
 
-public function messages(): array
-{
-    return [
-        'phone.required'          => 'A phone number is required.',
-        'phone.regex'             => 'Enter a valid Bangladeshi mobile number.',
-        'email.email'             => 'Please enter a valid email address.',
-        'address_line1.required'  => 'The delivery address field is required.',
-    ];
-}
+    public function messages(): array
+    {
+        return [
+            'phone.required'          => 'A phone number is required.',
+            'phone.regex'             => 'Enter a valid Bangladeshi mobile number.',
+            'email.email'             => 'Please enter a valid email address.',
+            'address_line1.required'  => 'The delivery address field is required.',
+        ];
+    }
 
 
     public function mount()

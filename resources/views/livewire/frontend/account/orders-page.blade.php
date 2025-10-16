@@ -11,14 +11,12 @@
                         Home
                     </a>
                 </li>
-                <li>/</li>
                 <li>
                     <a href="{{ route('account') }}" class="hover:underline">
                         <i class="fa-regular fa-user"></i>
                         Account
                     </a>
                 </li>
-                <li>/</li>
                 <li>Orders</li>
             </ul>
         </div>
