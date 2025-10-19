@@ -153,7 +153,7 @@
             </flux:navlist.group>
         </flux:navlist>
 
-         {{-- Promotion Management --}}
+        {{-- Promotion Management --}}
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Promotion Management')" class="grid">
 
@@ -168,8 +168,8 @@
                     {{ __('Coupons') }}</flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
-        
-         {{-- Report And Analytics --}}
+
+        {{-- Report And Analytics --}}
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Report And Analytics')" class="grid">
 
@@ -185,7 +185,7 @@
             </flux:navlist.group>
         </flux:navlist>
 
-         {{-- User Management --}}
+        {{-- User Management --}}
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('User Management')" class="grid">
 
@@ -199,10 +199,26 @@
                     :current="request()->routeIs('delivery.index')" wire:navigate>
                     {{ __('Deliveryman') }}</flux:navlist.item>
 
-                    {{-- Employees --}}
+                {{-- Employees --}}
                 <flux:navlist.item icon="employee-icon" :href="route('coupons.index')"
                     :current="request()->routeIs('coupons.index')" wire:navigate>
                     {{ __('Employees') }}</flux:navlist.item>
+            </flux:navlist.group>
+        </flux:navlist>
+
+        {{-- System Setting --}}
+        <flux:navlist variant="outline">
+            <flux:navlist.group :heading="__('System Setting')" class="grid">
+
+                {{-- Business Setup --}}
+                <flux:navlist.item icon="building-storefront" :href="route('business_setup.index')"
+                    :current="request()->routeIs('business_setup.index')" wire:navigate>
+                    {{ __('Business Setup') }}</flux:navlist.item>
+
+                {{-- Pages --}}
+                <flux:navlist.item icon="window" :href="route('delivery.index')"
+                    :current="request()->routeIs('delivery.index')" wire:navigate>
+                    {{ __('Pages') }}</flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
 
@@ -291,7 +307,8 @@
 
                 <form method="POST" action="{{ route('logout') }}" class="w-full">
                     @csrf
-                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
+                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle"
+                        class="w-full">
                         {{ __('Log Out') }}
                     </flux:menu.item>
                 </form>

@@ -82,6 +82,12 @@ return [
             'url' => env('APP_URL') . '/storage/identityFiles',
             'visibility' => 'public',
         ],
+        'company' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/company'),
+            'url' => env('APP_URL') . '/storage/company',
+            'visibility' => 'public',
+        ],
 
         's3' => [
             'driver' => 's3',

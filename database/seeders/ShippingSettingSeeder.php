@@ -15,7 +15,7 @@ class ShippingSettingSeeder extends Seeder
     {
         ShippingSetting::query()->firstOrCreate([], [
             'base_fee' => 60.00,
-            'free_delivery' => true,
+            'free_delivery' => false,
             'free_minimum' => 500.00,
         ]);
     }

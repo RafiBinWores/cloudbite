@@ -112,7 +112,7 @@ class CheckoutPage extends Component
 
         // Compute shipping from DB settings
         $base = (float) ($this->shipSetting->base_fee ?? 0);
-        $free = (bool) ($this->shipSetting->free_delivery ?? false);
+        $free = (bool) ($this->shipSetting->free_delivery ?? true);
         $min  = (float) ($this->shipSetting->free_minimum ?? 0);
 
         $this->shipping_total = ($free && $this->subtotal >= $min) ? 0.0 : $base;

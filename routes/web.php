@@ -5,6 +5,7 @@ use App\Http\Controllers\SslCommerzController;
 use App\Livewire\Admin\AddOns\AddOns;
 use App\Livewire\Admin\Banners\Banners;
 use App\Livewire\Admin\Buns\Buns;
+use App\Livewire\Admin\Business\BusinessSetup;
 use App\Livewire\Admin\Categories\Index;
 use App\Livewire\Admin\Coupons\Coupons;
 use App\Livewire\Admin\Crusts\Crusts;
@@ -99,6 +100,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     // Delivery Man route
     Route::get('delivery', Delivery::class)->name('delivery.index');
     Route::get('delivery/create', CreateDeliveryMan::class)->name('delivery.create');
+
+    // Business setup
+    Route::get('business-setup', BusinessSetup::class)->name('business_setup.index');
 });
 
 // Auth Routes

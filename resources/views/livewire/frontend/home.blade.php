@@ -566,6 +566,7 @@
 
     {{-- cart modal --}}
     <livewire:frontend.cart.add-to-cart-modal />
+    
 
     <!-- Offer promotion section -->
     <section class="relative bg-[url(/assets/images/discount-bg.jpg)] w-full bg-no-repeat bg-center object-cover">
