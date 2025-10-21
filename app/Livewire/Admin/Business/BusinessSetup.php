@@ -27,8 +27,16 @@ class BusinessSetup extends Component
     public string $phone = '';
     public string $email = '';
     public string $address = '';
+    public string $facebook = '';
+    public string $instagram = '';
+    public string $twitter = '';
+    public string $tiktok = '';
+    public string $youtube = '';
+    public string $whatsapp = '';
+    public string $footer_description_text = '';
 
-    public $logo_upload; 
+
+    public $logo_upload;
     public $favicon_upload;
 
     public ?string $logo = null;
@@ -62,6 +70,13 @@ class BusinessSetup extends Component
         $this->address      = (string) ($this->info->address ?? '');
         $this->logo         = $this->info->logo;
         $this->favicon      = $this->info->favicon;
+        $this->facebook  = (string) ($this->info->facebook ?? '');
+        $this->instagram = (string) ($this->info->instagram ?? '');
+        $this->twitter   = (string) ($this->info->twitter ?? '');
+        $this->tiktok    = (string) ($this->info->tiktok ?? '');
+        $this->youtube   = (string) ($this->info->youtube ?? '');
+        $this->whatsapp  = (string) ($this->info->whatsapp ?? '');
+        $this->footer_description_text  = (string) ($this->info->footer_description_text ?? '');
 
         // Shipping settings singleton (id=1)
         $this->record = ShippingSetting::find(1) ?? new ShippingSetting();
@@ -89,8 +104,15 @@ class BusinessSetup extends Component
             'phone'          => ['nullable', 'string', 'max:30'],
             'email'          => ['nullable', 'email', 'max:255'],
             'address'        => ['nullable', 'string', 'max:2000'],
+            'footer_description_text'        => ['nullable', 'string', 'max:2000'],
             'logo_upload'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
             'favicon_upload' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,ico,svg', 'max:2048'],
+            'facebook'       => ['nullable', 'url'],
+            'instagram'      => ['nullable', 'url'],
+            'twitter'        => ['nullable', 'url'],
+            'tiktok'         => ['nullable', 'url'],
+            'youtube'        => ['nullable', 'url'],
+            'whatsapp'       => ['nullable', 'url'],
 
             // delivery
             'base_fee'       => ['required', 'numeric', 'min:0'],
@@ -121,14 +143,7 @@ class BusinessSetup extends Component
     public function companyInformationSubmit(): void
     {
         // Validate only the company info fields + uploads
-        $this->validate([
-            'company_name'   => ['required', 'string', 'max:255'],
-            'phone'          => ['nullable', 'string', 'max:30'],
-            'email'          => ['nullable', 'email', 'max:255'],
-            'address'        => ['nullable', 'string', 'max:2000'],
-            'logo_upload'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
-            'favicon_upload' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,ico,svg', 'max:2048'],
-        ]);
+        $this->validate();
 
         $info = CompanyInfo::find(1) ?? new CompanyInfo();
         $info->id = 1;
@@ -163,7 +178,7 @@ class BusinessSetup extends Component
             $this->logo_upload = null;
         }
 
-        // --- FAVICON upload (optimize + timestamp name) ---
+        // FAVICON upload (optimize + timestamp name)
         if ($this->favicon_upload) {
             $this->purgeFilesByPrefix('favicon_');
 
@@ -195,6 +210,13 @@ class BusinessSetup extends Component
         $info->phone        = $this->phone;
         $info->email        = $this->email;
         $info->address      = $this->address;
+        $info->facebook  = $this->facebook;
+        $info->instagram = $this->instagram;
+        $info->twitter   = $this->twitter;
+        $info->tiktok    = $this->tiktok;
+        $info->youtube   = $this->youtube;
+        $info->whatsapp  = $this->whatsapp;
+        $info->footer_description_text  = $this->footer_description_text;
         $info->save();
 
         $this->info = $info;

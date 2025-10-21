@@ -10,7 +10,7 @@
 
             <!-- Logo (centered on sm & md) -->
             <a href="/" class="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
-                <img src="{{ asset('assets/images/logos/logo.png') }}" alt="Logo" class="h-10" />
+                <img src="{{ asset($businessSetting->logo) }}" alt="Logo" class="h-10" />
             </a>
 
             <!-- Desktop Menu -->
@@ -29,15 +29,14 @@
                     <ul
                         class="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-50">
                         <li>
-                            <a href="/categories/pizza" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">Pizza</a>
+                            <a href="" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">All</a>
                         </li>
-                        <li>
-                            <a href="/categories/burger" class="block px-4 py-2 hover:bg-gray-100">Burger</a>
+                        @foreach ($navbarCategories as $cat)
+                            <li>
+                            <a href="" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">{{ $cat->name }}</a>
                         </li>
-                        <li>
-                            <a href="/categories/crab"
-                                class="block px-4 py-2 hover:bg-gray-100 rounded-b-xl">Seafood</a>
-                        </li>
+                        @endforeach
+                        
                     </ul>
                 </li>
 

@@ -54,4 +54,10 @@ class Order extends Model
     {
         return $q->where('order_status', 'delivered');
     }
+
+    
+    public function scopeSearch($query, $value)
+    {
+        $query->where('order_code', 'like', "%{$value}%")->orWhere('phone', 'like', "%{$value}%")->orWhere('email', 'like', "%{$value}%")->orWhere('contact_name', 'like', "%{$value}%");
+    }
 }

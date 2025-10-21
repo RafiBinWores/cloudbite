@@ -13,5 +13,11 @@ class CompanyInfo extends Model
         'address',
         'logo',
         'favicon',
+        'facebook',
+        'instagram',
+        'twitter',
+        'tiktok',
+        'youtube',
+        'whatsapp',
     ];
 }

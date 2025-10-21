@@ -104,6 +104,23 @@
             </flux:navlist.group>
         </flux:navlist>
 
+                {{-- Order Management --}}
+        <flux:navlist variant="outline">
+            <flux:navlist.group :heading="__('Order Management')" class="grid">
+
+                {{-- Verify Offline Payment --}}
+                <flux:navlist.item icon="shopping-bag" :href="route('categories.index')"
+                    :current="request()->routeIs('categories.index')" wire:navigate>
+                    {{ __('Verify Offline Payment') }}</flux:navlist.item>
+
+
+                {{-- Order --}}
+                <flux:navlist.item icon="shopping-cart" :href="route('orders.index')"
+                    :current="request()->routeIs('orders.index')" wire:navigate>
+                    {{ __('Orders') }}</flux:navlist.item>
+            </flux:navlist.group>
+        </flux:navlist>
+
         {{-- Product Management --}}
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Product Management')" class="grid">

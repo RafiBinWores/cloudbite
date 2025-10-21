@@ -19,6 +19,12 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->string('logo')->nullable();
             $table->string('favicon')->nullable();
+            $table->string('footer_description_text')->nullable();
+            $table->string('facebook')->nullable();
+            $table->string('instagram')->nullable();
+            $table->string('tiktok')->nullable();
+            $table->string('youtube')->nullable();
+            $table->string('whatsapp')->nullable();
             $table->timestamps();
         });
     }

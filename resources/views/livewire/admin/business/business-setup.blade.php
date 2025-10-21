@@ -12,7 +12,7 @@
         <x-slot name="items">
             <x-tab-item id="business" label="Business Settings" />
             <x-tab-item id="delivery" label="Delivery Fee Setup" />
-            <x-tab-item id="qr_code" label="QR Code" />
+            <x-tab-item id="social_media" label="Social Media" />
         </x-slot>
 
         <x-tab-content id="business">
@@ -89,6 +89,11 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                            <flux:input wire:model="footer_description_text" label="Footer Description Text"
+                                placeholder="e.g. Best food delivery service." />
+                        </div>
+
                     <flux:button type="submit" variant="primary" class="cursor-pointer">
                         {{ $info ? 'Update Information' : 'Save Information' }}
                     </flux:button>
@@ -119,22 +124,23 @@
 
                                 <flux:error name="free_delivery" />
                             </flux:field>
-            
+
                         </div>
                     </div>
 
                     {{-- Use native input to guarantee disabled binding works in all cases --}}
-                        <div class="form-group">
-                            <flux:input type="number" step="0.01" min="0" wire:model.live.debounce.500ms="free_minimum"
-                                label="Free Delivery Minimum Order (৳)" placeholder="e.g. 500.00" :disabled="$free_delivery" />
-                            @if ($free_delivery)
-                                <p class="text-sm text-gray-400 mt-1">Free Delivery is ON — minimum is fixed at 0.
-                                    Toggle off to edit.</p>
-                            @else
-                                <p class="text-sm text-gray-400 mt-1">Set a threshold: orders ≥ this amount get free
-                                    delivery.</p>
-                            @endif
-                        </div>
+                    <div class="form-group">
+                        <flux:input type="number" step="0.01" min="0"
+                            wire:model.live.debounce.500ms="free_minimum" label="Free Delivery Minimum Order (৳)"
+                            placeholder="e.g. 500.00" :disabled="$free_delivery" />
+                        @if ($free_delivery)
+                            <p class="text-sm text-gray-400 mt-1">Free Delivery is ON — minimum is fixed at 0.
+                                Toggle off to edit.</p>
+                        @else
+                            <p class="text-sm text-gray-400 mt-1">Set a threshold: orders ≥ this amount get free
+                                delivery.</p>
+                        @endif
+                    </div>
 
                     <flux:button type="submit" variant="primary">Save Delivery Settings</flux:button>
                 </form>
@@ -142,6 +148,66 @@
         </x-tab-content>
 
         {{-- QR Code --}}
-        <x-tab-content id="qr_code"> Tab 3 </x-tab-content>
+        <x-tab-content id="social_media">
+            <form wire:submit="companyInformationSubmit" class="space-y-6">
+                <div class="grid lg:grid-cols-2 gap-4">
+
+                    <div class="form-group">
+                        <flux:input wire:model.defer="facebook" label="Facebook"
+                            placeholder="e.g. https://facebook.com/yourpage" />
+                    </div>
+
+                    <div class="form-group">
+                        <flux:input wire:model.defer="instagram" label="Instagram"
+                            placeholder="e.g. https://instagram.com/yourhandle" />
+                    </div>
+
+                    <div class="form-group">
+                        <flux:input wire:model.defer="twitter" label="Twitter / X"
+                            placeholder="e.g. https://x.com/yourhandle" />
+                    </div>
+
+                    <div class="form-group">
+                        <flux:input wire:model.defer="tiktok" label="TikTok"
+                            placeholder="e.g. https://www.tiktok.com/@yourhandle" />
+                    </div>
+
+                    <div class="form-group">
+                        <flux:input wire:model.defer="youtube" label="YouTube"
+                            placeholder="e.g. https://youtube.com/@yourchannel" />
+                    </div>
+
+                    <div class="form-group">
+                        <flux:input wire:model.defer="whatsapp" label="WhatsApp Link"
+                            placeholder="e.g. https://wa.me/8801XXXXXXXXX" />
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <flux:button type="submit" variant="primary">Save Social Links</flux:button>
+                    @php
+                        $links = [
+                            'Facebook' => $facebook,
+                            'Instagram' => $instagram,
+                            'X' => $twitter,
+                            'TikTok' => $tiktok,
+                            'YouTube' => $youtube,
+                            'WhatsApp' => $whatsapp,
+                        ];
+                    @endphp
+
+                    <div class="hidden md:flex flex-wrap gap-2">
+                        @foreach ($links as $label => $url)
+                            @if ($url)
+                                <a href="{{ str($url)->startsWith('http') ? $url : 'https://' . $url }}"
+                                    target="_blank" class="px-3 py-1 rounded-full text-xs border hover:bg-slate-50">
+                                    {{ $label }}
+                                </a>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+            </form>
+        </x-tab-content>
     </x-tab>
 </div>
