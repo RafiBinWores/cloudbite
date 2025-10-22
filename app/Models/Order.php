@@ -26,6 +26,7 @@ class Order extends Model
         'payment_status',
         'order_status',
         'cooking_time_min',
+        'cooking_end_at',
         'placed_at',
         'cancelled_at',
         'cancelled_reason',
@@ -38,6 +39,7 @@ class Order extends Model
         'meta' => 'array',
         'placed_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'cooking_end_at' => 'datetime',
     ];
 
 
