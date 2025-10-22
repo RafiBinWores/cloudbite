@@ -17,6 +17,7 @@ use App\Livewire\Admin\Dishes\Dishes;
 use App\Livewire\Admin\Dishes\EditDish;
 use App\Livewire\Admin\Dishes\ShowDish;
 use App\Livewire\Admin\Orders\Orders;
+use App\Livewire\Admin\Orders\Show;
 use App\Livewire\Admin\Tags\Tags;
 use App\Livewire\Frontend\Account\Account;
 use App\Livewire\Frontend\Account\Favorites;
@@ -107,6 +108,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
     // Orders Route
     Route::get('orders', Orders::class)->name('orders.index');
+    Route::get('orders/{code}', Show::class)->name('orders.show');
 });
 
 // Auth Routes

@@ -13,10 +13,6 @@
 @source '../../vendor/rappasoft/laravel-livewire-tables/resources/views/*.blade.php';
 @source '../../vendor/rappasoft/laravel-livewire-tables/resources/views/**/*.blade.php';
 
-@plugin "daisyui" {
-themes: false;
-}
-
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
@@ -91,3 +87,41 @@ select:focus[data-flux-control] {
 .form-group div[role="alert"] {
     margin-top: 0 !important;
 }
+
+  [x-cloak]{display:none!important}
+  html{scrollbar-gutter:stable}
+
+  :root{
+    --modal-in-dur: 300ms;               /* was ~220ms */
+    --modal-out-dur: 220ms;              /* was ~160ms */
+    --backdrop-in-dur: 220ms;            /* was 180ms  */
+    --backdrop-out-dur: 180ms;           /* was 140ms  */
+    --modal-spring: cubic-bezier(.16,1,.3,1); /* springy ease */
+    --modal-ease-out: cubic-bezier(.2,.8,.2,1);
+    --modal-ease-in: cubic-bezier(.4,0,1,1);
+  }
+
+  @keyframes backdrop-fade-in{
+    from{opacity:0}
+    to{opacity:.5}
+  }
+  @keyframes backdrop-fade-out{
+    from{opacity:.5}
+    to{opacity:0}
+  }
+
+  /* gentler pop with micro-overshoot */
+  @keyframes modal-smooth-in{
+    0%   {opacity:0; transform:translate3d(0,14px,0) scale(.975)}
+    60%  {opacity:1; transform:translate3d(0,0,0)    scale(1.008)}
+    100% {opacity:1; transform:translate3d(0,0,0)    scale(1)}
+  }
+  @keyframes modal-smooth-out{
+    0%   {opacity:1; transform:translate3d(0,0,0)    scale(1)}
+    100% {opacity:0; transform:translate3d(0,8px,0)  scale(.985)}
+  }
+
+  /* Accessibility: respect reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    * { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+  }

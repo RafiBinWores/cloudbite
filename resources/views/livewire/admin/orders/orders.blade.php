@@ -2,7 +2,7 @@
     {{-- Page Heading --}}
     <div class="relative mb-6 w-full">
         <flux:heading size="xl" class="mb-4 flex items-center gap-2" level="1"><img class="w-8"
-                src="{{ asset('assets/images/icons/checklist.png') }}" alt="Dish Icon">{{ __('Orders') }}</flux:heading>
+                src="{{ asset('assets/images/icons/checklist.png') }}" alt="order Icon">{{ __('Orders') }}</flux:heading>
         <flux:separator variant="subtle" />
     </div>
 
@@ -192,15 +192,71 @@
             </div>
 
             <!-- Export -->
+            <!-- Export -->
             <div class="flex items-center gap-2 dark:text-white">
-                <button type="button" wire:click="exportExcel"
-                    class="inline-flex items-center rounded-lg border px-3 py-2 text-sm dark:border-none dark:bg-neutral-600 hover:opacity-90 cursor-pointer hover:bg-accent/70 hover:text-white">
-                    Export Excel
+                <!-- Excel -->
+                <button type="button" wire:click="exportExcel" wire:loading.attr="disabled"
+                    wire:target="exportExcel"
+                    class="inline-flex items-center rounded-lg border px-3 py-2 text-sm dark:border-none dark:bg-neutral-600 hover:opacity-90 cursor-pointer hover:bg-accent/70 hover:text-white disabled:opacity-60 disabled:cursor-not-allowed"
+                    aria-busy="false">
+                    <!-- idle label -->
+                    <span wire:loading.remove wire:target="exportExcel">Export Excel</span>
+
+                    <!-- loading label + spinner -->
+                    <span class="inline-flex items-center gap-2" wire:loading wire:target="exportExcel">
+                        <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                stroke-width="3" />
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v3a5 5 0 0 0-5 5H4z" />
+                        </svg>
+                        Preparing…
+                    </span>
                 </button>
-                <button type="button" wire:click="exportPdf"
-                    class="inline-flex items-center rounded-lg border px-3 py-2 text-sm dark:border-none dark:bg-neutral-600 cursor-pointer hover:opacity-90 hover:bg-accent/70 hover:text-white">
-                    Export PDF
+
+                <!-- PDF -->
+                <button type="button" wire:click="exportPdf" wire:loading.attr="disabled" wire:target="exportPdf"
+                    class="inline-flex items-center rounded-lg border px-3 py-2 text-sm dark:border-none dark:bg-neutral-600 cursor-pointer hover:opacity-90 hover:bg-accent/70 hover:text-white disabled:opacity-60 disabled:cursor-not-allowed"
+                    aria-busy="false">
+                    <span wire:loading.remove wire:target="exportPdf">Export PDF</span>
+                    <span class="inline-flex items-center gap-2" wire:loading wire:target="exportPdf">
+                        <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                stroke-width="3" />
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v3a5 5 0 0 0-5 5H4z" />
+                        </svg>
+                        Preparing…
+                    </span>
                 </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Tiny center popup (place once, near your component root) -->
+    <div wire:loading wire:target="exportExcel,exportPdf"
+        class="fixed z-[60] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" role="status" aria-live="polite">
+        <div class="w-64 rounded-2xl shadow-xl border bg-white/95 dark:bg-neutral-800/95 dark:text-white p-4">
+            <div class="flex items-center gap-3">
+                <svg class="size-5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                        stroke-width="3"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v3a5 5 0 0 0-5 5H4z"></path>
+                </svg>
+
+                <!-- Generic label -->
+                <span class="font-medium">Exporting…</span>
+            </div>
+
+            <!-- Per-action hint (optional) -->
+            <div class="mt-1 text-xs text-slate-600 dark:text-slate-300">
+                <span wire:loading wire:target="exportExcel">Preparing Excel file</span>
+                <span wire:loading wire:target="exportPdf">Preparing PDF file</span>
+            </div>
+
+            <!-- Subtle progress bar (animated pulse) -->
+            <div class="mt-3 h-1 w-full rounded bg-slate-200 dark:bg-neutral-700 overflow-hidden">
+                <div class="h-full w-1/3 animate-pulse bg-slate-400 dark:bg-neutral-500 rounded"></div>
             </div>
         </div>
     </div>
@@ -260,32 +316,32 @@
                 </thead>
 
                 <tbody class="text-neutral-700 dark:text-white">
-                    @forelse ($orders as $dish)
-                        <tr wire:key="dish-{{ $dish->id }}" class="border-b dark:border-neutral-600">
+                    @forelse ($orders as $order)
+                        <tr wire:key="order-{{ $order->id }}" class="border-b dark:border-neutral-600">
                             <th class="px-4 lg:px-6 py-3">
                                 {{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}
                             </th>
 
                             <td class="px-4 lg:px-6 py-3">
-                                <div class="font-medium text-accent">{{ $dish->order_code }}</div>
+                                <div class="font-medium text-accent">{{ $order->order_code }}</div>
                             </td>
 
                             <td class="px-4 lg:px-6 py-3">
-                                <div class="font-medium">{{ $dish->created_at->format('d M Y') }}</div>
-                                <div class="font-medium">{{ $dish->created_at->format('h:i a') }}</div>
+                                <div class="font-medium">{{ $order->created_at->format('d M Y') }}</div>
+                                <div class="font-medium">{{ $order->created_at->format('h:i a') }}</div>
                             </td>
                             <td class="px-4 lg:px-6 py-3">
                                 <div class="font-medium">
-                                    {{ $dish->contact_name }} <br>
-                                    <a href="tel:{{ $dish->phone }}">{{ $dish->phone }}</a>
+                                    {{ $order->contact_name }} <br>
+                                    <a href="tel:{{ $order->phone }}">{{ $order->phone }}</a>
                                 </div>
                             </td>
 
                             <td class="px-4 lg:px-6 py-3">
                                 <div class="font-medium">
-                                    <span>${{ number_format($dish->grand_total, 2) }}</span>
+                                    <span><span class="font-medium font-oswald">৳</span> {{ number_format($order->grand_total, 2) }}</span>
                                     <br />
-                                    @if ($dish->payment_status == 'paid')
+                                    @if ($order->payment_status == 'paid')
                                         <span class="text-green-600 font-medium">Paid</span>
                                     @else
                                         <span class="text-red-600 font-medium">Unpaid</span>
@@ -294,13 +350,13 @@
                             </td>
 
                             <td class="px-4 lg:px-6 py-3">
-                                <div class="font-medium">{!! $orderStatusBadge($dish->order_status) !!}
+                                <div class="font-medium">{!! $orderStatusBadge($order->order_status) !!}
                                 </div>
                             </td>
 
                             <td class="px-4 lg:px-6 py-3">
                                 <div class="flex gap-2">
-                                    <flux:button href="" wire:navigate class="min-h-[40px]" icon="eye"
+                                    <flux:button href="{{ route('orders.show', $order->order_code) }}" wire:navigate class="min-h-[40px]" icon="eye"
                                         variant="primary" color="yellow"></flux:button>
 
                                     <flux:button href="" wire:navigate class="min-h-[40px]" icon="printer"
@@ -310,7 +366,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 lg:px-6 pt-4 text-center">No dishes found.</td>
+                            <td colspan="7" class="px-4 lg:px-6 pt-4 text-center">No orders found.</td>
                         </tr>
                     @endforelse
                 </tbody>

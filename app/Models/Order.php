@@ -25,6 +25,7 @@ class Order extends Model
         'payment_method',
         'payment_status',
         'order_status',
+        'cooking_time_min',
         'placed_at',
         'cancelled_at',
         'cancelled_reason',
@@ -55,6 +56,10 @@ class Order extends Model
         return $q->where('order_status', 'delivered');
     }
 
+        public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
     
     public function scopeSearch($query, $value)
     {
