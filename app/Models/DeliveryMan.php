@@ -24,4 +24,9 @@ class DeliveryMan extends Model
     protected $casts = [
         'identity_images' => 'array',
     ];
+
+    public function scopeSearch($query, $value)
+    {
+        $query->where('first_name', 'like', "%{$value}%")->orWhere('last_name', 'like', "%{$value}%")->orWhere('phone_number', 'like', "%{$value}%")->orWhere('email', 'like', "%{$value}%")->orWhere('identity_number', 'like', "%{$value}%");
+    }
 }

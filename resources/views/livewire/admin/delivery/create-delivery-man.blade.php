@@ -274,7 +274,7 @@
 
             </div>
 
-            <div class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl py-5">
+            <div class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl pt-5">
                 <h3 class="text-lg font-semibold mb-2 dark:text-gray-100 px-5">
                     Deliveryman information
                 </h3>

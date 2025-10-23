@@ -13,6 +13,7 @@ use App\Livewire\Admin\Crusts\Crusts;
 use App\Livewire\Admin\Cuisine\Cuisines;
 use App\Livewire\Admin\Delivery\CreateDeliveryMan;
 use App\Livewire\Admin\Delivery\Delivery;
+use App\Livewire\Admin\Delivery\EditDeliveryMan;
 use App\Livewire\Admin\Dishes\CreateDish;
 use App\Livewire\Admin\Dishes\Dishes;
 use App\Livewire\Admin\Dishes\EditDish;
@@ -103,6 +104,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     // Delivery Man route
     Route::get('delivery', Delivery::class)->name('delivery.index');
     Route::get('delivery/create', CreateDeliveryMan::class)->name('delivery.create');
+    Route::get('delivery/{deliveryMan}/edit', EditDeliveryMan::class)->name('delivery.edit');
 
     // Business setup
     Route::get('business-setup', BusinessSetup::class)->name('business_setup.index');

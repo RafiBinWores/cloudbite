@@ -28,7 +28,7 @@ class CreateDeliveryMan extends Component
         return [
             'first_name'         => 'required|string|max:255',
             'last_name'          => 'nullable|string|max:255',
-            'phone_number'       => 'required|string|max:32',
+            'phone_number'       => 'required|string|regex:/^(?:\+?88)?01[3-9]\d{8}$/|unique:delivery_men,phone_number',
             'identity_number'       => 'required|string',
             'email'       => 'required|string|email|unique:delivery_men,email',
             'password'       => 'required|string|min:8',
@@ -47,6 +47,8 @@ class CreateDeliveryMan extends Component
     }
 
     protected $messages = [
+        'phone_number.required'          => 'A phone number is required.',
+        'phone_number.regex'             => 'Enter a valid Bangladeshi mobile number.',
         'image.max'                => 'Profile image must be less than 2MB.',
         'image.dimensions'         => 'Profile image must be square (1:1).',
 
