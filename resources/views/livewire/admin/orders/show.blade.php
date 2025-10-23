@@ -21,12 +21,23 @@
             </p>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center flex-col md:flex-row gap-2">
             <flux:button href="{{ route('orders.show', $order->order_code) }}" icon="arrow-path" wire:navigate>
                 Refresh
             </flux:button>
-            <flux:button onclick="window.print()" icon="printer">Print</flux:button>
+
+            {{-- A4 / standard print --}}
+            <flux:button type="button" onclick="window.print()" icon="printer">
+                Print (A4)
+            </flux:button>
+
+            {{-- Thermal (80mm) --}}
+            <flux:button type="button" icon="printer" variant="primary"
+                onclick="window.open('{{ route('orders.print', $order->order_code) }}','_blank','noopener')">
+                Thermal Print (80mm)
+            </flux:button>
         </div>
+
     </div>
 
     {{-- Invoice layout --}}
@@ -113,7 +124,8 @@
                                 {{ str_replace('_', ' ', ucfirst($status)) }}
                             </span>
                         </p>
-                        <p><span class="font-medium">Payment:</span> {{ strtoupper($order->payment_method ?? 'cod') }}</p>
+                        <p><span class="font-medium">Payment:</span> {{ strtoupper($order->payment_method ?? 'cod') }}
+                        </p>
                         <p><span class="font-medium">Payment Status:</span>
                             {{ ucfirst($order->payment_status ?? '-') }}</p>
                         <p><span class="font-medium">Phone:</span> {{ $order->phone ?? '-' }}</p>
@@ -271,8 +283,8 @@
                         <span wire:loading.remove wire:target="saveStatus">Save Status</span>
                         <span wire:loading wire:target="saveStatus" class="inline-flex items-center gap-2">
                             <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                    stroke-width="3" />
+                                <circle class="opacity-25" cx="12" cy="12" r="10"
+                                    stroke="currentColor" stroke-width="3" />
                                 <path class="opacity-75" fill="currentColor"
                                     d="M4 12a8 8 0 0 1 8-8v3a5 5 0 0 0-5 5H4z" />
                             </svg>
@@ -368,71 +380,68 @@
         </div>
     </div>
 
-</div>
+    @push('scripts')
+        <script>
+            function cookTimer({
+                initialMinutes = 0,
+                endAtMs = null
+            }) {
+                return {
+                    minutes: initialMinutes,
+                    endMs: endAtMs,
+                    remainingSec: 0,
+                    _id: null,
 
+                    start() {
+                        if (!this.endMs && this.minutes > 0) {
+                            this.endMs = Date.now() + (this.minutes * 60_000);
+                        }
+                        this._tick();
+                        if (this._id) clearInterval(this._id);
+                        this._id = setInterval(() => this._tick(), 1000);
+                    },
 
-@push('scripts')
-    <script>
-        function cookTimer({
-            initialMinutes = 0,
-            endAtMs = null
-        }) {
-            return {
-                minutes: initialMinutes,
-                endMs: endAtMs,
-                remainingSec: 0,
-                _id: null,
+                    _tick() {
+                        if (!this.endMs) {
+                            this.remainingSec = 0;
+                            return;
+                        }
+                        const diff = Math.max(0, Math.floor((this.endMs - Date.now()) / 1000));
+                        this.remainingSec = diff;
+                        if (diff <= 0 && this._id) {
+                            clearInterval(this._id);
+                            this._id = null;
+                        }
+                    },
 
-                start() {
-                    if (!this.endMs && this.minutes > 0) {
-                        this.endMs = Date.now() + (this.minutes * 60_000);
+                    format() {
+                        const m = Math.floor(this.remainingSec / 60);
+                        const s = this.remainingSec % 60;
+                        return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                    },
+
+                    progress() {
+                        const total = Math.max(1, Math.floor(this.minutes * 60));
+                        const remaining = Math.max(0, Math.min(total, this.remainingSec));
+                        return Math.round((remaining / total) * 100);
                     }
-                    this._tick();
-                    if (this._id) clearInterval(this._id);
-                    this._id = setInterval(() => this._tick(), 1000);
-                },
 
-                _tick() {
-                    if (!this.endMs) {
-                        this.remainingSec = 0;
-                        return;
-                    }
-                    const diff = Math.max(0, Math.floor((this.endMs - Date.now()) / 1000));
-                    this.remainingSec = diff;
-                    if (diff <= 0 && this._id) {
-                        clearInterval(this._id);
-                        this._id = null;
-                    }
-                },
-
-                format() {
-                    const m = Math.floor(this.remainingSec / 60);
-                    const s = this.remainingSec % 60;
-                    return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                },
-
-                progress() {
-                    const total = Math.max(1, Math.floor(this.minutes * 60));
-                    const remaining = Math.max(0, Math.min(total, this.remainingSec));
-                    return Math.round((remaining / total) * 100);
                 }
-
             }
-        }
 
-        window.addEventListener('cooking-time:started', (e) => {
-            const detail = e.detail || {};
-            const end = detail.end_at_ms;
-            if (!end) return;
+            window.addEventListener('cooking-time:started', (e) => {
+                const detail = e.detail || {};
+                const end = detail.end_at_ms;
+                if (!end) return;
 
-            document.querySelectorAll('[x-data^="cookTimer"]').forEach(el => {
-                const st = Alpine.$data(el);
-                st.endMs = end;
-                // recompute minutes from server ETA to keep progress correct
-                st.minutes = Math.max(0, Math.round((end - Date.now()) / 60_000));
-                st.start();
+                document.querySelectorAll('[x-data^="cookTimer"]').forEach(el => {
+                    const st = Alpine.$data(el);
+                    st.endMs = end;
+                    // recompute minutes from server ETA to keep progress correct
+                    st.minutes = Math.max(0, Math.round((end - Date.now()) / 60_000));
+                    st.start();
+                });
             });
-        });
-    </script>
-@endpush
+        </script>
+    @endpush
 </div>

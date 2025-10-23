@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrderPrintController;
 use App\Http\Controllers\OrderThankYouController;
 use App\Http\Controllers\SslCommerzController;
 use App\Livewire\Admin\AddOns\AddOns;
@@ -109,6 +110,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     // Orders Route
     Route::get('orders', Orders::class)->name('orders.index');
     Route::get('orders/{code}', Show::class)->name('orders.show');
+    // routes/web.php
+    Route::get('/admin/orders/{code}/print', [OrderPrintController::class, 'show'])->name('orders.print');
 });
 
 // Auth Routes
