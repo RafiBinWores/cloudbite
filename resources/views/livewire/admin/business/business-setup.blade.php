@@ -41,26 +41,50 @@
                             <flux:textarea wire:model="address" label="Address" placeholder="Write your address." />
                         </div>
 
-                        {{-- Logo --}}
+                        {{-- Logo dark --}}
                         <div class="form-group">
-                            <flux:input type="file" wire:model="logo_upload" label="Logo" accept="image/*" />
+                            <flux:input type="file" wire:model="logo_dark_upload" label="Logo Dark" accept="image/*" />
 
-                            @if ($logo_upload)
+                            @if ($logo_dark_upload)
                                 <div class="mt-2">
                                     <p class="text-xs text-slate-500 mb-1">New Logo Preview (3:1)</p>
-                                    <img src="{{ $logo_upload->temporaryUrl() }}"
+                                    <img src="{{ $logo_dark_upload->temporaryUrl() }}"
                                         class="w-full aspect-[3/1] object-contain rounded-lg border" alt="Logo preview">
                                 </div>
-                            @elseif ($logo)
+                            @elseif ($logo_dark)
                                 <div class="mt-2">
-                                    <p class="text-xs text-slate-500 mb-1">Current Logo</p>
-                                    <img src="{{ asset('storage/' . $logo) }}"
-                                        class="w-full aspect-[3/1] object-contain rounded-lg border" alt="Current logo">
+                                    <p class="text-xs text-slate-500 mb-1">Current Dark Logo</p>
+                                    <img src="{{ asset('storage/' . $logo_dark) }}"
+                                        class="w-full aspect-[3/1] object-contain rounded-lg border" alt="Current dark logo">
                                 </div>
                             @else
                                 <div
                                     class="mt-2 w-full aspect-[3/1] grid place-items-center border rounded-lg text-slate-400 text-sm">
-                                    3:1 Logo placeholder
+                                    3:1 Dark Logo placeholder
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- Logo light --}}
+                        <div class="form-group">
+                            <flux:input type="file" wire:model="logo_light_upload" label="Logo Light" accept="image/*" />
+
+                            @if ($logo_light_upload)
+                                <div class="mt-2">
+                                    <p class="text-xs text-slate-500 mb-1">New Logo Preview (3:1)</p>
+                                    <img src="{{ $logo_light_upload->temporaryUrl() }}"
+                                        class="w-full aspect-[3/1] object-contain rounded-lg border" alt="Logo preview">
+                                </div>
+                            @elseif ($logo_light)
+                                <div class="mt-2">
+                                    <p class="text-xs text-slate-500 mb-1">Current Logo_light</p>
+                                    <img src="{{ asset('storage/' . $logo_light) }}"
+                                        class="w-full aspect-[3/1] object-contain rounded-lg border" alt="Current Light logo">
+                                </div>
+                            @else
+                                <div
+                                    class="mt-2 w-full aspect-[3/1] grid place-items-center border rounded-lg text-slate-400 text-sm">
+                                    3:1 Light Logo placeholder
                                 </div>
                             @endif
                         </div>

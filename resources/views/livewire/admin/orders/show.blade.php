@@ -49,8 +49,16 @@
             {{-- Brand header (logo centered above company name) --}}
             <div class="rounded-2xl border dark:border-neutral-700 p-6 bg-slate-50/60 dark:bg-neutral-700/40">
                 <div class="flex flex-col items-center text-center">
-                    <img src="{{ asset($businessSetting->logo) }}" alt="{{ $businessSetting->company_name }}"
-                        class="h-14 w-auto mb-2" />
+
+                    @if ($businessSetting?->logo_dark)
+                        <img src="{{ asset($businessSetting->logo_dark) }}" alt="Logo"
+                            class="h-14 w-auto block dark:hidden">
+                    @endif
+
+                    @if ($businessSetting?->logo_light)
+                        <img src="{{ asset($businessSetting->logo_light) }}" alt="Logo"
+                            class="h-14 w-auto hidden dark:block">
+                    @endif
                     <h2 class="text-xl font-semibold tracking-wide">{{ $businessSetting->company_name }}</h2>
                     <p class="text-sm text-slate-600 dark:text-slate-300">
                         {{ $businessSetting->address ?? 'Address' }}

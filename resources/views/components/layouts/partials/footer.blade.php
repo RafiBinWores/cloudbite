@@ -12,7 +12,7 @@
                       <!-- Brand -->
                       <div class="lg:col-span-2 lg:pr-8">
                           <div class="flex items-center gap-4">
-                              <img src="{{ asset($businessSetting->logo) }}" alt="Logo" class="h-12 md:h-16">
+                              <img src="{{ asset($businessSetting->logo_light) }}" alt="Logo" class="h-12 md:h-16">
                           </div>
 
                           <p class="text-slate-200/90 leading-7 max-w-md mt-6">

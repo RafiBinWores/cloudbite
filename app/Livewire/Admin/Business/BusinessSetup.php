@@ -9,10 +9,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-
-// Intervention Image (v3)
 use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver; // use Imagick driver if you prefer
+use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\Encoders\PngEncoder;
 
@@ -36,10 +34,14 @@ class BusinessSetup extends Component
     public string $footer_description_text = '';
 
 
-    public $logo_upload;
+    // Add new props
+    public $logo_dark_upload;
+    public $logo_light_upload;
     public $favicon_upload;
 
-    public ?string $logo = null;
+    public ?string $logo_dark = null;
+    public ?string $logo_light = null;
+
     public ?string $favicon = null;
 
     public ?CompanyInfo $info = null;
@@ -68,7 +70,8 @@ class BusinessSetup extends Component
         $this->phone        = (string) ($this->info->phone ?? '');
         $this->email        = (string) ($this->info->email ?? '');
         $this->address      = (string) ($this->info->address ?? '');
-        $this->logo         = $this->info->logo;
+        $this->logo_dark  = $this->info->logo_dark;
+        $this->logo_light = $this->info->logo_light;
         $this->favicon      = $this->info->favicon;
         $this->facebook  = (string) ($this->info->facebook ?? '');
         $this->instagram = (string) ($this->info->instagram ?? '');
@@ -105,7 +108,8 @@ class BusinessSetup extends Component
             'email'          => ['nullable', 'email', 'max:255'],
             'address'        => ['nullable', 'string', 'max:2000'],
             'footer_description_text'        => ['nullable', 'string', 'max:2000'],
-            'logo_upload'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
+            'logo_dark_upload'  => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
+            'logo_light_upload' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
             'favicon_upload' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,ico,svg', 'max:2048'],
             'facebook'       => ['nullable', 'url'],
             'instagram'      => ['nullable', 'url'],
@@ -151,32 +155,55 @@ class BusinessSetup extends Component
         $img = $this->imageManager();
         $ts  = now()->timestamp;
 
-        // --- LOGO upload (optimize + timestamp name) ---
-        if ($this->logo_upload) {
-            $this->purgeFilesByPrefix('logo_');
-
-            $mime = $this->logo_upload->getMimeType();
-            $ext  = strtolower($this->logo_upload->getClientOriginalExtension() ?: '');
+        // --- LOGO DARK upload (optimized) ---
+        if ($this->logo_dark_upload) {
+            $this->purgeFilesByPrefix('logo_dark_');
+            $mime = $this->logo_dark_upload->getMimeType();
+            $ext  = strtolower($this->logo_dark_upload->getClientOriginalExtension() ?: '');
 
             if ($ext === 'svg' || $mime === 'image/svg+xml') {
-                $filename = "logo_{$ts}.svg";
-                $path = $this->logo_upload->storeAs('company', $filename, 'public');
+                $filename = "logo_dark_{$ts}.svg";
+                $path = $this->logo_dark_upload->storeAs('company', $filename, 'public');
             } else {
-                // 3:1 cover @ 1200x400 -> webp(80)
-                $image = $img->read($this->logo_upload->getRealPath());
+                $image = $img->read($this->logo_dark_upload->getRealPath());
                 $image->orient();
+                // keep wide aspect; 1200x400 works well across UI & print
                 $image = $image->cover(1200, 400, 'center');
-                $encoded = $image->encode(new WebpEncoder(quality: 80));
-
-                $filename = "logo_{$ts}.webp";
+                $encoded = $image->encode(new WebpEncoder(quality: 85)); // a touch higher for logo crispness
+                $filename = "logo_dark_{$ts}.webp";
                 $path = "company/{$filename}";
                 Storage::disk('public')->put($path, $encoded);
             }
 
-            $info->logo = $path;
-            $this->logo = $path;
-            $this->logo_upload = null;
+            $info->logo_dark = $path;
+            $this->logo_dark = $path;
+            $this->logo_dark_upload = null;
         }
+
+        // --- LOGO LIGHT upload (optimized) ---
+        if ($this->logo_light_upload) {
+            $this->purgeFilesByPrefix('logo_light_');
+            $mime = $this->logo_light_upload->getMimeType();
+            $ext  = strtolower($this->logo_light_upload->getClientOriginalExtension() ?: '');
+
+            if ($ext === 'svg' || $mime === 'image/svg+xml') {
+                $filename = "logo_light_{$ts}.svg";
+                $path = $this->logo_light_upload->storeAs('company', $filename, 'public');
+            } else {
+                $image = $img->read($this->logo_light_upload->getRealPath());
+                $image->orient();
+                $image = $image->cover(1200, 400, 'center');
+                $encoded = $image->encode(new WebpEncoder(quality: 85));
+                $filename = "logo_light_{$ts}.webp";
+                $path = "company/{$filename}";
+                Storage::disk('public')->put($path, $encoded);
+            }
+
+            $info->logo_light = $path;
+            $this->logo_light = $path;
+            $this->logo_light_upload = null;
+        }
+
 
         // FAVICON upload (optimize + timestamp name)
         if ($this->favicon_upload) {
@@ -189,11 +216,11 @@ class BusinessSetup extends Component
                 $filename = "favicon_{$ts}.svg";
                 $path = $this->favicon_upload->storeAs('company', $filename, 'public');
             } else {
-                // square cover -> 32x32 -> PNG
+                // square cover -> 180 -> PNG
                 $image = $img->read($this->favicon_upload->getRealPath());
                 $image->orient();
-                $image = $image->cover(512, 512, 'center'); // start larger for crisp downscale
-                $png32 = $image->scale(32)->encode(new PngEncoder());
+                $image = $image->cover(512, 512, 'center');
+                $png32 = $image->scale(180)->encode(new PngEncoder());
 
                 $filename = "favicon_{$ts}.png";
                 $path = "company/{$filename}";

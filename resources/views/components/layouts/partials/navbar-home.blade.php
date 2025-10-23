@@ -10,7 +10,7 @@
 
             <!-- Logo (centered on sm & md) -->
             <a href="/" class="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
-                <img src="{{ asset($businessSetting->logo) }}" alt="Logo" class="h-10" />
+                <img src="{{ asset($businessSetting->logo_dark) }}" alt="Logo" class="h-14" />
             </a>
 
             <!-- Desktop Menu -->
