@@ -4,7 +4,9 @@ namespace App\Livewire\Admin\Orders;
 
 use App\Models\Order;
 use App\Models\Addon;
+use App\Models\DeliveryMan;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
 class Show extends Component
@@ -32,18 +34,28 @@ class Show extends Component
         'failed_to_deliver',
     ];
 
+    // Delivery assign UI
+    public ?int $delivery_man_id = null;      // bound to x-select
+    public array $deliveryMenOptions = [];     // options for x-select
+
     public function mount(string $code): void
     {
         $this->code = $code;
 
-        $this->order = Order::with(['user', 'items.dish', 'items.crust', 'items.bun'])
+        $this->order = Order::with([
+                'user',
+                'items.dish',
+                'items.crust',
+                'items.bun',
+                'deliveryMan', // <-- load current assignee
+            ])
             ->where('order_code', $code)
             ->firstOrFail();
 
         // Prefill UI state
         $this->order_status     = (string) ($this->order->order_status ?? '');
         $this->cooking_time_min = $this->order->cooking_time_min;
-        $this->is_paid = strtolower((string) ($this->order->payment_status ?? 'unpaid')) === 'paid';
+        $this->is_paid          = strtolower((string) ($this->order->payment_status ?? 'unpaid')) === 'paid';
 
         if ($this->order->cooking_end_at && $this->order->cooking_end_at->isFuture()) {
             $this->cooking_end_at_ms = $this->order->cooking_end_at->valueOf();
@@ -60,29 +72,51 @@ class Show extends Component
             ->values();
 
         $this->addons = Addon::whereIn('id', $addonIds)->get()->keyBy('id');
+
+        // Build delivery men options for x-select
+        $this->deliveryMenOptions = DeliveryMan::query()
+            ->where('status', 'active')
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get(['id','first_name','last_name','phone_number','email','profile_image'])
+            ->map(function ($d) {
+                $fullName = trim($d->first_name.' '.($d->last_name ?? ''));
+                return [
+                    'id'     => $d->id,
+                    'label'  => $fullName . ' (' . $d->phone_number . ')', // shown in dropdown
+                    'avatar' => $d->profile_image
+                        ? Storage::url($d->profile_image)
+                        : asset('assets/images/placeholders/avatar-placeholder.png'),
+                    'phone'  => $d->phone_number,
+                    'email'  => $d->email,
+                    'name'   => $fullName,
+                ];
+            })->all();
+
+        // Preselect current assignment
+        $this->delivery_man_id = $this->order->delivery_man_id;
     }
 
-public function saveStatus(): void
-{
-    $this->validate([
-        'order_status' => ['required', 'in:' . implode(',', $this->statuses)],
-    ]);
+    public function saveStatus(): void
+    {
+        $this->validate([
+            'order_status' => ['required', 'in:' . implode(',', $this->statuses)],
+        ]);
 
-    $prev = (string) ($this->order->order_status ?? '');
-    $this->order->order_status = $this->order_status;
+        $prev = (string) ($this->order->order_status ?? '');
+        $this->order->order_status = $this->order_status;
 
-    // If leaving preparing, clear persisted end time
-    if ($prev === 'preparing' && $this->order_status !== 'preparing') {
-        $this->order->cooking_time_min = null;
-        $this->order->cooking_end_at   = null;
-        $this->cooking_time_min        = null;
-        $this->cooking_end_at_ms       = null;
+        // If leaving preparing, clear persisted end time
+        if ($prev === 'preparing' && $this->order_status !== 'preparing') {
+            $this->order->cooking_time_min = null;
+            $this->order->cooking_end_at   = null;
+            $this->cooking_time_min        = null;
+            $this->cooking_end_at_ms       = null;
+        }
+
+        $this->order->save();
+        $this->dispatch('toast', type: 'success', message: 'Order status updated.');
     }
-
-    $this->order->save();
-    $this->dispatch('toast', type: 'success', message: 'Order status updated.');
-}
-
 
     /** Save payment status (from toggle) */
     public function savePaymentStatus(): void
@@ -121,6 +155,44 @@ public function saveStatus(): void
         $this->dispatch('toast', type: 'success', message: 'Cooking time started.');
     }
 
+    /** ---------------- Delivery assign actions ---------------- */
+
+    public function assignDeliveryMan(): void
+    {
+        if (!$this->delivery_man_id) {
+            $this->dispatch('toast', type: 'warning', message: 'Please select a delivery man.');
+            return;
+        }
+
+        // Ensure selected id exists in options (prevents tampering)
+        $exists = collect($this->deliveryMenOptions)->firstWhere('id', (int) $this->delivery_man_id);
+        if (!$exists) {
+            $this->dispatch('toast', type: 'error', message: 'Selected delivery man not found.');
+            return;
+        }
+
+        $this->order->delivery_man_id = (int) $this->delivery_man_id;
+        $this->order->save();
+        $this->order->load('deliveryMan');
+
+        $this->dispatch('toast', type: 'success', message: 'Delivery man assigned.');
+    }
+
+    public function clearDeliveryMan(): void
+    {
+        if (!$this->order->delivery_man_id) {
+            $this->dispatch('toast', type: 'info', message: 'No delivery man is assigned.');
+            return;
+        }
+
+        $this->order->delivery_man_id = null;
+        $this->order->save();
+
+        $this->delivery_man_id = null;
+        $this->order->unsetRelation('deliveryMan');
+
+        $this->dispatch('toast', type: 'success', message: 'Delivery man removed.');
+    }
 
     public function render()
     {

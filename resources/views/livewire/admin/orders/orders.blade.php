@@ -359,8 +359,8 @@
                                     <flux:button href="{{ route('orders.show', $order->order_code) }}" wire:navigate class="min-h-[40px]" icon="eye"
                                         variant="primary" color="yellow"></flux:button>
 
-                                    <flux:button href="" wire:navigate class="min-h-[40px]" icon="printer"
-                                        variant="primary" color="blue" />
+                                    <flux:button onclick="window.open('{{ route('orders.print', $order->order_code) }}','_blank','noopener')" wire:navigate class="min-h-[40px]" icon="printer"
+                                        variant="primary" class="cursor-pointer" />
                                 </div>
                             </td>
                         </tr>

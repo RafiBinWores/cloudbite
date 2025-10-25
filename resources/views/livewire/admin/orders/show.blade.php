@@ -1,17 +1,44 @@
 <div>
     @push('styles')
         <style>
-            @media print {
-                .print\:hidden {
-                    display: none !important;
-                }
+            /* A4 page setup */
+            @page {
+                size: A4;
+                margin: 12mm;
+            }
 
+            @media print {
+
+                html,
                 body {
                     background: #fff !important;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+                body * {
+                    visibility: hidden !important;
+                }
+                #invoice-print,
+                #invoice-print * {
+                    visibility: visible !important;
+                }
+                #invoice-print {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    /* fits within @page margin */
+                    box-shadow: none !important;
+                    border: 0 !important;
+                    background: #fff !important;
+                }
+                .print\:hidden {
+                    display: none !important;
                 }
             }
         </style>
     @endpush
+
     {{-- Top bar (hidden on print) --}}
     <div class="flex items-center justify-between gap-3 mb-6 print:hidden">
         <div>
@@ -27,12 +54,12 @@
             </flux:button>
 
             {{-- A4 / standard print --}}
-            <flux:button type="button" onclick="window.print()" icon="printer">
+            <flux:button type="button" onclick="window.print()" icon="printer" class="cursor-pointer">
                 Print (A4)
             </flux:button>
 
             {{-- Thermal (80mm) --}}
-            <flux:button type="button" icon="printer" variant="primary"
+            <flux:button type="button" icon="printer" variant="primary" class="cursor-pointer"
                 onclick="window.open('{{ route('orders.print', $order->order_code) }}','_blank','noopener')">
                 Thermal Print (80mm)
             </flux:button>
@@ -41,7 +68,7 @@
     </div>
 
     {{-- Invoice layout --}}
-    <div class="grid md:grid-cols-3 gap-6">
+    <div class="grid md:grid-cols-3 gap-6" id="invoice-print">
         {{-- Left: invoice details --}}
         <div
             class="md:col-span-2 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border dark:border-none print:shadow-none print:border-0">
@@ -273,6 +300,93 @@
                 </div>
             </div>
 
+            {{-- Assign delivery man --}}
+            <div class="rounded-2xl border dark:border-neutral-700 p-6 bg-slate-50/60 dark:bg-neutral-700/40">
+                <h3 class="font-semibold mb-3">Assign Deliveryman</h3>
+
+                @if ($order->deliveryMan)
+                    {{-- Currently assigned --}}
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <div class="shrink-0 flex items-center justify-center">
+                                <img src="{{ asset($order->deliveryMan->profile_image ?? '') }}" alt=""
+                                    class="h-10 w-10 rounded-full object-cover">
+                            </div>
+                            <div class="text-sm space-y-1">
+                                <p class="font-medium text-lg">
+                                    {{ trim(($order->deliveryMan->first_name ?? '') . ' ' . ($order->deliveryMan->last_name ?? '')) }}
+                                </p>
+                                <div>
+                                    <flux:link href="tel:{{ $order->deliveryMan->phone_number ?? '—' }}">{{ $order->deliveryMan->phone_number ?? '—' }}</flux:link>
+                                </div>
+                                <div>
+                                    <flux:link href="mailto:{{ $order->deliveryMan->email }}">
+                                    {{ $order->deliveryMan->email ?? '-' }}</flux:link>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2 pt-2">
+                            <x-select wire:model.live="delivery_man_id" :options="$deliveryMenOptions" option-label="label"
+                                option-value="id" option-avatar="avatar" placeholder="— Change delivery man —"
+                                searchable
+                                class="w-full rounded-lg !py-[9px] !bg-white/10
+                           {{ $errors->has('delivery_man_id')
+                               ? '!border-red-500 focus:!ring-red-500'
+                               : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-rose-400' }}" />
+
+                            <div class="flex gap-2 items-center">
+                                <flux:button wire:click="assignDeliveryMan" icon="check-circle" variant="primary"
+                                    class="whitespace-nowrap cursor-pointer">
+                                    <span wire:loading.remove wire:target="assignDeliveryMan">Update</span>
+                                    <span wire:loading wire:target="assignDeliveryMan" class="inline-flex gap-2">
+                                        <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none"
+                                            aria-hidden="true">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10"
+                                                stroke="currentColor" stroke-width="3" />
+                                            <path class="opacity-75" fill="currentColor"
+                                                d="M4 12a8 8 0 0 1 8-8v3a5 5 0 0 0-5 5H4z" />
+                                        </svg> Saving…
+                                    </span>
+                                </flux:button>
+
+                                <flux:button wire:click="clearDeliveryMan" icon="x-circle"
+                                    class="whitespace-nowrap cursor-pointer">
+                                    Remove
+                                </flux:button>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    {{-- Not assigned yet --}}
+                    <div class="space-y-3">
+                        <label class="text-sm">Select delivery man</label>
+
+                        <x-select wire:model.live="delivery_man_id" :options="$deliveryMenOptions" option-label="label"
+                            option-value="id" option-avatar="avatar" placeholder="— Select —" searchable
+                            class="w-full rounded-lg !py-[9px] !bg-white/10
+                       {{ $errors->has('delivery_man_id')
+                           ? '!border-red-500 focus:!ring-red-500'
+                           : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-rose-400' }}" />
+
+                        <flux:button wire:click="assignDeliveryMan" icon="truck" variant="primary"
+                            class="cursor-pointer">
+                            <span wire:loading.remove wire:target="assignDeliveryMan">Assign</span>
+                            <span wire:loading wire:target="assignDeliveryMan" class="inline-flex items-center gap-2">
+                                <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none"
+                                    aria-hidden="true">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10"
+                                        stroke="currentColor" stroke-width="3" />
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 0 1 8-8v3a5 5 0 0 0-5 5H4z" />
+                                </svg> Saving…
+                            </span>
+                        </flux:button>
+                    </div>
+                @endif
+            </div>
+
+
 
             {{-- Status updater --}}
             <div class="rounded-2xl border dark:border-neutral-700 p-6 bg-slate-50/60 dark:bg-neutral-700/40">
@@ -287,7 +401,8 @@
                         @endforeach
                     </select>
 
-                    <flux:button wire:click="saveStatus" icon="check-circle" variant="primary" class="relative">
+                    <flux:button wire:click="saveStatus" icon="check-circle" variant="primary"
+                        class="relative cursor-pointer">
                         <span wire:loading.remove wire:target="saveStatus">Save Status</span>
                         <span wire:loading wire:target="saveStatus" class="inline-flex items-center gap-2">
                             <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -354,7 +469,8 @@
 
                     {{-- IMPORTANT: use x-bind:disabled on Blade component --}}
                     <flux:button wire:click="saveCookingTime" icon="check-circle" variant="primary"
-                        x-bind:disabled="!canEdit" class="disabled:opacity-60 disabled:cursor-not-allowed">
+                        x-bind:disabled="!canEdit"
+                        class="disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                         <span wire:loading.remove wire:target="saveCookingTime">Save Cooking Time</span>
                         <span wire:loading wire:target="saveCookingTime" class="inline-flex items-center gap-2">
                             <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none">

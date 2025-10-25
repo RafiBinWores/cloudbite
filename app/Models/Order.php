@@ -9,6 +9,7 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'session_id',
+        'delivery_man_id',
         'order_code',
         'subtotal',
         'discount_total',
@@ -43,6 +44,11 @@ class Order extends Model
     ];
 
 
+    public function deliveryMan()
+    {
+        return $this->belongsTo(DeliveryMan::class, 'delivery_man_id');
+    }
+
     public function items()
     {
         return $this->hasMany(OrderItem::class);
@@ -58,11 +64,11 @@ class Order extends Model
         return $q->where('order_status', 'delivered');
     }
 
-        public function user()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-    
+
     public function scopeSearch($query, $value)
     {
         $query->where('order_code', 'like', "%{$value}%")->orWhere('phone', 'like', "%{$value}%")->orWhere('email', 'like', "%{$value}%")->orWhere('contact_name', 'like', "%{$value}%");

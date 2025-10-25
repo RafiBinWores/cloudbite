@@ -62,8 +62,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
 // Admin Dashboard Route Starts
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::view('dashboard', 'dashboard')
-        ->name('dashboard');
+    Route::view('dashboard', 'dashboard')->name('dashboard');
 
     Route::redirect('settings', 'settings/profile');
 
@@ -112,7 +111,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     // Orders Route
     Route::get('orders', Orders::class)->name('orders.index');
     Route::get('orders/{code}', Show::class)->name('orders.show');
-    // routes/web.php
     Route::get('/admin/orders/{code}/print', [OrderPrintController::class, 'show'])->name('orders.print');
 });
 
