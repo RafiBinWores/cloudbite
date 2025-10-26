@@ -207,8 +207,8 @@
             <flux:navlist.group :heading="__('User Management')" class="grid">
 
                 {{-- Customers --}}
-                <flux:navlist.item icon="user-group" :href="route('banners.index')"
-                    :current="request()->routeIs('banners.index')" wire:navigate>
+                <flux:navlist.item icon="user-group" :href="route('customers.index')"
+                    :current="request()->routeIs('customers.index')" wire:navigate>
                     {{ __('Customers') }}</flux:navlist.item>
 
                 {{-- Deliveryman --}}

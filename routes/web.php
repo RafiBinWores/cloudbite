@@ -11,6 +11,7 @@ use App\Livewire\Admin\Categories\Index;
 use App\Livewire\Admin\Coupons\Coupons;
 use App\Livewire\Admin\Crusts\Crusts;
 use App\Livewire\Admin\Cuisine\Cuisines;
+use App\Livewire\Admin\Customer\Customers;
 use App\Livewire\Admin\Delivery\CreateDeliveryMan;
 use App\Livewire\Admin\Delivery\Delivery;
 use App\Livewire\Admin\Delivery\EditDeliveryMan;
@@ -112,6 +113,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('orders', Orders::class)->name('orders.index');
     Route::get('orders/{code}', Show::class)->name('orders.show');
     Route::get('/admin/orders/{code}/print', [OrderPrintController::class, 'show'])->name('orders.print');
+
+    // Customers Route
+    Route::get('customers', Customers::class)->name('customers.index');
 });
 
 // Auth Routes

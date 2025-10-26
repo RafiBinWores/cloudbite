@@ -84,4 +84,9 @@ class User extends Authenticatable
     {
         return $this->favorites()->where('dish_id', $dishId)->exists();
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }
