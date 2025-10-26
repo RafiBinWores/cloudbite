@@ -29,7 +29,7 @@
                     <ul
                         class="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-50">
                         <li>
-                            <a href="/categories/pizza" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">All</a>
+                            <a href="{{ route('fontDishes.index') }}" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">All</a>
                         </li>
                         <li>
                             <a href="/categories/pizza" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">Pizza</a>
@@ -44,7 +44,7 @@
                     </ul>
                 </li>
 
-                <li><a href="shop.html" class="hover:opacity-80">Dishes</a></li>
+                <li><a href="{{ route('fontDishes.index') }}" class="hover:opacity-80">Dishes</a></li>
                 <li><a href="#" class="hover:opacity-80">Contact</a></li>
                 <li><a href="#" class="hover:opacity-80">About</a></li>
             </ul>

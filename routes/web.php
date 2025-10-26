@@ -28,14 +28,17 @@ use App\Livewire\Frontend\Account\OrderDetails;
 use App\Livewire\Frontend\Account\OrdersPage;
 use App\Livewire\Frontend\Cart\CartPage;
 use App\Livewire\Frontend\Checkout\CheckoutPage;
+use App\Livewire\Frontend\Dishes\DishIndex;
 use App\Livewire\Frontend\Home;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
+
+// Dishes
+Route::get('dishes', DishIndex::class)->name('fontDishes.index');
 
 // cart page
 Route::get('/cart', CartPage::class)->name('cart.page');

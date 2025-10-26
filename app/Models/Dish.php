@@ -106,4 +106,18 @@ class Dish extends Model
     {
         return $this->belongsToMany(\App\Models\User::class, 'favorites')->withTimestamps();
     }
+
+    public function scopeVisible($q)
+    {
+        return $q->where('visibility', 'Yes');
+    }
+    public function scopeAvailableNow($q, $now = null)
+    {
+        $now = $now ?: now();
+        return $q->where('available_from', '<=', $now)->where('available_till', '>=', $now);
+    }
+    public function orderItems()
+    {
+        return $this->hasMany(\App\Models\OrderItem::class);
+    }
 }

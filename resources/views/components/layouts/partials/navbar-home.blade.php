@@ -29,7 +29,7 @@
                     <ul
                         class="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-50">
                         <li>
-                            <a href="" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">All</a>
+                            <a href="{{ route('fontDishes.index') }}" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">All</a>
                         </li>
                         @foreach ($navbarCategories as $cat)
                             <li>
@@ -40,7 +40,7 @@
                     </ul>
                 </li>
 
-                <li><a href="shop.html" class="hover:text-customRed-200">Shop</a></li>
+                <li><a href="{{ route('fontDishes.index') }}" class="hover:text-customRed-200">Dishes</a></li>
                 <li><a href="#" class="hover:text-customRed-200">Contact</a></li>
                 <li><a href="#" class="hover:text-customRed-200">About</a></li>
             </ul>
