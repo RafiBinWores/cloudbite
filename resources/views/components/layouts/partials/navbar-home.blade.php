@@ -33,7 +33,7 @@
                         </li>
                         @foreach ($navbarCategories as $cat)
                             <li>
-                            <a href="" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">{{ $cat->name }}</a>
+                            <a href="{{ route('fontDishes.index', ['categories' => [$cat->slug]]) }}" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">{{ $cat->name }}</a>
                         </li>
                         @endforeach
                         
@@ -47,13 +47,10 @@
 
             <div class="flex items-center gap-3 ml-auto lg:ml-0">
                 <div class="drawer drawer-end z-[60]" x-data="cartDrawer()" x-cloak>
-                    <!-- Toggle -->
-                    {{-- <input id="cart-drawer" type="checkbox" class="drawer-toggle" /> --}}
-
                     <!-- Cart button -->
                     <a href="{{ route('cart.page') }}" wire:navigate class="drawer-content">
                         <label for="cart-drawer"
-                            class="relative inline-grid place-items-center size-10 sm:size-12 rounded-full bg-slate-900 cursor-pointer">
+                            class="relative inline-grid place-items-center size-9 sm:size-12 rounded-full bg-slate-900 cursor-pointer">
                             <i class="fa-solid fa-cart-shopping text-white text-lg sm:text-xl"></i>
                             <span
                                 class="absolute -top-1 -right-1 grid place-items-center rounded-full bg-red-600 text-white text-[10px] sm:text-xs font-bold w-4 h-4 sm:w-5 sm:h-5">
@@ -61,79 +58,11 @@
                             </span>
                         </label>
                     </a>
-
-                    <!-- Drawer panel -->
-                    {{-- <div class="drawer-side">
-                        <!-- overlay closes drawer -->
-                        <label for="cart-drawer" class="drawer-overlay" aria-label="Close cart"></label>
-
-                        <div class="bg-base-100 text-base-content min-h-full w-full sm:w-96 shadow-2xl flex flex-col">
-                            <!-- Header -->
-                            <div class="flex items-center justify-between px-5 py-4 border-b">
-                                <h2 class="font-oswald text-xl">Your Cart</h2>
-                                <label for="cart-drawer" class="p-2 rounded hover:bg-slate-100 cursor-pointer"
-                                    aria-label="Close cart">
-                                    <i class="fa-solid fa-xmark text-xl"></i>
-                                </label>
-                            </div>
-
-                            <!-- Items -->
-                            <div class="flex-1 overflow-y-auto divide-y">
-                                <template x-for="(item, i) in cart" :key="i">
-                                    <div class="flex gap-3 p-4">
-                                        <img :src="item.image" alt=""
-                                            class="w-16 h-16 object-cover rounded">
-                                        <div class="flex-1">
-                                            <p class="font-medium" x-text="item.name"></p>
-                                            <p class="text-sm text-slate-500" x-text="item.desc"></p>
-                                            <div class="mt-2 flex items-center justify-between">
-                                                <div class="inline-flex items-center border rounded">
-                                                    <button type="button" @click="decrement(i)"
-                                                        class="px-2 py-1 hover:bg-slate-100">-</button>
-                                                    <span class="px-3" x-text="item.qty"></span>
-                                                    <button type="button" @click="increment(i)"
-                                                        class="px-2 py-1 hover:bg-slate-100">+</button>
-                                                </div>
-                                                <span class="font-medium">৳<span
-                                                        x-text="item.qty * item.price"></span></span>
-                                            </div>
-                                        </div>
-                                        <button type="button" @click="remove(i)"
-                                            class="self-start p-2 rounded hover:bg-slate-100" aria-label="Remove item">
-                                            <i class="fa-regular fa-trash-can"></i>
-                                        </button>
-                                    </div>
-                                </template>
-
-                                <!-- Empty state -->
-                                <div x-show="cart.length === 0" class="p-6 text-center text-slate-500">Your cart is
-                                    empty.</div>
-                            </div>
-
-                            <!-- Footer -->
-                            <div class="border-t p-5 space-y-4">
-                                <div class="flex items-center justify-between text-base">
-                                    <span class="text-slate-600">Subtotal</span>
-                                    <span class="font-semibold">৳<span x-text="subtotal()"></span></span>
-                                </div>
-                                <div class="flex gap-3">
-                                    <a href="/cart"
-                                        class="flex-1 inline-flex items-center justify-center h-11 rounded-md border border-slate-300 hover:bg-slate-50">
-                                        View Cart
-                                    </a>
-                                    <a href="/checkout"
-                                        class="flex-1 inline-flex items-center justify-center h-11 rounded-md bg-[#e80f3a] text-white hover:opacity-95">
-                                        Checkout
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div> --}}
                 </div>
 
                 <!-- Account icon -->
                 <a href="{{ route('account') }}" wire:navigate
-                    class="grid border rounded-full border-slate-900 w-10 h-10 sm:w-12 sm:h-12 place-items-center hover:bg-slate-900 group duration-200 flex-none">
+                    class="grid border rounded-full border-slate-900 size-9 sm:w-12 sm:h-12 place-items-center hover:bg-slate-900 group duration-200 flex-none">
                     <i class="fa-regular fa-user group-hover:text-white"></i>
                 </a>
             </div>
@@ -169,19 +98,18 @@
                     <!-- Inline Dropdown -->
                     <ul x-show="catOpen" x-transition class="pl-8 pr-4 bg-slate-50 text-base text-slate-800">
                         <li>
-                            <a href="/categories/pizza" class="block py-2 hover:text-rose-600">Pizza</a>
+                            <a href="/categories/pizza" class="block py-2 hover:text-rose-600">All</a>
                         </li>
-                        <li>
-                            <a href="/categories/burger" class="block py-2 hover:text-rose-600">Burger</a>
+                        @foreach ($navbarCategories as $cat)
+                            <li>
+                            <a href="{{ route('fontDishes.index', ['categories' => [$cat->slug]]) }}" class="block py-2 hover:text-rose-600">{{ $cat->name }}</a>
                         </li>
-                        <li>
-                            <a href="/categories/seafood" class="block py-2 hover:text-rose-600">Seafood</a>
-                        </li>
+                        @endforeach
                     </ul>
                 </li>
 
                 <li>
-                    <a href="#" class="block px-5 py-4 hover:bg-slate-100">Shop</a>
+                    <a href="#" class="block px-5 py-4 hover:bg-slate-100">Dishes</a>
                 </li>
                 <li>
                     <a href="#" class="block px-5 py-4 hover:bg-slate-100">Contact</a>

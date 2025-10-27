@@ -16,7 +16,6 @@ class DishIndex extends Component
 {
     use WithPagination;
 
-    // Query-string state (slug-based)
     #[Url(history: true)] public string $search = '';
     #[Url(history: true)] public array  $categories = [];
     #[Url(history: true)] public array  $cuisines   = [];

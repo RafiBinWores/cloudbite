@@ -2,11 +2,6 @@
     <!-- Container -->
     <div class="max-w-7xl px-4 mx-auto py-10 lg:py-16">
 
-        <!-- Top row: (kept minimal; the dedicated open button sits inside main section) -->
-        <div class="mb-6 flex items-center justify-between">
-            <!-- (optional spot for a title) -->
-        </div>
-
         <div class="grid grid-cols-12 gap-6">
             <!-- Sidebar (desktop) -->
             <aside class="hidden lg:block col-span-3 border border-gray-300 rounded-xl p-4 font-oswald">
@@ -49,7 +44,7 @@
 
                         @if (count($categoryOptions) > 5)
                             <button type="button" @click="showAll = !showAll"
-                                class="mt-3 text-sm font-medium text-customRed-100 hover:underline"
+                                class="mt-3 text-sm font-medium text-customRed-100 hover:underline cursor-pointer"
                                 x-text="showAll ? 'Show less' : 'View all ({{ count($categoryOptions) - 5 }})'"></button>
                         @endif
                     </div>
@@ -73,7 +68,7 @@
 
                     @if (count($cuisineOptions) > 5)
                         <button type="button" @click="showAllCui = !showAllCui"
-                            class="mt-3 text-sm font-medium text-customRed-100 hover:underline"
+                            class="mt-3 text-sm font-medium text-customRed-100 hover:underline cursor-pointer"
                             x-text="showAllCui ? 'Show less' : 'View all ({{ count($cuisineOptions) - 5 }})'"></button>
                     @endif
                 </div>
@@ -92,7 +87,7 @@
                     <div class="flex items-center justify-between pb-3 border-b border-gray-200">
                         <p class="font-medium text-2xl">Filters</p>
                         <button @click="filtersOpen=false"
-                            class="w-10 h-10 grid place-items-center rounded-md border border-gray-300">
+                            class="w-10 h-10 grid place-items-center rounded-md border border-gray-300 cursor-pointer hover:bg-gray-100 duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -102,68 +97,69 @@
                     </div>
 
                     <!-- Same content as desktop sidebar -->
-                <div class="mt-4">
-                    <p class="mb-1 text-lg">Search</p>
-                    <label class="input rounded-lg border border-gray-300 flex items-center gap-2 px-3 h-11">
-                        <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none"
-                                stroke="currentColor">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <path d="m21 21-4.3-4.3"></path>
-                            </g>
-                        </svg>
-                        <input type="search" placeholder="Search" class="flex-1 outline-none border-none focus:ring-0"
-                            wire:model.live.debounce.300ms="search" />
-                    </label>
-                </div>
+                    <div class="mt-4">
+                        <p class="mb-1 text-lg">Search</p>
+                        <label class="input rounded-lg border border-gray-300 flex items-center gap-2 px-3 h-11">
+                            <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none"
+                                    stroke="currentColor">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.3-4.3"></path>
+                                </g>
+                            </svg>
+                            <input type="search" placeholder="Search"
+                                class="flex-1 outline-none border-none focus:ring-0"
+                                wire:model.live.debounce.300ms="search" />
+                        </label>
+                    </div>
 
-                                    <!-- Categories -->
-                <div class="space-y-4">
-                    <p class="text-lg mt-4">Categories</p>
-                    <div x-data="{ showAll: false }">
+                    <!-- Categories -->
+                    <div class="space-y-4">
+                        <p class="text-lg mt-4">Categories</p>
+                        <div x-data="{ showAll: false }">
+                            <div class="ps-1 space-y-3">
+                                @foreach ($categoryOptions as $cat)
+                                    <label
+                                        x-show="showAll || {{ $loop->index }} < 5 || $wire.categories?.includes('{{ $cat['slug'] }}')"
+                                        x-cloak class="font-jost text-sm flex items-center font-medium gap-2">
+                                        <input type="checkbox"
+                                            class="focus:ring-red-500 text-red-500 size-4 border-2 border-gray-300 rounded"
+                                            value="{{ $cat['slug'] }}" wire:model.live="categories" />
+                                        {{ $cat['name'] }}
+                                    </label>
+                                @endforeach
+                            </div>
+
+                            @if (count($categoryOptions) > 5)
+                                <button type="button" @click="showAll = !showAll"
+                                    class="mt-3 text-sm font-medium text-customRed-100 hover:underline cursor-pointer"
+                                    x-text="showAll ? 'Show less' : 'View all ({{ count($categoryOptions) - 5 }})'"></button>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Cuisines --}}
+                    <div x-data="{ showAllCui: false }" class="mt-6">
+                        <p class="text-lg mt-4 mb-4">Cuisines</p>
                         <div class="ps-1 space-y-3">
-                            @foreach ($categoryOptions as $cat)
+                            @foreach ($cuisineOptions as $cui)
                                 <label
-                                    x-show="showAll || {{ $loop->index }} < 5 || $wire.categories?.includes('{{ $cat['slug'] }}')"
+                                    x-show="showAllCui || {{ $loop->index }} < 5 || $wire.cuisines?.includes('{{ $cui['slug'] }}')"
                                     x-cloak class="font-jost text-sm flex items-center font-medium gap-2">
                                     <input type="checkbox"
                                         class="focus:ring-red-500 text-red-500 size-4 border-2 border-gray-300 rounded"
-                                        value="{{ $cat['slug'] }}" wire:model.live="categories" />
-                                    {{ $cat['name'] }}
+                                        value="{{ $cui['slug'] }}" wire:model.live="cuisines" />
+                                    {{ $cui['name'] }}
                                 </label>
                             @endforeach
                         </div>
 
-                        @if (count($categoryOptions) > 5)
-                            <button type="button" @click="showAll = !showAll"
-                                class="mt-3 text-sm font-medium text-customRed-100 hover:underline"
-                                x-text="showAll ? 'Show less' : 'View all ({{ count($categoryOptions) - 5 }})'"></button>
+                        @if (count($cuisineOptions) > 5)
+                            <button type="button" @click="showAllCui = !showAllCui"
+                                class="mt-3 text-sm font-medium text-customRed-100 hover:underline cursor-pointer"
+                                x-text="showAllCui ? 'Show less' : 'View all ({{ count($cuisineOptions) - 5 }})'"></button>
                         @endif
                     </div>
-                </div>
-
-                {{-- Cuisines --}}
-                <div x-data="{ showAllCui: false }" class="mt-6">
-                    <p class="text-lg mt-4 mb-4">Cuisines</p>
-                    <div class="ps-1 space-y-3">
-                        @foreach ($cuisineOptions as $cui)
-                            <label
-                                x-show="showAllCui || {{ $loop->index }} < 5 || $wire.cuisines?.includes('{{ $cui['slug'] }}')"
-                                x-cloak class="font-jost text-sm flex items-center font-medium gap-2">
-                                <input type="checkbox"
-                                    class="focus:ring-red-500 text-red-500 size-4 border-2 border-gray-300 rounded"
-                                    value="{{ $cui['slug'] }}" wire:model.live="cuisines" />
-                                {{ $cui['name'] }}
-                            </label>
-                        @endforeach
-                    </div>
-
-                    @if (count($cuisineOptions) > 5)
-                        <button type="button" @click="showAllCui = !showAllCui"
-                            class="mt-3 text-sm font-medium text-customRed-100 hover:underline"
-                            x-text="showAllCui ? 'Show less' : 'View all ({{ count($cuisineOptions) - 5 }})'"></button>
-                    @endif
-                </div>
                 </aside>
             </div>
             <!-- /Mobile Filters Drawer -->
@@ -172,7 +168,7 @@
             <section class="col-span-12 lg:col-span-9 lg:ps-2">
                 <div class="flex flex-wrap items-center justify-between gap-3 font-jost">
                     <button
-                        class="lg:hidden inline-flex items-center gap-2 px-4 h-11 rounded-xl border border-gray-300 bg-white"
+                        class="lg:hidden inline-flex items-center gap-2 px-4 h-11 rounded-xl border border-gray-300 bg-white cursor-pointer hover:bg-slate-50 duration-300"
                         @click="filtersOpen = true">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor">
@@ -193,7 +189,9 @@
 
                     <div class="flex items-center gap-2">
                         <label class="text-base sm:text-lg">Sort By:</label>
-                        <select class="border px-2 border-gray-300 p-1.5 rounded" wire:model.live="sort">
+                        <select
+                            class="border px-2 border-gray-300 p-1.5 rounded focus:border-red-500 focus:ring-red-500"
+                            wire:model.live="sort">
                             <option value="all">All</option>
                             <option value="name">Name</option>
                             <option value="popularity">Popularity</option>
@@ -263,8 +261,10 @@
                         </div>
                     @empty
                         <div class="col-span-full">
-                            <div class="rounded-xl border border-dashed p-8 text-center text-slate-600 flex flex-col items-center gap-4 font-medium">
-                                <img src="{{ asset('assets/images/icons/empty.gif') }}" alt="Empty box" class="w-28" />
+                            <div
+                                class="rounded-xl border border-dashed p-8 text-center text-slate-600 flex flex-col items-center gap-4 font-medium">
+                                {{-- <img src="{{ asset('assets/images/icons/empty.gif') }}" alt="Empty box"
+                                    class="w-28" /> --}}
                                 Nothing found. Try another search or remove some filters.
                             </div>
                         </div>

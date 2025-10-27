@@ -1,5 +1,5 @@
     <!-- Header -->
-    <header>
+    <header class="shadow-sm">
         <nav id="siteNav"
             class="sticky top-0 z-40 h-20 px-4 sm:px-6 lg:h-24 lg:px-12 max-w-7xl mx-auto flex items-center justify-between">
             <!-- Hamburger (sm & md) -->
@@ -29,18 +29,15 @@
                     <ul
                         class="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-50">
                         <li>
-                            <a href="{{ route('fontDishes.index') }}" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">All</a>
+                            <a href="{{ route('fontDishes.index') }}"
+                                class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">All</a>
                         </li>
-                        <li>
-                            <a href="/categories/pizza" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">Pizza</a>
-                        </li>
-                        <li>
-                            <a href="/categories/burger" class="block px-4 py-2 hover:bg-gray-100">Burger</a>
-                        </li>
-                        <li>
-                            <a href="/categories/crab"
-                                class="block px-4 py-2 hover:bg-gray-100 rounded-b-xl">Seafood</a>
-                        </li>
+                        @foreach ($navbarCategories as $cat)
+                            <li>
+                                <a href="{{ route('fontDishes.index', ['categories' => [$cat->slug]]) }}"
+                                    class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">{{ $cat->name }}</a>
+                            </li>
+                        @endforeach
                     </ul>
                 </li>
 
@@ -97,19 +94,19 @@
                     <!-- Inline Dropdown -->
                     <ul x-show="catOpen" x-transition class="pl-8 pr-4 bg-slate-50 text-base text-slate-800">
                         <li>
-                            <a href="/categories/pizza" class="block py-2 hover:text-rose-600">Pizza</a>
+                            <a href="{{ route('fontDishes.index') }}" class="block py-2 hover:text-rose-600">All</a>
                         </li>
-                        <li>
-                            <a href="/categories/burger" class="block py-2 hover:text-rose-600">Burger</a>
-                        </li>
-                        <li>
-                            <a href="/categories/seafood" class="block py-2 hover:text-rose-600">Seafood</a>
-                        </li>
+                        @foreach ($navbarCategories as $cat)
+                            <li>
+                                <a href="{{ route('fontDishes.index', ['categories' => [$cat->slug]]) }}"
+                                    class="block py-2 hover:text-rose-600">{{ $cat->name }}</a>
+                            </li>
+                        @endforeach
                     </ul>
                 </li>
 
                 <li>
-                    <a href="#" class="block px-5 py-4 hover:bg-slate-100">Dishes</a>
+                    <a href="{{ route('fontDishes.index') }}" class="block px-5 py-4 hover:bg-slate-100">Dishes</a>
                 </li>
                 <li>
                     <a href="#" class="block px-5 py-4 hover:bg-slate-100">Contact</a>
