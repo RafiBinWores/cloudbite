@@ -57,10 +57,10 @@
     {{-- footer --}}
     @include('components.layouts.partials.footer')
 
+    @livewireScripts
+
     {{-- Scripts --}}
     @stack('scripts')
-
-    @livewireScripts
 </body>
 
 </html>

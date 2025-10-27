@@ -130,9 +130,9 @@
 
             <div class="swiper categoriesSwiper mt-10">
                 <div class="swiper-wrapper">
-                    @foreach ($categories as $cat)
+                    @foreach ($navbarCategories as $cat)
                         <div class="swiper-slide">
-                            <a href="" wire:navigate
+                            <a href="{{ route('fontDishes.index', ['categories' => [$cat->slug]]) }}" wire:navigate
                                 class="group p-[30px] bg-[linear-gradient(180deg,rgba(255,255,255,0.8)_0%,#ECF0F3_100%)] 
                            border-gray-200 border rounded-md overflow-hidden block">
 
@@ -528,7 +528,8 @@
                                     <div class="flex items-center justify-between mt-2">
                                         <div class="font-oswald text-customRed-100 flex items-center gap-2">
                                             <p class="font-medium text-lg">
-                                                <span class="font-bold">&#2547;</span> {{ $dish->price_with_discount }}
+                                                <span class="font-bold">&#2547;</span>
+                                                {{ $dish->price_with_discount }}
                                             </p>
                                             @if ($dish->price_with_discount < $dish->display_price)
                                                 <p class="font-medium line-through text-gray-500">
@@ -748,6 +749,9 @@
                 slidesPerView: 4,
                 spaceBetween: 20,
                 loop: false,
+                preventClicks: false,
+                preventClicksPropagation: false,
+                touchStartPreventDefault: false,
                 // autoplay: {
                 //     delay: 2500,
                 //     disableOnInteraction: false

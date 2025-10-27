@@ -11,7 +11,7 @@ class Address extends Model
         'label',
         'contact_name',
         'contact_phone',
-        'line1',
+        'address',
         'area',
         'city',
         'state',

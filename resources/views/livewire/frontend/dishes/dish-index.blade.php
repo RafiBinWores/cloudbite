@@ -265,6 +265,7 @@
                                 class="rounded-xl border border-dashed p-8 text-center text-slate-600 flex flex-col items-center gap-4 font-medium">
                                 {{-- <img src="{{ asset('assets/images/icons/empty.gif') }}" alt="Empty box"
                                     class="w-28" /> --}}
+                                    <i class="fa-regular fa-box-open text-8xl mb-4 text-neutral-500"></i>
                                 Nothing found. Try another search or remove some filters.
                             </div>
                         </div>

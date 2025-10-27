@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('contact_name')->nullable();
             $table->string('contact_phone')->nullable();
 
-            $table->string('line1');
+            $table->string('address');
             $table->string('area')->nullable();
             $table->string('city')->default('Dhaka');
             $table->string('state')->nullable();
@@ -29,6 +29,7 @@ return new class extends Migration
             $table->decimal('lng', 10, 7)->nullable();
 
             $table->timestamps();
+            $table->unique(['user_id', 'label'], 'addresses_user_label_unique');
         });
     }
 

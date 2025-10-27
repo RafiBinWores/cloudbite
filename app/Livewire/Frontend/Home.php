@@ -12,10 +12,6 @@ class Home extends Component
 {
     public function render()
     {
-        $categories = Category::where('status', 'active')
-        ->orderByDesc('created_at')
-        ->get();
-
         $now = now();
         $dishes = Dish::where('visibility', 'Yes')
             ->where('available_from', '<=', $now)
@@ -23,7 +19,7 @@ class Home extends Component
             ->orderByDesc('created_at')
             ->get();
         
-        return view('livewire.frontend.home', compact('categories', 'dishes'))
+        return view('livewire.frontend.home', compact('dishes'))
             ->title('Home - CloudBite');
     }
 }

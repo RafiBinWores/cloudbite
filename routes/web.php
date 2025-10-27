@@ -23,6 +23,8 @@ use App\Livewire\Admin\Orders\Orders;
 use App\Livewire\Admin\Orders\Show;
 use App\Livewire\Admin\Tags\Tags;
 use App\Livewire\Frontend\Account\Account;
+use App\Livewire\Frontend\Account\Address;
+use App\Livewire\Frontend\Account\AddressForm;
 use App\Livewire\Frontend\Account\Favorites;
 use App\Livewire\Frontend\Account\OrderDetails;
 use App\Livewire\Frontend\Account\OrdersPage;
@@ -62,6 +64,9 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/account/favorites', Favorites::class)->name('account.favorites');
     Route::get('/account/orders', OrdersPage::class)->name('account.orders');
     Route::get('/account/orders/{code}', OrderDetails::class)->name('account.orders.show');
+
+    Route::get('/account/address', Address::class)->name('account.address');
+    Route::get('/account/create-address', AddressForm::class)->name('address.create');
 });
 
 // Admin Dashboard Route Starts

@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
         View::share('navbarCategories', Cache::remember('navbar_categories_v1', 3600, function () {
             return Category::query()
                 ->where('status', true)
-                ->orderBy('name')
+                ->orderBy('created_at', 'desc')
                 ->get(['id', 'name', 'slug', 'image']);
         }));
 

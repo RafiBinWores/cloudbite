@@ -29,11 +29,11 @@
                     <ul
                         class="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 z-50">
                         <li>
-                            <a href="{{ route('fontDishes.index') }}" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">All</a>
+                            <a href="{{ route('fontDishes.index') }}" wire:navigate class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">All</a>
                         </li>
                         @foreach ($navbarCategories as $cat)
                             <li>
-                            <a href="{{ route('fontDishes.index', ['categories' => [$cat->slug]]) }}" class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">{{ $cat->name }}</a>
+                            <a href="{{ route('fontDishes.index', ['categories' => [$cat->slug]]) }}" wire:navigate class="block px-4 py-2 hover:bg-gray-100 rounded-t-xl">{{ $cat->name }}</a>
                         </li>
                         @endforeach
                         
@@ -98,11 +98,11 @@
                     <!-- Inline Dropdown -->
                     <ul x-show="catOpen" x-transition class="pl-8 pr-4 bg-slate-50 text-base text-slate-800">
                         <li>
-                            <a href="/categories/pizza" class="block py-2 hover:text-rose-600">All</a>
+                            <a href="/" wire:navigate class="block py-2 hover:text-rose-600">All</a>
                         </li>
                         @foreach ($navbarCategories as $cat)
                             <li>
-                            <a href="{{ route('fontDishes.index', ['categories' => [$cat->slug]]) }}" class="block py-2 hover:text-rose-600">{{ $cat->name }}</a>
+                            <a href="{{ route('fontDishes.index', ['categories' => [$cat->slug]]) }}" wire:navigate class="block py-2 hover:text-rose-600">{{ $cat->name }}</a>
                         </li>
                         @endforeach
                     </ul>

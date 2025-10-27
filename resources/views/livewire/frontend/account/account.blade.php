@@ -85,7 +85,7 @@
         </a>
 
         {{-- Address --}}
-        <a href=""
+        <a href="{{ route('account.address') }}" wire:navigate
             class="py-5 bg-gray-100/80 rounded-xl h-[130px] flex items-center justify-center flex-col group border border-transparent duration-150 hover:border-customRed-100/60">
             <svg xmlns="http://www.w3.org/2000/svg" class="size-12 text-slate-800 group-hover:text-customRed-100"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
