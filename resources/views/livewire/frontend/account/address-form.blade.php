@@ -82,7 +82,7 @@
         {{-- Top: title + quick labels --}}
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <h2 class="text-xl font-semibold tracking-tight">Address</h2>
+                <h2 class="text-xl font-semibold tracking-tight">Delivery Address</h2>
                 <p class="text-xs text-slate-500">Pick on map or search a place — we’ll auto-fill the fields below.</p>
             </div>
 
@@ -125,7 +125,7 @@
                         <label class="font-medium">Contact Name</label>
                         <input type="text"
                             class="focus:outline-none focus:border-none focus:ring-2 focus:ring-customRed-100 rounded w-full mt-1"
-                            wire:model.defer="contact_name" />
+                            wire:model.defer="contact_name" placeholder="Name" />
                         @error('contact_name')
                             <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
                         @enderror

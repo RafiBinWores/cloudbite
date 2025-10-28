@@ -66,7 +66,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/account/orders/{code}', OrderDetails::class)->name('account.orders.show');
 
     Route::get('/account/address', Address::class)->name('account.address');
-    Route::get('/account/create-address', AddressForm::class)->name('address.create');
+    Route::get('/create-address/{label?}', AddressForm::class)->name('address.create');
 });
 
 // Admin Dashboard Route Starts
