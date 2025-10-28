@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('city')->default('Dhaka');
             $table->string('state')->nullable();
             $table->string('postal_code')->nullable();
+            $table->string('note')->nullable();
             $table->string('country')->default('Bangladesh');
             $table->decimal('lat', 10, 7)->nullable();
             $table->decimal('lng', 10, 7)->nullable();
