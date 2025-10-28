@@ -149,16 +149,16 @@
 
 
                                         <div class="flex items-center gap-2">
-                                            <button class="btn btn-circle btn-ghost"
+                                            <button class="font-medium cursor-pointer"
                                                 @click.prevent="$wire.decrementQty({{ $item->id }})">–</button>
 
                                             <input type="number" min="1" max="99"
-                                                class="input input-bordered input-sm w-16 text-center"
+                                                class="rounded-lg w-16 text-center focus:outline-none focus:ring-customRed-100 border border-gray-300"
                                                 value="{{ $item->qty }}"
                                                 oninput="this.value = Math.max(1, Math.min(99, parseInt(this.value || 1)));"
                                                 @change.prevent="$wire.changeQty({{ $item->id }}, parseInt($event.target.value))" />
 
-                                            <button class="btn btn-circle btn-ghost"
+                                            <button class="font-medium cursor-pointer"
                                                 @click.prevent="$wire.incrementQty({{ $item->id }})">+</button>
                                         </div>
                                     </div>
@@ -168,8 +168,8 @@
                     @endforeach
 
                     <div class="flex items-center justify-between">
-                        <button class="btn btn-ghost" wire:click="clearCart">Clear cart</button>
-                        <a href="{{ url('/') }}" class="btn btn-outline">Continue Shopping</a>
+                        <button class="btn btn-ghost font-medium cursor-pointer" wire:click="clearCart">Clear cart</button>
+                        <a href="{{ url('/') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors bg-white border-2 rounded-md text-slate-900 hover:text-white border-slate-900 hover:bg-slate-900 duration-300">Continue Shopping</a>
                     </div>
                 </div>
 
@@ -209,7 +209,7 @@
                                 <input type="text"
                                     class="border-0 ring-0 focus:ring-0 focus:outline-none focus:border-0 outline-none w-full"
                                     placeholder="Enter coupon code" wire:model.defer="coupon_code" />
-                                <button class="btn bg-customRed-100 text-white" wire:click="applyCoupon">Apply</button>
+                                <button class="bg-customRed-100 text-white px-2 py-2 rounded cursor-pointer hover:bg-customRed-200" wire:click="applyCoupon">Apply</button>
                             </div>
                             @if ($coupon_feedback)
                                 <div
@@ -260,9 +260,11 @@
                             </span>
                         </div>
 
-                        <a href="{{ route('checkout') }}" class="btn bg-customRed-100 text-white w-full h-12 rounded-xl">
+                        <div class="flex text-center">
+                            <a href="{{ route('checkout') }}" class="bg-customRed-100 hover:bg-customRed-200 duration-200 text-white w-full py-3 rounded-xl">
                             Checkout
                         </a>
+                        </div>
                     </div>
                 </div>
 

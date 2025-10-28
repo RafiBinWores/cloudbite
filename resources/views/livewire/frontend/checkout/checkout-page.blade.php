@@ -14,10 +14,7 @@
                     <div class="flex items-start justify-between gap-3 mb-4">
                         <div class="flex items-center gap-3">
                             <div class="size-10 rounded-xl grid place-items-center bg-gradient-to-tr from-customRed-100/25 to-customRed-200/10 text-customRed-100">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/>
-                                    <circle cx="12" cy="10" r="3"/>
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-truck-icon lucide-truck"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
                             </div>
                             <div>
                                 <h2 class="text-lg font-semibold leading-none">Delivery Information</h2>
@@ -46,10 +43,7 @@
                         <div class="space-y-4 text-[15px]">
                             {{-- Name --}}
                             <div class="flex items-start gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 size-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="8" r="4"/>
-                                    <path d="M6 20a6 6 0 0 1 12 0"/>
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-icon lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                 <div class="font-medium">{{ $selected->contact_name ?: ($contact_name ?? '') }}</div>
                             </div>
 
@@ -57,9 +51,7 @@
 
                             {{-- Phone --}}
                             <div class="flex items-start gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 size-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.11 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.35 1.94.66 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.23a2 2 0 0 1 2.11-.45c.93.31 1.89.53 2.87.66A2 2 0 0 1 22 16.92z"/>
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-[18px] opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone-icon lucide-phone"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
                                 <div class="opacity-80">{{ $selected->contact_phone ?: ($phone ?? '') }}</div>
                             </div>
 
@@ -67,10 +59,7 @@
 
                             {{-- Address --}}
                             <div class="flex items-start gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 size-5 opacity-70" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/>
-                                    <circle cx="12" cy="10" r="3"/>
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-9 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin-icon lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
                                 <div>
                                     <div class="font-medium">{{ $selected->address }}</div>
                                     <div class="opacity-70 text-sm">
