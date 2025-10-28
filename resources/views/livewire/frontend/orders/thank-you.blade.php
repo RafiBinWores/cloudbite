@@ -64,7 +64,7 @@
         </div>
 
         <a href="{{ url('/') }}"
-           class="btn bg-customRed-100 text-white mt-6">
+           class="btn bg-customRed-100 text-white mt-6 px-5 py-3 rounded-md inline-block">
             Back to Home
         </a>
     </div>
