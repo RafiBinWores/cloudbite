@@ -22,6 +22,9 @@ class AddToCartModal extends Component
     public ?int $bun_id = null;
     public array $addon_ids = [];
 
+    // ✅ Variations selection: [groupIndex => optionIndex]
+    public array $variation_selection = [];
+
     public bool $open = false;
     public bool $crust_required = true;
     public bool $bun_required = true;
@@ -39,18 +42,24 @@ class AddToCartModal extends Component
         $this->addon_ids = [];
 
         $this->dish = Dish::with(['crusts', 'buns', 'addOns'])->findOrFail($dishId);
+
+        // ✅ default select first option of each variation group
+        $this->variation_selection = [];
+        foreach ((array)($this->dish->variations ?? []) as $gIndex => $group) {
+            if (!empty($group['options'])) {
+                $this->variation_selection[$gIndex] = 0;
+            }
+        }
+
         $this->open = true;
 
         $this->isFavorited = Auth::check() && Auth::user()->hasFavorited($this->dish->id);
     }
 
-    // 👇 Add this
     public function toggleFavorite(): void
     {
         if (!Auth::check()) {
-            // If you have a login modal, trigger it; otherwise redirect
-            $this->dispatch('open-login'); // optional custom event if you use a login modal
-            // return redirect()->route('login'); // or redirect if you prefer
+            $this->dispatch('open-login');
             $this->warning(
                 title: 'Please log in to save favorites.',
                 position: 'top-right',
@@ -77,7 +86,6 @@ class AddToCartModal extends Component
                 showCloseIcon: true,
             );
         } else {
-            // Optional guard
             Dish::query()->findOrFail($dishId);
             $user->favorites()->attach($dishId);
             $this->isFavorited = true;
@@ -101,14 +109,30 @@ class AddToCartModal extends Component
     }
 
     /** ================= Live preview helpers ================= */
+
+    // ✅ Base price is variation price if selected, else dish price_with_discount or price
     public function getBasePriceProperty(): float
     {
         if (!$this->dish) return 0.0;
-        // If you have an accessor (price_with_discount), it'll be used; otherwise fallback to price.
-        return (float) ($this->dish->price_with_discount ?? $this->dish->price ?? 0);
+
+        $base = (float) ($this->dish->price_with_discount ?? $this->dish->price ?? 0);
+
+        $vars = (array)($this->dish->variations ?? []);
+        if (!$vars) return round($base, 2);
+
+        foreach ($vars as $gIndex => $group) {
+            $optIndex = $this->variation_selection[$gIndex] ?? null;
+            if ($optIndex === null) continue;
+
+            $opt = $group['options'][$optIndex] ?? null;
+            if ($opt && isset($opt['price'])) {
+                $base = (float)$opt['price'];
+            }
+        }
+
+        return round($base, 2);
     }
 
-    // Crust extra from Crust model's own price (NOT pivot)
     public function getCrustExtraProperty(): float
     {
         if (!$this->dish || !$this->crust_id) return 0.0;
@@ -116,13 +140,11 @@ class AddToCartModal extends Component
         return round((float)($c?->price ?? 0), 2);
     }
 
-    // Bun extra (free for now)
     public function getBunExtraProperty(): float
     {
         return 0.0;
     }
 
-    // Add-ons total from AddOn model's own price (NOT pivot)
     public function getAddonsExtraProperty(): float
     {
         if (!$this->dish) return 0.0;
@@ -155,6 +177,19 @@ class AddToCartModal extends Component
             'addon_ids.*' => 'integer',
         ]);
 
+        // ✅ require variation for every group that has options
+        $variationRules = [];
+        foreach ((array)($this->dish->variations ?? []) as $gIndex => $group) {
+            if (!empty($group['options'])) {
+                $variationRules["variation_selection.$gIndex"] = 'required|integer|min:0';
+            }
+        }
+        if ($variationRules) {
+            $this->validate($variationRules, [
+                'required' => 'Please select a variation option.'
+            ]);
+        }
+
         $rules = [
             'crust_id' => ($this->crust_required && $this->dish->crusts->count() > 0) ? 'required|integer' : 'nullable',
             'bun_id'   => ($this->bun_required   && $this->dish->buns->count()   > 0) ? 'required|integer' : 'nullable',
@@ -177,7 +212,8 @@ class AddToCartModal extends Component
             qty: $this->qty,
             crustId: $this->crust_id,
             bunId: $this->bun_id,
-            addonIds: $this->addon_ids
+            addonIds: $this->addon_ids,
+            variationsSelected: $this->variation_selection // ✅ send selected variation
         );
 
         $this->success(
@@ -186,10 +222,11 @@ class AddToCartModal extends Component
             showProgress: true,
             showCloseIcon: true,
         );
+
         $this->dispatch('cart-updated');
         $this->open = false;
 
-        $this->reset(['dish', 'qty', 'crust_id', 'bun_id', 'addon_ids']);
+        $this->reset(['dish', 'qty', 'crust_id', 'bun_id', 'addon_ids', 'variation_selection']);
     }
 
     public function render()

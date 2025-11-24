@@ -15,12 +15,11 @@ class CreateDish extends Component
     use WithFileUploads, WithTcToast;
 
     // Form properties
-    public $title = null, $short_description = null, $description = null;
+    public $title = null, $short_description = null;
     public $category_id = [], $related_dish_id = [], $cuisine_id = [];
     public $price = null, $discount = null, $vat = null, $discount_type = null, $sku = null;
     public $track_stock = 'No', $daily_stock = null;
-    public $available_from = null, $available_till = null;
-    public $visibility = 'Yes';
+    public $available_from = null, $available_till = null, $visibility = 'Yes';
 
     public $thumbnail = null;
     public $gallery = [];
@@ -30,44 +29,59 @@ class CreateDish extends Component
     // Arrays
     public $tags = [];
     public $buns = [];
-    public $crusts = []; 
+    public $crusts = [];
     public $addOns = [];
     public $related_dishes = [];
 
-    // Validation rules
+    // NEW: Variations (group -> options)
+    public $variations = [];
+
     public function rules(): array
     {
         return [
             'title' => 'required|string|max:255|unique:dishes,title',
-            'short_description' => 'required|string',
-            'description' => 'nullable|string',
+            'short_description' => 'required|string|max:500',
+
             'category_id' => 'required|numeric',
             'related_dish_id' => 'nullable',
             'cuisine_id' => 'required|numeric',
-            'price' => 'required',
-            'tags' => 'nullable',
-            'buns' => 'nullable',
-            'crusts' => 'nullable',
-            'addOns' => 'nullable',
+
+            'price' => 'required|numeric|min:0',
+
+            'tags' => 'nullable|array',
+            'buns' => 'nullable|array',
+            'crusts' => 'nullable|array',
+            'addOns' => 'nullable|array',
+
             'discount_type' => 'nullable|in:amount,percent|required_with:discount',
             'discount'      => 'nullable|numeric|gte:0|required_with:discount_type',
-            'vat' => 'nullable',
-            'sku' => 'required_if:track_stock,Yes|nullable',
+            'vat' => 'nullable|numeric|min:0',
+
+            'sku' => 'required_if:track_stock,Yes|nullable|string|max:255',
             'track_stock' => 'required|in:Yes,No',
             'daily_stock' => 'required_if:track_stock,Yes|nullable|integer|min:0',
+
             'available_from' => 'required',
             'available_till' => 'required',
-            'visibility' => 'required',
-            'thumbnail'        => 'required|image|max:5048|mimes:jpg,jpeg,png,webp,svg',
-            'gallery'      => 'array|max:4',
-            'gallery.*'    => 'image|max:5048|mimes:jpg,jpeg,png,webp',
-            'meta_title' => 'nullable|string',
-            'meta_description' => 'nullable|string',
-            'meta_keyword' => 'nullable|string',
+            'visibility' => 'required|in:Yes,No',
+
+            'thumbnail'     => 'required|image|max:5048|mimes:jpg,jpeg,png,webp,svg',
+            'gallery'       => 'array|max:4',
+            'gallery.*'     => 'image|max:5048|mimes:jpg,jpeg,png,webp',
+
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keyword' => 'nullable|string|max:255',
+
+            // NEW: variation validation
+            'variations' => 'nullable|array',
+            'variations.*.name' => 'nullable|string|max:100',
+            'variations.*.options' => 'nullable|array',
+            'variations.*.options.*.label' => 'required_with:variations.*.name|string|max:100',
+            'variations.*.options.*.price' => 'required_with:variations.*.name|numeric|min:0',
         ];
     }
 
-    // Fires for ANY wire:model change
     public function updated($property, $value)
     {
         $this->resetErrorBag($property);
@@ -102,9 +116,70 @@ class CreateDish extends Component
         }
     }
 
+    // =========================
+    // Variation helpers (UI)
+    // =========================
+    public function addVariationGroup()
+    {
+        $this->variations[] = [
+            'name' => '',
+            'options' => [
+                ['label' => '', 'price' => 0],
+            ],
+        ];
+    }
+
+    public function removeVariationGroup($index)
+    {
+        unset($this->variations[$index]);
+        $this->variations = array_values($this->variations);
+    }
+
+    public function addVariationOption($vIndex)
+    {
+        $this->variations[$vIndex]['options'][] = ['label' => '', 'price' => 0];
+    }
+
+    public function removeVariationOption($vIndex, $oIndex)
+    {
+        unset($this->variations[$vIndex]['options'][$oIndex]);
+        $this->variations[$vIndex]['options'] = array_values($this->variations[$vIndex]['options']);
+    }
+
+    // Clean empty rows before save
+    private function normalizeVariations(): array
+    {
+        $out = [];
+
+        foreach ((array) $this->variations as $group) {
+            $name = trim($group['name'] ?? '');
+            if ($name === '') continue;
+
+            $opts = [];
+            foreach ((array)($group['options'] ?? []) as $opt) {
+                $label = trim($opt['label'] ?? '');
+                $price = $opt['price'] ?? null;
+                if ($label === '' || $price === null || $price === '') continue;
+
+                $opts[] = [
+                    'label' => $label,
+                    'price' => (float) $price,
+                ];
+            }
+
+            if ($opts) {
+                $out[] = [
+                    'name' => $name,
+                    'options' => $opts,
+                ];
+            }
+        }
+
+        return $out;
+    }
+
     public function submit()
     {
-        // dd($this->tags);
         $this->validate();
 
         $dailyStock = ($this->track_stock === 'Yes') ? (int)($this->daily_stock ?? 0) : null;
@@ -142,7 +217,7 @@ class CreateDish extends Component
                 'title'             => $this->title,
                 'slug'              => $slug,
                 'short_description' => $this->short_description,
-                'description'       => $this->description,
+
                 'category_id'       => $this->category_id ? (int)$this->category_id : null,
                 'cuisine_id'        => $this->cuisine_id ? (int)$this->cuisine_id : null,
 
@@ -152,7 +227,6 @@ class CreateDish extends Component
                 'vat'               => $this->vat !== null ? (float)$this->vat : null,
                 'sku'               => $this->sku ?: null,
 
-                // keep as "Yes"/"No" strings (matches your model/DB)
                 'track_stock'       => $this->track_stock,
                 'daily_stock'       => $dailyStock,
 
@@ -168,6 +242,9 @@ class CreateDish extends Component
                 'meta_keyword'      => $this->meta_keyword,
 
                 'tags'              => $this->tags ?: [],
+
+                // NEW: save cleaned variations
+                'variations'        => $this->normalizeVariations(),
             ];
 
             // capture pivot arrays before closure
@@ -193,7 +270,6 @@ class CreateDish extends Component
             $this->reset([
                 'title',
                 'short_description',
-                'description',
                 'category_id',
                 'cuisine_id',
                 'price',
@@ -216,35 +292,31 @@ class CreateDish extends Component
                 'crusts',
                 'addOns',
                 'related_dishes',
+                'variations',
             ]);
 
-            // Defaults
             $this->track_stock = 'No';
             $this->visibility  = 'Yes';
-            $this->tags = [];
-            $this->buns = $this->crusts = $this->addOns = $this->related_dishes = [];
 
-            // $this->dispatch('toast', type: 'success', message: 'Cuisine created successfully.');
             $this->success(
-            title: 'Dish created successfully',
-            position: 'top-right',
-            showProgress: true,
-            showCloseIcon: true,
-        );
+                title: 'Dish created successfully',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
+
         } catch (\Throwable $e) {
             if ($storedThumb) Storage::disk('public')->delete($storedThumb);
             if (!empty($storedGallery)) Storage::disk('public')->delete($storedGallery);
 
             report($e);
-            // Temporarily show the actual reason while debugging:
-            // $this->dispatch('toast', type: 'error', message: 'Failed: '.$e->getMessage());
-            // $this->dispatch('toast', type: 'error', message: 'Failed to create dish. Please try again.');
+
             $this->error(
-            title: 'Failed to create dish. Please try again.',
-            position: 'top-right',
-            showProgress: true,
-            showCloseIcon: true,
-        );
+                title: 'Failed to create dish. Please try again.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
     }
 

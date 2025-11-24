@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Dishes;
 
 use App\Models\Dish;
+use Developermithu\Tallcraftui\Traits\WithTcToast;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -12,12 +13,12 @@ use Illuminate\Validation\Rule;
 
 class EditDish extends Component
 {
-    use WithFileUploads;
+    use WithFileUploads, WithTcToast;
 
     public ?Dish $dish = null;
 
     // Form props
-    public $title = null, $short_description = null, $description = null;
+    public $title = null, $short_description = null;
     public $category_id = null, $related_dish_id = null, $cuisine_id = null;
     public $price = null, $discount = null, $vat = null, $discount_type = null, $sku = null;
     public $track_stock = 'No', $daily_stock = null;
@@ -30,20 +31,21 @@ class EditDish extends Component
     public $meta_title, $meta_description, $meta_keyword;
 
     // Arrays / Pivots
-    public $tags = [];            // stored as JSON cast
-    public $buns = [];            // pivot IDs
-    public $crusts = [];          // pivot IDs
-    public $addOns = [];          // pivot IDs
-    public $related_dishes = [];  // pivot IDs (dishes)
+    public $tags = [];
+    public $buns = [];
+    public $crusts = [];
+    public $addOns = [];
+    public $related_dishes = [];
+
+    // NEW
+    public $variations = [];
 
     public function mount(Dish $dish)
     {
         $this->dish = $dish;
 
-        // Base
         $this->title             = $dish->title;
         $this->short_description = $dish->short_description;
-        $this->description       = $dish->description;
         $this->category_id       = $dish->category_id;
         $this->cuisine_id        = $dish->cuisine_id;
 
@@ -65,56 +67,126 @@ class EditDish extends Component
         $this->meta_description = $dish->meta_description;
         $this->meta_keyword     = $dish->meta_keyword;
 
-        // Arrays
-        $this->tags             =$dish->tags;
-        $this->buns             = $dish->buns()->allRelatedIds()->toArray();
-        $this->crusts           = $dish->crusts()->allRelatedIds()->toArray();
-        $this->addOns           = $dish->addOns()->allRelatedIds()->toArray();
-        $this->related_dishes   = $dish->relatedDishes()->allRelatedIds()->toArray();
+        $this->tags           = $dish->tags ?? [];
+        $this->buns           = $dish->buns()->allRelatedIds()->toArray();
+        $this->crusts         = $dish->crusts()->allRelatedIds()->toArray();
+        $this->addOns         = $dish->addOns()->allRelatedIds()->toArray();
+        $this->related_dishes = $dish->relatedDishes()->allRelatedIds()->toArray();
+
+        // load variations json
+        $this->variations = $dish->variations ?? [];
     }
 
     public function rules(): array
     {
         return [
             'title'             => ['required', 'string', 'max:255', Rule::unique('dishes', 'title')->ignore($this->dish?->id)],
-            'short_description' => 'required|string',
-            'description'       => 'required|string',
+            'short_description' => 'required|string|max:500',
+
             'category_id'       => 'required|numeric',
             'related_dish_id'   => 'nullable',
             'cuisine_id'        => 'required|numeric',
 
-            'price'         => 'required|numeric',
+            'price'         => 'required|numeric|min:0',
             'discount_type' => 'nullable|in:amount,percent|required_with:discount',
             'discount'      => 'nullable|numeric|gte:0|required_with:discount_type',
-            'vat'           => 'nullable|numeric',
-            'sku'           => 'nullable|string',
+            'vat'           => 'nullable|numeric|min:0',
+            'sku'           => 'nullable|string|max:255',
 
             'tags'      => 'nullable|array',
             'buns'      => 'nullable|array',
             'crusts'    => 'nullable|array',
             'addOns'    => 'nullable|array',
 
-            'track_stock'   => 'required|in:Yes,No',
-            'daily_stock'   => 'required_if:track_stock,Yes|nullable|integer|min:0',
-            'available_from' => 'nullable',
-            'available_till' => 'nullable|after_or_equal:available_from',
-            'visibility'    => 'required|in:Yes,No',
+            'track_stock'    => 'required|in:Yes,No',
+            'daily_stock'    => 'required_if:track_stock,Yes|nullable|integer|min:0',
+            'available_from' => 'required',
+            'available_till' => 'required',
+            'visibility'     => 'required|in:Yes,No',
 
-            // On update, images are optional:
+            // Images optional on update
             'thumbnail'   => 'nullable|image|max:5048|mimes:jpg,jpeg,png,webp,svg',
             'gallery'     => 'nullable|array|max:4',
             'gallery.*'   => 'nullable|image|max:5048|mimes:jpg,jpeg,png,webp',
 
-            'meta_title'       => 'nullable|string',
-            'meta_description' => 'nullable|string',
-            'meta_keyword'     => 'nullable|string',
+            'meta_title'       => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keyword'     => 'nullable|string|max:255',
+
+            // variations
+            'variations' => 'nullable|array',
+            'variations.*.name' => 'nullable|string|max:100',
+            'variations.*.options' => 'nullable|array',
+            'variations.*.options.*.label' => 'required_with:variations.*.name|string|max:100',
+            'variations.*.options.*.price' => 'required_with:variations.*.name|numeric|min:0',
         ];
     }
 
-    // Clear field-level error on change
     public function updated($property, $value)
     {
         $this->resetErrorBag($property);
+    }
+
+    // =========================
+    // Variation helpers (UI)
+    // =========================
+    public function addVariationGroup()
+    {
+        $this->variations[] = [
+            'name' => '',
+            'options' => [
+                ['label' => '', 'price' => 0],
+            ],
+        ];
+    }
+
+    public function removeVariationGroup($index)
+    {
+        unset($this->variations[$index]);
+        $this->variations = array_values($this->variations);
+    }
+
+    public function addVariationOption($vIndex)
+    {
+        $this->variations[$vIndex]['options'][] = ['label' => '', 'price' => 0];
+    }
+
+    public function removeVariationOption($vIndex, $oIndex)
+    {
+        unset($this->variations[$vIndex]['options'][$oIndex]);
+        $this->variations[$vIndex]['options'] = array_values($this->variations[$vIndex]['options']);
+    }
+
+    private function normalizeVariations(): array
+    {
+        $out = [];
+
+        foreach ((array) $this->variations as $group) {
+            $name = trim($group['name'] ?? '');
+            if ($name === '') continue;
+
+            $opts = [];
+            foreach ((array)($group['options'] ?? []) as $opt) {
+                $label = trim($opt['label'] ?? '');
+                $price = $opt['price'] ?? null;
+
+                if ($label === '' || $price === null || $price === '') continue;
+
+                $opts[] = [
+                    'label' => $label,
+                    'price' => (float) $price,
+                ];
+            }
+
+            if ($opts) {
+                $out[] = [
+                    'name' => $name,
+                    'options' => $opts,
+                ];
+            }
+        }
+
+        return $out;
     }
 
     /** Alpine preview helper */
@@ -145,8 +217,6 @@ class EditDish extends Component
     /** Update/save changes */
     public function updateDish()
     {
-
-        // dd($this->available_from, $this->available_till);
         $this->validate();
 
         $dailyStock = ($this->track_stock === 'Yes') ? (int)($this->daily_stock ?? 0) : null;
@@ -160,15 +230,15 @@ class EditDish extends Component
         try {
             $ts   = now()->format('YmdHis');
 
-            // Keep slug unless title changed
             $slug = $this->dish->slug;
             if ($this->title !== $this->dish->title) {
                 $slug = Str::slug($this->title ?: $slug);
             }
 
-            // Save NEW thumbnail if provided
             if ($this->thumbnail) {
-                $ext = $this->thumbnail->getClientOriginalExtension() ?: $this->thumbnail->extension() ?: 'jpg';
+                $ext = $this->thumbnail->getClientOriginalExtension()
+                    ?: $this->thumbnail->extension() ?: 'jpg';
+
                 $newThumb = $this->thumbnail->storeAs(
                     'dishes/thumbnail',
                     "{$slug}-{$ts}-thumb.{$ext}",
@@ -176,7 +246,6 @@ class EditDish extends Component
                 );
             }
 
-            // Save NEW gallery if provided (max 4)
             if (!empty($this->gallery)) {
                 foreach (array_slice($this->gallery, 0, 4) as $i => $file) {
                     $ext = $file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg';
@@ -192,11 +261,10 @@ class EditDish extends Component
                 'title'             => $this->title,
                 'slug'              => $slug,
                 'short_description' => $this->short_description,
-                'description'       => $this->description,
-                'category_id'       => $this->category_id ? (int)$this->category_id : null,
-                'cuisine_id'        => $this->cuisine_id ? (int)$this->cuisine_id : null,
+                'category_id'       => (int)$this->category_id,
+                'cuisine_id'        => (int)$this->cuisine_id,
 
-                'price'         => $this->price !== null ? (float)$this->price : 0,
+                'price'         => (float)$this->price,
                 'discount_type' => $this->discount_type ?: null,
                 'discount'      => $this->discount !== null ? (float)$this->discount : null,
                 'vat'           => $this->vat !== null ? (float)$this->vat : null,
@@ -208,7 +276,6 @@ class EditDish extends Component
                 'available_till' => $this->available_till ?: null,
                 'visibility'     => $this->visibility,
 
-                // Images: keep old unless new provided
                 'thumbnail' => $newThumb ?: $oldThumb,
                 'gallery'   => !empty($newGallery) ? $newGallery : $oldGallery,
 
@@ -216,46 +283,53 @@ class EditDish extends Component
                 'meta_description' => $this->meta_description,
                 'meta_keyword'     => $this->meta_keyword,
 
-                'tags' => $this->tags ?: [],
+                'tags'       => $this->tags ?: [],
+                'variations' => $this->normalizeVariations(),
             ];
 
-            // Capture pivots
             $buns    = array_values(array_filter((array)$this->buns));
             $crusts  = array_values(array_filter((array)$this->crusts));
             $addOns  = array_values(array_filter((array)$this->addOns));
-            $related_dishes = array_values(array_filter((array)$this->related_dishes));
+            $related = array_values(array_filter((array)$this->related_dishes));
 
-            DB::transaction(function () use ($data, $buns, $crusts, $addOns, $related_dishes) {
+            DB::transaction(function () use ($data, $buns, $crusts, $addOns, $related) {
                 $this->dish->update($data);
                 $this->dish->buns()->sync($buns);
                 $this->dish->crusts()->sync($crusts);
                 $this->dish->addOns()->sync($addOns);
-                $this->dish->relatedDishes()->sync($related_dishes);
+                $this->dish->relatedDishes()->sync($related);
             });
 
-            // If we saved a new thumbnail, delete old file
-            if ($newThumb && $oldThumb && Storage::disk('public')->exists($oldThumb)) {
-                Storage::disk('public')->delete($oldThumb);
-            }
+            if ($newThumb && $oldThumb) Storage::disk('public')->delete($oldThumb);
 
-            // If we saved a new gallery, delete old gallery files
             if (!empty($newGallery) && !empty($oldGallery)) {
                 foreach ($oldGallery as $path) {
-                    if ($path && Storage::disk('public')->exists($path)) {
-                        Storage::disk('public')->delete($path);
-                    }
+                    if ($path) Storage::disk('public')->delete($path);
                 }
             }
 
             $this->dispatch('dish-updated', id: $this->dish->id);
-            $this->dispatch('toast', type: 'success', message: 'Dish updated successfully.');
+            // $this->dispatch('toast', type: 'success', message: 'Dish updated successfully.');
+            $this->success(
+                title: 'Dish updated successfully',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
+
         } catch (\Throwable $e) {
-            // Roll back new uploads on failure
             if ($newThumb) Storage::disk('public')->delete($newThumb);
             if (!empty($newGallery)) Storage::disk('public')->delete($newGallery);
 
             report($e);
-            $this->dispatch('toast', type: 'error', message: 'Failed to update dish. Please try again.');
+            // $this->dispatch('toast', type: 'error', message: 'Failed to update dish. Please try again.');
+
+            $this->error(
+                title: 'Failed to update dish. Please try again.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
         }
     }
 

@@ -1,18 +1,4 @@
 <div>
-    @push('styles')
-        <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
-        <style>
-            .dark .ql-toolbar { background-color: none; border-top-left-radius: 8px; border-top-right-radius: 8px; }
-            .dark .ql-toolbar button, .dark .ql-toolbar .ql-picker { color:#828690; }
-            .dark .ql-toolbar button:hover, .dark .ql-toolbar .ql-picker-label:hover { color:#f87171; }
-            .dark .ql-toolbar .ql-stroke { stroke:#828690 !important; }
-            .dark .ql-toolbar .ql-fill { fill:#828690 !important; }
-            .dark .ql-toolbar .ql-picker-options { background:#111827; border-color:#374151; }
-            .dark .ql-toolbar .ql-picker-options span { color:#828690; }
-            .dark .ql-toolbar .ql-picker-options span:hover { background:#374151; }
-        </style>
-    @endpush
-
     {{-- Preload existing image URLs for Alpine fallbacks --}}
     @php
         use Illuminate\Support\Facades\Storage;
@@ -29,7 +15,9 @@
         <flux:heading size="xl" class="mb-3" level="1">{{ __('Edit Dish') }}</flux:heading>
         <flux:breadcrumbs class="mb-6">
             <flux:breadcrumbs.item href="{{ route('dashboard') }}" icon="home" separator="slash" wire:navigate />
-            <flux:breadcrumbs.item href="{{ route('dishes.index') }}" separator="slash" wire:navigate>Dishes</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item href="{{ route('dishes.index') }}" separator="slash" wire:navigate>
+                Dishes
+            </flux:breadcrumbs.item>
             <flux:breadcrumbs.item separator="slash">Edit Dish</flux:breadcrumbs.item>
         </flux:breadcrumbs>
         <flux:separator variant="subtle" />
@@ -41,9 +29,9 @@
 
             <!-- LEFT COLUMN -->
             <div class="lg:col-span-7 space-y-6">
-                <!-- Name & Description -->
+                <!-- Name & Short Description -->
                 <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
-                    <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Name and Description</h3>
+                    <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Name and Short Description</h3>
 
                     <div class="space-y-6">
                         {{-- Title --}}
@@ -59,15 +47,6 @@
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('short_description') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-400' }}"
                                 placeholder="Mention what your dish includes" />
                         </div>
-
-                        {{-- Description --}}
-                        <div class="form-group dark">
-                            <label for="editor">Description <span class="text-red-500">*</span></label>
-                            <div wire:ignore>
-                                <div id="editor" class="min-h-38 rounded-b-lg border border-gray-300"></div>
-                            </div>
-                            <input type="hidden" id="description" wire:model.live="description">
-                        </div>
                     </div>
                 </section>
 
@@ -79,11 +58,15 @@
                         {{-- Categories --}}
                         <div class="form-group">
                             @php
-                                $cat = App\Models\Category::where('status', 'active')->get(['id','name','image'])->map(fn($c) => [
-                                    'id' => $c->id,
-                                    'name' => $c->name,
-                                    'avatar' => $c->image ? Storage::url($c->image) : asset('assets/images/placeholders/cat-placeholder.png'),
-                                ]);
+                                $cat = App\Models\Category::where('status', 'active')
+                                    ->get(['id','name','image'])
+                                    ->map(fn($c) => [
+                                        'id' => $c->id,
+                                        'name' => $c->name,
+                                        'avatar' => $c->image
+                                            ? Storage::url($c->image)
+                                            : asset('assets/images/placeholders/cat-placeholder.png'),
+                                    ]);
                             @endphp
 
                             <x-select wire:model.live="category_id" label="Category*" :options="$cat"
@@ -94,11 +77,15 @@
                         {{-- Cuisines --}}
                         <div class="form-group">
                             @php
-                                $cuisines = App\Models\Cuisine::where('status', 'active')->get(['id','name','image'])->map(fn($c) => [
-                                    'id' => $c->id,
-                                    'name' => $c->name,
-                                    'image' => $c->image ? Storage::url($c->image) : asset('assets/images/placeholders/cat-placeholder.png'),
-                                ]);
+                                $cuisines = App\Models\Cuisine::where('status', 'active')
+                                    ->get(['id','name','image'])
+                                    ->map(fn($c) => [
+                                        'id' => $c->id,
+                                        'name' => $c->name,
+                                        'image' => $c->image
+                                            ? Storage::url($c->image)
+                                            : asset('assets/images/placeholders/cat-placeholder.png'),
+                                    ]);
                             @endphp
 
                             <x-select wire:model.live="cuisine_id" label="Cuisine*" :options="$cuisines"
@@ -117,11 +104,15 @@
                         {{-- Related Dish --}}
                         <div class="form-group md:col-span-2">
                             @php
-                                $dishes = App\Models\Dish::where('visibility', 'Yes')->get(['id','title','thumbnail'])->map(fn($d) => [
-                                    'id' => $d->id,
-                                    'name' => $d->title,
-                                    'avatar' => $d->thumbnail ? Storage::url($d->thumbnail) : asset('assets/images/placeholders/cat-placeholder.png'),
-                                ]);
+                                $dishes = App\Models\Dish::where('visibility', 'Yes')
+                                    ->get(['id','title','thumbnail'])
+                                    ->map(fn($d) => [
+                                        'id' => $d->id,
+                                        'name' => $d->title,
+                                        'avatar' => $d->thumbnail
+                                            ? Storage::url($d->thumbnail)
+                                            : asset('assets/images/placeholders/cat-placeholder.png'),
+                                    ]);
                             @endphp
 
                             <x-select wire:model.live="related_dishes" label="Related Dishes" :options="$dishes"
@@ -136,11 +127,14 @@
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Dish Pricing</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {{-- Price --}}
+                        {{-- Base Price --}}
                         <div class="form-group md:col-span-2">
-                            <x-input type="number" min="0" step="any" label="Price (Tk)*" wire:model.live="price"
+                            <x-input type="number" min="0" step="any" label="Base Price (Tk)*" wire:model.live="price"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('price') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Price" />
+                            <small class="text-xs text-neutral-500 dark:text-neutral-300">
+                                Default price if no variation selected.
+                            </small>
                         </div>
 
                         {{-- Discount type --}}
@@ -162,6 +156,87 @@
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('vat') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Vat" />
                         </div>
+                    </div>
+                </section>
+
+                <!-- Variations -->
+                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold dark:text-gray-100">Variations</h3>
+
+                        <flux:button type="button" variant="filled" color="rose" icon="plus-icon"
+                            wire:click="addVariationGroup">
+                            Add Variation
+                        </flux:button>
+                    </div>
+
+                    <div class="space-y-4">
+                        @forelse($variations as $vIndex => $variation)
+                            <div class="border border-gray-200 dark:border-neutral-600 rounded-xl p-4 bg-neutral-50 dark:bg-neutral-600">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-1">
+                                        <x-input
+                                            label="Variation Name* (ex: Size, Crust, Drink)"
+                                            wire:model.live="variations.{{ $vIndex }}.name"
+                                            placeholder="Size"
+                                            class="rounded-lg !bg-white/10 !py-[9px]" />
+                                    </div>
+
+                                    <flux:button
+                                        type="button"
+                                        icon="trash-icon"
+                                        variant="filled"
+                                        class="mt-6"
+                                        wire:click="removeVariationGroup({{ $vIndex }})">
+                                        Remove
+                                    </flux:button>
+                                </div>
+
+                                <div class="mt-4 space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <p class="font-medium text-sm dark:text-gray-100">Options</p>
+
+                                        <button type="button"
+                                            wire:click="addVariationOption({{ $vIndex }})"
+                                            class="text-sm text-rose-600 hover:underline">
+                                            + Add Option
+                                        </button>
+                                    </div>
+
+                                    @foreach(($variation['options'] ?? []) as $oIndex => $option)
+                                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                                            <div class="md:col-span-7">
+                                                <x-input
+                                                    label="Option Name* (ex: Small, Medium)"
+                                                    wire:model.live="variations.{{ $vIndex }}.options.{{ $oIndex }}.label"
+                                                    placeholder="Small"
+                                                    class="rounded-lg !bg-white/10 !py-[9px]" />
+                                            </div>
+
+                                            <div class="md:col-span-4">
+                                                <x-input type="number" min="0" step="any"
+                                                    label="Price (Tk)*"
+                                                    wire:model.live="variations.{{ $vIndex }}.options.{{ $oIndex }}.price"
+                                                    placeholder="0"
+                                                    class="rounded-lg !bg-white/10 !py-[9px]" />
+                                            </div>
+
+                                            <div class="md:col-span-1">
+                                                <button type="button"
+                                                    wire:click="removeVariationOption({{ $vIndex }}, {{ $oIndex }})"
+                                                    class="h-10 w-full rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-neutral-700 dark:hover:bg-neutral-800">
+                                                    ×
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-sm text-neutral-500 dark:text-neutral-300">
+                                No variations added yet.
+                            </p>
+                        @endforelse
                     </div>
                 </section>
 
@@ -256,7 +331,6 @@
                 <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Availability</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {{-- If you truly store only time (H:i), these are fine. --}}
                         <div class="form-group">
                             <x-input type="time" wire:model.live="available_from" label="Available From*"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('available_from') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
@@ -280,7 +354,7 @@
                         </h3>
                     </div>
 
-                    <!-- Thumbnail (Big Preview) -->
+                    <!-- Thumbnail -->
                     <div class="relative aspect-square w-full overflow-hidden rounded-xl border 
                             {{ $errors->has('thumbnail') ? 'border-red-500' : 'border-gray-200 dark:border-neutral-600' }} 
                             bg-neutral-50 dark:bg-neutral-600 cursor-pointer"
@@ -352,7 +426,9 @@
                     <flux:spacer />
 
                     <flux:modal.close>
-                        <flux:button icon="cross-icon" variant="filled" class="cursor-pointer me-2">Cancel</flux:button>
+                        <flux:button icon="cross-icon" variant="filled" class="cursor-pointer me-2">
+                            Cancel
+                        </flux:button>
                     </flux:modal.close>
 
                     <flux:button type="submit" icon="fileAdd-icon" class="cursor-pointer" variant="primary"
@@ -366,40 +442,7 @@
     </form>
 
     @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
         <script>
-            let quill;
-            document.addEventListener('livewire:navigated', () => {
-                quill = new Quill('#editor', {
-                    theme: 'snow',
-                    modules: {
-                        toolbar: [
-                            ['bold','italic','underline','strike'],
-                            ['blockquote'], ['link'],
-                            [{ list:'ordered' }, { list:'bullet' }, { list:'check' }],
-                            [{ script:'sub' }, { script:'super' }],
-                            [{ indent:'-1' }, { indent:'+1' }],
-                            [{ direction:'rtl' }],
-                            [{ size:['small', false, 'large', 'huge'] }],
-                            [{ header:[1,2,3,4,5,6,false] }],
-                            [{ color:[] }, { background:[] }],
-                            [{ font:[] }], [{ align:[] }], ['clean']
-                        ]
-                    }
-                });
-
-                const initial = @this.get('description') ?? '';
-                if (initial) quill.root.innerHTML = initial;
-
-                const input = document.querySelector('#description');
-                quill.on('text-change', () => {
-                    const html = quill.root.innerHTML;
-                    const plain = quill.getText().trim();
-                    input.value = plain.length ? html : '';
-                    input.dispatchEvent(new Event('input'));
-                });
-            });
-
             function dishImages({ existingThumb = null, existingGallery = [] } = {}) {
                 return {
                     displaySrc: null,
@@ -414,7 +457,6 @@
                     },
 
                     async sync() {
-                        // Prefer new uploads (temporaryUrl), else fallback to stored URLs
                         const urls = await this.$wire.previewUrls();
                         this.thumbnailSrc = urls.thumbnail || existingThumb || null;
 
@@ -430,12 +472,10 @@
 
                     removeThumbnail() {
                         this.$wire.clearThumbnail();
-                        // do not clear existingThumb automatically; keep UI clean
                         this.thumbnailSrc = null;
                     },
 
                     removeGallery(i) {
-                        // When removing, only affects newly uploaded array; existing still shown until update
                         this.$wire.removeFromGallery(i);
                         this.gallerySrcs.splice(i, 1);
                     },

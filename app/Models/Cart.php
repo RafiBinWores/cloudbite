@@ -13,7 +13,7 @@ class Cart extends Model
         'session_id',
         'currency',
         'subtotal',
-        'discount_total',
+        'discount_total', // coupon only
         'tax_total',
         'grand_total',
         'meta',
@@ -41,62 +41,91 @@ class Cart extends Model
     {
         $items = $this->items()->with('dish')->get();
 
-        // Default TRUE because you mentioned you've already added VAT in cart lines.
-        $pricesIncludeTax = (bool) data_get($this->meta, 'prices_include_tax', true);
+        /**
+         * ✅ IMPORTANT:
+         * Your cart item prices are NET (VAT not added in repo),
+         * so prices_include_tax MUST default to FALSE.
+         */
+        $pricesIncludeTax = (bool) data_get($this->meta, 'prices_include_tax', false);
 
-        $rawSubtotal = 0.0;
-        $displayTax  = 0.0;  // always for UI/reporting
-        $discount    = max(0.0, (float) ($this->discount_total ?? 0.0));
+        $rawSubtotalNet = 0.0;        // Net subtotal (already discounted product base + extras)
+        $displayTax     = 0.0;        // VAT computed on net subtotal (or extracted if gross)
+        $couponDiscount = max(0.0, (float) ($this->discount_total ?? 0.0)); // coupon only
 
-        // First pass: subtotal & (preliminary) tax for display
+        // extra buckets for UI / reporting
+        $originalProductSubtotal = 0.0;  // base_original * qty
+        $discountedBaseSubtotal  = 0.0;  // base_after_discount * qty
+        $extrasSubtotal          = 0.0;  // extras * qty
+
         foreach ($items as $item) {
-            $lineTotal = (float) $item->line_total;                    // what you already store
-            $vat       = (float) (optional($item->dish)->vat ?? 0.0);  // per-item VAT %
+            $qty = (int) ($item->qty ?? 1);
 
-            $rawSubtotal += $lineTotal;
+            $lineTotal = (float) ($item->line_total ?? 0);
 
+            $vat = (float) data_get($item->meta, 'vat_percent', optional($item->dish)->vat ?? 0.0);
+
+            // for UI buckets
+            $baseOriginal = (float) data_get($item->meta, 'base_original', 0);
+            $baseAfter    = (float) data_get($item->meta, 'base_after_discount', $baseOriginal);
+
+            $crustExtra   = (float) data_get($item->meta, 'crust_extra', 0);
+            $addonsExtra  = (float) data_get($item->meta, 'addons_extra', 0);
+            $extrasPerUnit= $crustExtra + $addonsExtra;
+
+            $originalProductSubtotal += $baseOriginal * $qty;
+            $discountedBaseSubtotal  += $baseAfter * $qty;
+            $extrasSubtotal          += $extrasPerUnit * $qty;
+
+            // cart subtotal net
+            $rawSubtotalNet += $lineTotal;
+
+            // tax display/compute
             if ($vat > 0) {
                 if ($pricesIncludeTax) {
-                    // Extract included VAT from a gross line:
-                    // tax = gross - gross/(1+r)
+                    // Extract VAT from gross line
                     $rate      = 1 + ($vat / 100);
                     $baseExVat = $lineTotal / $rate;
                     $displayTax += ($lineTotal - $baseExVat);
                 } else {
-                    // Compute VAT from a net line:
+                    // Add VAT on net line
                     $displayTax += $lineTotal * ($vat / 100);
                 }
             }
         }
 
-        $subtotal   = round($rawSubtotal, 2);
-        $displayTax = round($displayTax);
+        $subtotalNet = round($rawSubtotalNet, 2);
+        $displayTax  = round($displayTax, 2);
 
-        // Clamp discount
-        if ($discount > $subtotal) {
-            $discount = $subtotal;
+        // Clamp coupon discount
+        if ($couponDiscount > $subtotalNet) {
+            $couponDiscount = $subtotalNet;
         }
-        $discount = round($discount, 2);
+        $couponDiscount = round($couponDiscount, 2);
 
-        // GRAND TOTAL (no shipping)
+        // ✅ Grand total
         if ($pricesIncludeTax) {
-            // VAT is already inside subtotal → don't add again
-            $grand = round($subtotal - $discount, 2);
+            $grand = round($subtotalNet - $couponDiscount, 2);
         } else {
-            // VAT not in subtotal → add it
-            // (Optional improvement: recompute tax after discount by prorating discount per line)
-            $grand = round($subtotal - $discount + $displayTax, 2);
+            $grand = round($subtotalNet + $displayTax - $couponDiscount, 2);
         }
+        if ($grand < 0) $grand = 0.00;
 
-        if ($grand < 0) {
-            $grand = 0.00;
-        }
-
-        // Persist
-        $this->subtotal       = $subtotal;
-        $this->discount_total = $discount;
-        $this->tax_total      = $displayTax;   // display/report only if prices include tax
+        // ✅ Save core columns
+        $this->subtotal       = $subtotalNet;
+        $this->discount_total = $couponDiscount; // coupon only
+        $this->tax_total      = $displayTax;
         $this->grand_total    = $grand;
+
+        // ✅ Save product discount breakdown into meta for UI
+        $meta = (array) ($this->meta ?? []);
+        $meta['breakdown'] = [
+            'product_original_subtotal' => round($originalProductSubtotal, 2),
+            'product_discount_subtotal' => round(max(0, $originalProductSubtotal - $discountedBaseSubtotal), 2),
+            'addons_subtotal'           => round($extrasSubtotal, 2),
+        ];
+        $meta['prices_include_tax'] = $pricesIncludeTax;
+
+        $this->meta = $meta;
 
         $this->save();
     }

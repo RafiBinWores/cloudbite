@@ -38,13 +38,15 @@ class CartRepository
         return Cart::create([
             'user_id'    => Auth::id(),
             'session_id' => session()->getId(),
+            'meta' => [
+                'prices_include_tax' => false, // NET prices by default
+            ],
         ]);
     }
 
     /** (Deprecated) Kept only if some old code still calls it — now non-creating */
     public function loadCart(array $with = []): ?Cart
     {
-        // IMPORTANT: no auto-create here anymore
         $cart = $this->forCurrentUser();
         if ($cart && $with) $cart->load($with);
         return $cart;
@@ -56,15 +58,55 @@ class CartRepository
         int $qty,
         ?int $crustId = null,
         ?int $bunId = null,
-        array $addonIds = []
+        array $addonIds = [],
+        array $variationsSelected = []
     ): Cart {
-        return DB::transaction(function () use ($dishId, $qty, $crustId, $bunId, $addonIds) {
+        return DB::transaction(function () use (
+            $dishId,
+            $qty,
+            $crustId,
+            $bunId,
+            $addonIds,
+            $variationsSelected
+        ) {
             $cart = $this->ensureCart();
 
             $dish = Dish::with(['crusts', 'buns', 'addOns'])->findOrFail($dishId);
 
-            $base = (float) ($dish->price ?? 0); // always original/base price
+            /** ----------------------------
+             *  1) BASE PRICE (variation aware)
+             *  ---------------------------- */
+            $baseOriginal = (float) ($dish->price ?? 0);
 
+            $vars = (array) ($dish->variations ?? []);
+            foreach ($vars as $gIndex => $group) {
+                $optIndex = $variationsSelected[$gIndex] ?? null;
+                if ($optIndex === null) continue;
+
+                $opt = $group['options'][$optIndex] ?? null;
+                if ($opt && isset($opt['price'])) {
+                    $baseOriginal = (float) $opt['price'];
+                }
+            }
+
+            /** ----------------------------
+             *  2) APPLY DISH DISCOUNT on chosen base
+             *  ---------------------------- */
+            $baseAfterDiscount = $baseOriginal;
+
+            if ($dish->discount_type && (float) $dish->discount > 0) {
+                if ($dish->discount_type === 'percent') {
+                    $baseAfterDiscount = $baseOriginal * (1 - ((float) $dish->discount / 100));
+                } elseif ($dish->discount_type === 'amount') {
+                    $baseAfterDiscount = max(0, $baseOriginal - (float) $dish->discount);
+                }
+            }
+
+            $baseAfterDiscount = round($baseAfterDiscount, 2);
+
+            /** ----------------------------
+             *  3) EXTRAS
+             *  ---------------------------- */
             $crustExtra = 0.0;
             if ($crustId) {
                 $c = $dish->crusts->firstWhere('id', $crustId);
@@ -84,26 +126,47 @@ class CartRepository
                 }
             }
 
-            $unit = round($base + $crustExtra + $bunExtra + $addonsExtra, 2);
+            /** ----------------------------
+             *  4) FINAL UNIT (NET, VAT excluded)
+             *  ---------------------------- */
+            $unit = round($baseAfterDiscount + $crustExtra + $bunExtra + $addonsExtra, 2);
+
+            /** ----------------------------
+             *  5) UNIQUE LINE KEY (addon + variation)
+             *  ---------------------------- */
+            $variationsSelectedSorted = (array) $variationsSelected;
+            ksort($variationsSelectedSorted);
+            $variationKey = json_encode($variationsSelectedSorted);
+
+            /** ----------------------------
+             *  6) VAT percent saved for cart calc
+             *  ---------------------------- */
+            $vatPercent = (float) ($dish->vat ?? 0);
 
             $existing = $cart->items()
                 ->where('dish_id', $dishId)
                 ->where('crust_id', $crustId)
                 ->where('bun_id', $bunId)
                 ->where('addon_ids', json_encode($addonIdsSorted))
+                ->where('variation_selection', $variationKey)
                 ->first();
+
+            $metaPayload = [
+                'base_original'       => $baseOriginal,       // ✅ needed to compute discount later
+                'base_after_discount' => $baseAfterDiscount,  // ✅ discounted base stored
+                'crust_extra'         => $crustExtra,
+                'bun_extra'           => $bunExtra,
+                'addons_extra'        => $addonsExtra,
+                'variation_selection' => $variationsSelectedSorted,
+                'vat_percent'         => $vatPercent,         // ✅ for cart VAT calc
+            ];
 
             if ($existing) {
                 $existing->qty += $qty;
                 $existing->unit_price = $unit;
                 $existing->line_total = $existing->qty * $unit;
-                $existing->meta = [
-                    'base'         => $base,
-                    'crust_extra'  => $crustExtra,
-                    'bun_extra'    => $bunExtra,
-                    'addons_extra' => $addonsExtra,
-                    'display_price_with_discount' => (float) ($dish->price_with_discount ?? null),
-                ];
+                $existing->variation_selection = $variationsSelectedSorted;
+                $existing->meta = $metaPayload;
                 $existing->save();
             } else {
                 $cart->items()->create([
@@ -112,15 +175,10 @@ class CartRepository
                     'crust_id'   => $crustId,
                     'bun_id'     => $bunId,
                     'addon_ids'  => $addonIdsSorted,
+                    'variation_selection' => $variationsSelectedSorted,
                     'unit_price' => $unit,
                     'line_total' => $unit * $qty,
-                    'meta'       => [
-                        'base'         => $base,
-                        'crust_extra'  => $crustExtra,
-                        'bun_extra'    => $bunExtra,
-                        'addons_extra' => $addonsExtra,
-                        'display_price_with_discount' => (float) ($dish->price_with_discount ?? null),
-                    ],
+                    'meta'       => $metaPayload,
                 ]);
             }
 
@@ -258,7 +316,7 @@ class CartRepository
             'applied_at'     => now()->toISOString(),
         ];
 
-        $cart->discount_total = $discount;
+        $cart->discount_total = $discount; // coupon only
         $cart->meta = $meta;
         $cart->refreshTotals();
 

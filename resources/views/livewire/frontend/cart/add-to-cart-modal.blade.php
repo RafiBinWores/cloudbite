@@ -68,6 +68,9 @@
                     {{ number_format($this->base_price, 2) }}
                     <span class="!font-bold text-md font-oswald">&#2547;</span>
                   </span>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    (Price updates when you choose variation)
+                  </p>
                 </div>
               </div>
             </div>
@@ -82,6 +85,63 @@
 
         {{-- Body --}}
         <div class="px-5 py-3 space-y-5 overflow-y-auto max-h-[60vh]">
+
+          {{-- ================= VARIATIONS ================= --}}
+          @if ($dish && !empty($dish->variations))
+            @php
+                $variations = collect($dish->variations);
+            @endphp
+
+            <div class="space-y-4">
+              @foreach ($variations as $gIndex => $group)
+                @php
+                    $gName = $group['name'] ?? 'Variation';
+                    $options = $group['options'] ?? [];
+                @endphp
+
+                @if (!empty($options))
+                  <div class="bg-customRed-100/10 shadow md:p-5 rounded-lg
+                              @error('variation_selection.'.$gIndex) border border-customRed-100 @enderror">
+                    <div class="flex items-center justify-between mb-4">
+                      <div>
+                        <h4 class="font-oswald font-medium text-lg">{{ $gName }}</h4>
+                        <p class="text-xs opacity-60">Please select one</p>
+                      </div>
+                      <p class="bg-customRed-100 text-white font-jost px-3 py-1 rounded-full text-xs">Required</p>
+                    </div>
+
+                    <div class="font-jost text-gray-700 space-y-3 pe-2">
+                      @foreach ($options as $oIndex => $opt)
+                        @php
+                            $label = $opt['label'] ?? 'Option';
+                            $price = (float)($opt['price'] ?? 0);
+                        @endphp
+
+                        <label class="flex items-center justify-between gap-3">
+                          <span class="flex items-center gap-3">
+                            <input type="radio"
+                                   name="variation_{{ $gIndex }}"
+                                   value="{{ $oIndex }}"
+                                   wire:model.live="variation_selection.{{ $gIndex }}"
+                                   class="h-4 w-4 text-red-500 border-slate-300 focus:ring-red-500" />
+                            <span>{{ $label }}</span>
+                          </span>
+
+                          <span class="text-sm">Tk {{ number_format($price, 2) }}</span>
+                        </label>
+                      @endforeach
+                    </div>
+
+                    @error('variation_selection.'.$gIndex)
+                      <p class="text-xs text-customRed-100 mt-2">{{ $message }}</p>
+                    @enderror
+                  </div>
+                @endif
+              @endforeach
+            </div>
+          @endif
+          {{-- ================= /VARIATIONS ================= --}}
+
           {{-- Crust select --}}
           @if ($dish && $dish->crusts->count())
             <div class="bg-customRed-100/15 shadow mt-2 md:p-5 rounded-lg @error('crust_id') border border-customRed-100 @enderror">

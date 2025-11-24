@@ -12,14 +12,29 @@
         // --- Money formatting (hide .00) ---
         $money = fn($v) => fmod((float) $v, 1) == 0 ? number_format($v, 0) : number_format($v, 2);
 
-        // --- Price math ---
+        // --- Helper: final price after discount + VAT ---
+        $finalPriceOf = function ($price) use ($dish) {
+            $price = (float) $price;
+
+            // discount
+            if ($dish->discount_type && ($dish->discount ?? 0) > 0) {
+                if ($dish->discount_type === 'percent') {
+                    $price = max(0, $price - $price * (($dish->discount ?? 0) / 100));
+                } else {
+                    $price = max(0, $price - (float) $dish->discount);
+                }
+            }
+
+            // vat
+            $vatPercent = (float) ($dish->vat ?? 0);
+            $price = $price + $price * ($vatPercent / 100);
+
+            return $price;
+        };
+
+        // --- Base price math ---
         $basePrice = (float) ($dish->price ?? 0);
-        $hasDiscount = $dish->discount_type && ($dish->discount ?? 0) > 0;
-        $discounted = $hasDiscount
-            ? ($dish->discount_type === 'percent'
-                ? max(0, $basePrice - $basePrice * (($dish->discount ?? 0) / 100))
-                : max(0, $basePrice - (float) $dish->discount))
-            : $basePrice;
+        $finalBasePrice = $finalPriceOf($basePrice);
 
         // --- Tags: accept array or CSV of names ---
         $tags = $dish->tags;
@@ -32,7 +47,7 @@
         }
 
         // --- Media URLs ---
-        $placeholder = asset('images/placeholder-dish.png'); // add a file in public/images/
+        $placeholder = asset('images/placeholder-dish.png');
         $mainThumb = $dish->thumbnail ? Storage::url($dish->thumbnail) : $placeholder;
         $gallery = is_array($dish->gallery) ? $dish->gallery : (array) ($dish->gallery ?? []);
 
@@ -56,10 +71,8 @@
         $withinWindow = true;
         if ($from24 && $till24) {
             if ($from24 <= $till24) {
-                // Same-day window, e.g., 10:00 -> 18:00
                 $withinWindow = $now24 >= $from24 && $now24 <= $till24;
             } else {
-                // Overnight window, e.g., 22:00 -> 03:00
                 $withinWindow = $now24 >= $from24 || $now24 <= $till24;
             }
         } elseif ($from24) {
@@ -70,11 +83,15 @@
 
         $stockOk = ($dish->track_stock ?? 'No') === 'No' || ($dish->daily_stock ?? 0) > 0;
 
-        $isAvailable = $dish->is_available ?? $dish->visibility === 'Yes' && $withinWindow && $stockOk;
+        $isAvailable = $dish->is_available ?? ($dish->visibility === 'Yes' && $withinWindow && $stockOk);
+
+        // --- Variations ---
+        $variations = collect($dish->variations ?? []);
     @endphp
 
     <div class="px-4 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
             <!-- LEFT: Media -->
             <div class="space-y-4">
                 <!-- Main image -->
@@ -118,41 +135,26 @@
                 <!-- Price -->
                 <div class="flex items-center gap-3">
                     <div>
-                        <div class="text-2xl font-semibold text-emerald-500">৳{{ $money($basePrice) }}</div>
-                    <span class="text-xs text-neutral-500">(Base Price)</span>
+                        <div class="text-2xl font-semibold text-emerald-500">
+                            ৳{{ $money($basePrice) }}
+                        </div>
+                        <span class="text-xs text-neutral-500">(Base Price)</span>
                     </div>
 
                     <flux:separator vertical />
 
                     <div>
-                        @php
-                            $basePrice = (float) ($dish->price ?? 0);
-
-                            // Apply discount
-                            if ($dish->discount_type && $dish->discount > 0) {
-                                if ($dish->discount_type === 'percent') {
-                                    $afterDiscount = max(0, $basePrice - $basePrice * ($dish->discount / 100));
-                                } else {
-                                    $afterDiscount = max(0, $basePrice - (float) $dish->discount);
-                                }
-                            } else {
-                                $afterDiscount = $basePrice;
-                            }
-
-                            // Apply VAT (assume $dish->vat = percent, e.g. 15)
-                            $vatPercent = (float) ($dish->vat ?? 0);
-                            $finalPrice = $afterDiscount + $afterDiscount * ($vatPercent / 100);
-
-                            // Format function
-                            $money = fn($v) => fmod($v, 1) == 0 ? number_format($v, 0) : number_format($v, 2);
-                        @endphp
-
-                        <!-- Show price -->
                         <div class="text-xl font-semibold text-emerald-600">
-                            ৳{{ $money($finalPrice) }} <span
-                                class="px-2 py-0.5 text-xs rounded bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200">
-                                -{{ $dish->discount_type === 'percent' ? $money($dish->discount) . '%' : '৳' . $money($dish->discount) }}
-                            </span>
+                            ৳{{ $money($finalBasePrice) }}
+
+                            @if ($dish->discount_type && ($dish->discount ?? 0) > 0)
+                                <span
+                                    class="px-2 py-0.5 text-xs rounded bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200">
+                                    -{{ $dish->discount_type === 'percent'
+                                        ? $money($dish->discount) . '%'
+                                        : '৳' . $money($dish->discount) }}
+                                </span>
+                            @endif
                         </div>
 
                         @if ($dish->vat)
@@ -167,11 +169,15 @@
                 <div class="flex flex-wrap items-center gap-2">
                     @if ($isAvailable)
                         <span
-                            class="px-3 py-1 text-xs rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">Available</span>
+                            class="px-3 py-1 text-xs rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                            Available
+                        </span>
                     @else
                         <span
-                            class="px-3 py-1 text-xs rounded-full bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300">Unavailable</span>
-                    @endif>
+                            class="px-3 py-1 text-xs rounded-full bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300">
+                            Unavailable
+                        </span>
+                    @endif
 
                     @if ($fromDisplay || $tillDisplay)
                         <span class="text-xs text-neutral-500 dark:text-neutral-400">
@@ -179,14 +185,12 @@
                         </span>
                     @endif
 
-                    <span class="text-xs">
-                        <span
-                            class="px-2 py-0.5 rounded-full font-medium
+                    <span
+                        class="px-2 py-0.5 text-xs rounded-full font-medium
                         {{ $dish->visibility === 'Yes'
                             ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
                             : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300' }}">
-                            Visibility: {{ $dish->visibility ?? '—' }}
-                        </span>
+                        Visibility: {{ $dish->visibility ?? '—' }}
                     </span>
                 </div>
 
@@ -218,6 +222,38 @@
                     </div>
                 </div>
 
+                <!-- Variations -->
+                @if ($variations->count())
+                    <div class="p-4 rounded-2xl border border-neutral-200 dark:border-neutral-700 space-y-3">
+                        <h3 class="font-semibold text-neutral-800 dark:text-neutral-100">Variations</h3>
+
+                        @foreach($variations as $group)
+                            <div>
+                                <p class="text-sm font-medium text-neutral-700 dark:text-neutral-200">
+                                    {{ $group['name'] ?? '—' }}
+                                </p>
+
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                    @foreach(($group['options'] ?? []) as $opt)
+                                        @php
+                                            $optPrice = (float)($opt['price'] ?? 0);
+                                            $optFinal = $finalPriceOf($optPrice);
+                                        @endphp
+
+                                        <span
+                                            class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm">
+                                            <span>{{ $opt['label'] ?? '—' }}</span>
+                                            <span class="text-neutral-500 dark:text-neutral-400">
+                                                ৳{{ $money($optFinal) }}
+                                            </span>
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
                 <!-- Tags -->
                 @if ($tags->count())
                     <div class="flex flex-wrap items-center gap-2 pt-1">
@@ -241,10 +277,10 @@
                                     class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm">
                                     <span>{{ $bun->name }}</span>
                                     @if (!is_null($bun->price ?? null))
-                                        <span
-                                            class="text-neutral-500 dark:text-neutral-400">৳{{ $money($bun->price) }}</span>
+                                        <span class="text-neutral-500 dark:text-neutral-400">
+                                            ৳{{ $money($bun->price) }}
+                                        </span>
                                     @endif
-
                                 </span>
                             @endforeach
                         </div>
@@ -261,7 +297,7 @@
                                     class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm">
                                     <span>{{ $crust->name }}</span>
                                     <span class="text-neutral-500 dark:text-neutral-400">
-                                        {{ isset($crust->price) && $crust->price > 0 ? '৳' . $money($crust->price) : 'Free' }}
+                                        {{ isset($crust->price) && $crust->price > 0 ? '৳'.$money($crust->price) : 'Free' }}
                                     </span>
                                 </span>
                             @endforeach
@@ -279,8 +315,9 @@
                                     class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm">
                                     <span>{{ $addon->name }}</span>
                                     @if (isset($addon->price))
-                                        <span
-                                            class="text-neutral-500 dark:text-neutral-400">৳{{ $money($addon->price) }}</span>
+                                        <span class="text-neutral-500 dark:text-neutral-400">
+                                            ৳{{ $money($addon->price) }}
+                                        </span>
                                     @endif
                                 </span>
                             @endforeach
@@ -298,14 +335,6 @@
                 <p class="text-neutral-600 dark:text-neutral-300">{{ $dish->short_description ?? '—' }}</p>
             </div>
 
-            <!-- Description -->
-            <div class="p-4 rounded-2xl border border-neutral-200 dark:border-neutral-700">
-                <p class="font-semibold text-neutral-800 dark:text-neutral-100 mb-2">Description</p>
-                <div class="prose dark:prose-invert max-w-none text-neutral-700 dark:text-neutral-200">
-                    {!! $dish->description ?? '—' !!}
-                </div>
-            </div>
-
             <!-- SEO / Meta (collapsible) -->
             <div x-data="{ openSeo: false }" class="border border-neutral-200 dark:border-neutral-700 rounded-2xl">
                 <button type="button" @click="openSeo = !openSeo"
@@ -313,30 +342,30 @@
                     <span class="font-medium text-neutral-800 dark:text-neutral-100">SEO Metadata</span>
                     <span class="text-sm text-neutral-500" x-text="openSeo ? 'Hide' : 'Show'"></span>
                 </button>
+
                 <div x-show="openSeo" x-cloak class="px-4 pb-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                         <div>
                             <div class="text-neutral-500 dark:text-neutral-400">Meta Title</div>
                             <div class="font-medium text-neutral-800 dark:text-neutral-100">
-                                {{ $dish->meta_title ?: '—' }}</div>
+                                {{ $dish->meta_title ?: '—' }}
+                            </div>
                         </div>
                         <div>
                             <div class="text-neutral-500 dark:text-neutral-400">Meta Keywords</div>
                             <div class="font-medium text-neutral-800 dark:text-neutral-100">
-                                {{ $dish->meta_keyword ?: '—' }}</div>
+                                {{ $dish->meta_keyword ?: '—' }}
+                            </div>
                         </div>
                         <div class="sm:col-span-2">
                             <div class="text-neutral-500 dark:text-neutral-400">Meta Description</div>
                             <div class="font-medium text-neutral-800 dark:text-neutral-100">
-                                {{ $dish->meta_description ?: '—' }}</div>
+                                {{ $dish->meta_description ?: '—' }}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div> <!-- /container -->
-
-
-
-
 </div>

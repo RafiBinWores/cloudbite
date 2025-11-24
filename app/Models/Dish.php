@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class Dish extends Model
 {
@@ -12,7 +11,6 @@ class Dish extends Model
         'title',
         'slug',
         'short_description',
-        'description',
         'category_id',
         'cuisine_id',
         'price',
@@ -31,6 +29,7 @@ class Dish extends Model
         'meta_title',
         'meta_description',
         'meta_keyword',
+        'variations',
     ];
 
     protected $casts = [
@@ -38,6 +37,7 @@ class Dish extends Model
         'available_till' => 'string',
         'tags' => 'array',
         'gallery' => 'array',
+        'variations' => 'array',
     ];
 
     public function category()

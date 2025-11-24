@@ -109,9 +109,9 @@
             <flux:navlist.group :heading="__('Order Management')" class="grid">
 
                 {{-- Verify Offline Payment --}}
-                <flux:navlist.item icon="shopping-bag" :href="route('categories.index')"
+                {{-- <flux:navlist.item icon="shopping-bag" :href="route('categories.index')"
                     :current="request()->routeIs('categories.index')" wire:navigate>
-                    {{ __('Verify Offline Payment') }}</flux:navlist.item>
+                    {{ __('Verify Offline Payment') }}</flux:navlist.item> --}}
 
 
                 {{-- Order --}}

@@ -46,9 +46,8 @@ class CartPage extends Component
         $this->coupon_feedback = $res['message'];
         $this->loadCart($repo);
 
-        // Keep input synced with applied one or clear on failure
         if ($res['ok']) {
-             $this->coupon_code = (string) data_get($this->cart?->meta, 'coupon.code', $this->coupon_code);
+            $this->coupon_code = (string) data_get($this->cart?->meta, 'coupon.code', $this->coupon_code);
         }
     }
 
@@ -56,13 +55,14 @@ class CartPage extends Component
     {
         $repo->removeCoupon();
         $this->coupon_code = '';
-        // $this->coupon_feedback = 'Coupon removed.';
+
         $this->success(
             title: 'Coupon removed.',
             position: 'top-right',
             showProgress: true,
             showCloseIcon: true,
         );
+
         $this->loadCart($repo);
     }
 
@@ -70,94 +70,87 @@ class CartPage extends Component
     {
         $repo->bumpItemQty($itemId, +1);
         $this->loadCart($repo);
-        $this->success(
-            title: 'Quantity updated.',
-            position: 'top-right',
-            showProgress: true,
-            showCloseIcon: true,
-        );
+        $this->success(title: 'Quantity updated.', position: 'top-right', showProgress: true, showCloseIcon: true);
     }
 
     public function decrementQty(CartRepository $repo, int $itemId): void
     {
         $repo->bumpItemQty($itemId, -1);
         $this->loadCart($repo);
-        $this->success(
-            title: 'Quantity updated.',
-            position: 'top-right',
-            showProgress: true,
-            showCloseIcon: true,
-        );
+        $this->success(title: 'Quantity updated.', position: 'top-right', showProgress: true, showCloseIcon: true);
     }
 
     public function changeQty(CartRepository $repo, int $itemId, int $qty): void
     {
         $repo->setItemQty($itemId, max(1, min(99, $qty)));
         $this->loadCart($repo);
-        $this->success(
-            title: 'Quantity updated.',
-            position: 'top-right',
-            showProgress: true,
-            showCloseIcon: true,
-        );
+        $this->success(title: 'Quantity updated.', position: 'top-right', showProgress: true, showCloseIcon: true);
     }
 
     public function removeItem(CartRepository $repo, int $itemId): void
     {
         $repo->removeItem($itemId);
         $this->loadCart($repo);
-        $this->success(
-            title: 'Item removed.',
-            position: 'top-right',
-            showProgress: true,
-            showCloseIcon: true,
-        );
+        $this->success(title: 'Item removed.', position: 'top-right', showProgress: true, showCloseIcon: true);
     }
 
     public function clearCart(CartRepository $repo): void
     {
         $repo->clear();
         $this->loadCart($repo);
-        $this->success(
-            title: 'Cart cleared.',
-            position: 'top-right',
-            showProgress: true,
-            showCloseIcon: true,
-        );
+        $this->success(title: 'Cart cleared.', position: 'top-right', showProgress: true, showCloseIcon: true);
     }
 
-    /** Sum of base product prices (discounted unit base), excludes crust/add-ons */
+    /** ✅ Item price WITHOUT discount (variation-aware) */
     public function getProductPriceSubtotalProperty(): float
     {
         if (!$this->cart) return 0.0;
 
         $sum = 0.0;
         foreach ($this->cart->items as $item) {
-            $originalBase = (float) data_get($item->meta, 'base', $item->unit_price);
-            $sum += $originalBase * (int) $item->qty;
+            $baseOriginal = (float) data_get(
+                $item->meta,
+                'base_original',
+                data_get($item->meta, 'base', $item->unit_price)
+            );
+
+            $sum += $baseOriginal * (int) $item->qty;
         }
         return round($sum, 2);
     }
 
-    /** Sum of per-product discounts (original dish price - discounted base) */
+    /** ✅ Only product discount amount */
     public function getProductDiscountSubtotalProperty(): float
     {
         if (!$this->cart) return 0.0;
 
         $sum = 0.0;
         foreach ($this->cart->items as $item) {
-            $originalBase  = (float) data_get($item->meta, 'base', $item->unit_price);
-            $discountBase  = data_get($item->meta, 'display_price_with_discount');
-            $discountBase  = is_null($discountBase) ? $originalBase : (float) $discountBase;
+            $baseOriginal = (float) data_get(
+                $item->meta,
+                'base_original',
+                data_get($item->meta, 'base', $item->unit_price)
+            );
 
-            $perUnit = max(0.0, $originalBase - $discountBase);
-            $sum += $perUnit * (int) $item->qty;
+            $baseAfterDiscount = (float) data_get(
+                $item->meta,
+                'base_after_discount',
+                data_get($item->meta, 'display_price_with_discount', $baseOriginal)
+            );
+
+            $perUnitDiscount = max(0.0, $baseOriginal - $baseAfterDiscount);
+            $sum += $perUnitDiscount * (int) $item->qty;
         }
         return round($sum, 2);
     }
 
+    /** ✅ Price after discount (base only, no addons) */
+    public function getProductAfterDiscountSubtotalProperty(): float
+    {
+        return round($this->product_price_subtotal - $this->product_discount_subtotal, 2);
+    }
 
-    /** Add-ons bucket = crust extra + add-on extras (all options) */
+    /** Add-ons bucket = crust extra + bun extra + add-on extras */
     public function getAddonsSubtotalProperty(): float
     {
         if (!$this->cart) return 0.0;
@@ -165,32 +158,38 @@ class CartPage extends Component
         $sum = 0.0;
         foreach ($this->cart->items as $item) {
             $crustExtra  = (float) data_get($item->meta, 'crust_extra', 0);
+            $bunExtra    = (float) data_get($item->meta, 'bun_extra', 0);
             $addonsExtra = (float) data_get($item->meta, 'addons_extra', 0);
-            $sum += ($crustExtra + $addonsExtra) * (int) $item->qty;
+
+            $sum += ($crustExtra + $bunExtra + $addonsExtra) * (int) $item->qty;
         }
         return round($sum, 2);
     }
 
-    /** Coupon discount at cart level (use carts.discount_total) */
+    /** Subtotal after product discount + addons */
+    public function getSubTotalAfterDiscountProperty(): float
+    {
+        return round($this->product_after_discount_subtotal + $this->addons_subtotal, 2);
+    }
+
+    /** Coupon discount at cart level */
     public function getCouponDiscountTotalProperty(): float
     {
         return (float) ($this->cart->discount_total ?? 0);
     }
 
-    /** Tax at cart level (use carts.tax_total) */
+    /** Tax at cart level */
     public function getTaxTotalProperty(): float
     {
         return (float) ($this->cart->tax_total ?? 0);
     }
 
-    /** Grand total = product + addons + tax - product discount - coupon discount */
+    /** Grand total = base after discount + addons + tax - coupon */
     public function getGrandTotalProperty(): float
     {
         return round(
-            $this->product_price_subtotal
-                + $this->addons_subtotal
+            $this->sub_total_after_discount
                 + $this->tax_total
-                - $this->product_discount_subtotal
                 - $this->coupon_discount_total,
             2
         );

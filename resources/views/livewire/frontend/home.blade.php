@@ -496,64 +496,132 @@
             <div class="swiper dishesSwiper mt-10">
                 <div class="swiper-wrapper pb-5">
                     @foreach ($dishes as $dish)
-                        <div class="swiper-slide">
-                            <div class="card bg-base-100 shadow-sm rounded-xl">
-                                <figure class="relative">
-                                    <img src="{{ asset($dish->thumbnail) }}" alt="{{ $dish->title }}"
-                                        class="w-full h-48 object-cover rounded-t-xl" />
-                                    @if ($dish->discount && $dish->discount_type)
-                                        <span
-                                            class="absolute top-2 left-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-customRed-100/80 text-white z-10">
-                                            @php
-                                                $discountValue =
-                                                    fmod($dish->discount, 1) === 0.0
-                                                        ? intval($dish->discount)
-                                                        : number_format($dish->discount, 2, '.', '');
-                                            @endphp
-                                            @if ($dish->discount_type === 'percent')
-                                                {{ $discountValue }} <span class="ps-1 font-jost">&#x25; OFF</span>
-                                            @elseif($dish->discount_type === 'amount')
-                                                {{ $discountValue }} <span class="font-normal font-oswald ps-1">&#2547;
-                                                </span> <span class="ps-1">OFF</span>
-                                            @endif
-                                        </span>
-                                    @endif
-                                </figure>
-                                <div class="card-body p-3">
-                                    <h2 class="card-title font-medium font-oswald line-clamp-1 text-slate-900">
-                                        {{ $dish->title }}
-                                    </h2>
-                                    <p class="font-jost line-clamp-1">{{ $dish->short_description }}</p>
+    @php
+        // ---------- VARIATION PRICE HELPERS ----------
+        $variations = collect($dish->variations ?? []);
 
-                                    <div class="flex items-center justify-between mt-2">
-                                        <div class="font-oswald text-customRed-100 flex items-center gap-2">
-                                            <p class="font-medium text-lg">
-                                                <span class="font-bold">&#2547;</span>
-                                                {{ $dish->price_with_discount }}
-                                            </p>
-                                            @if ($dish->price_with_discount < $dish->display_price)
-                                                <p class="font-medium line-through text-gray-500">
-                                                    <span class="font-bold">&#2547;</span> {{ $dish->display_price }}
-                                                </p>
-                                            @endif
-                                        </div>
+        $varPrices = $variations->flatMap(function ($g) {
+            return collect($g['options'] ?? [])->pluck('price');
+        })->filter(fn($p) => is_numeric($p))->map(fn($p) => (float)$p);
 
-                                        <button
-                                            wire:click="$dispatch('open-add-to-cart', { dishId: {{ $dish->id }} })"
-                                            class="inline-block relative isolate rounded px-5 py-2 mt-1 overflow-hidden cursor-pointer bg-customRed-100 font-medium text-white group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60">
-                                            <span
-                                                class="pointer-events-none absolute w-64 h-0 rotate-45 -translate-x-20 bg-slate-900 top-1/2 transition-all duration-300 ease-out group-hover:h-64 group-hover:-translate-y-32"></span>
-                                            <span
-                                                class="relative z-10 transition-colors font-medium font-oswald duration-300 group-hover:text-white">
-                                                Add to Cart
-                                            </span>
-                                        </button>
+        $hasVariations = $varPrices->count() > 0;
 
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
+        $minVarBase = $hasVariations ? $varPrices->min() : null;
+
+        // apply dish discount on variation base (optional but usually expected)
+        $applyDiscount = function ($price) use ($dish) {
+            $price = (float)$price;
+            if ($dish->discount && $dish->discount_type) {
+                if ($dish->discount_type === 'percent') {
+                    $price = max(0, $price - ($price * ((float)$dish->discount / 100)));
+                } elseif ($dish->discount_type === 'amount') {
+                    $price = max(0, $price - (float)$dish->discount);
+                }
+            }
+            return $price;
+        };
+
+        $minVarDiscounted = $hasVariations ? $applyDiscount($minVarBase) : null;
+
+        // For non-variation dishes, use model accessors
+        $normalPrice = (float)($dish->price_with_discount ?? $dish->price ?? 0);
+        $normalOld   = (float)($dish->display_price ?? $dish->price ?? 0);
+
+        // Formatting
+        $money = fn($v) => fmod((float)$v, 1) == 0 ? number_format($v, 0) : number_format($v, 2);
+    @endphp
+
+    <div class="swiper-slide">
+        <div class="card bg-base-100 shadow-sm rounded-xl">
+            <figure class="relative">
+                <img
+                    src="{{ asset($dish->thumbnail) }}"
+                    alt="{{ $dish->title }}"
+                    class="w-full h-48 object-cover rounded-t-xl"
+                />
+
+                {{-- Discount Badge --}}
+                @if ($dish->discount && $dish->discount_type)
+                    <span
+                        class="absolute top-2 left-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-customRed-100/80 text-white z-10">
+                        @php
+                            $discountValue =
+                                fmod($dish->discount, 1) === 0.0
+                                    ? intval($dish->discount)
+                                    : number_format($dish->discount, 2, '.', '');
+                        @endphp
+
+                        @if ($dish->discount_type === 'percent')
+                            {{ $discountValue }} <span class="ps-1 font-jost">&#x25; OFF</span>
+                        @elseif($dish->discount_type === 'amount')
+                            {{ $discountValue }}
+                            <span class="font-normal font-oswald ps-1">&#2547;</span>
+                            <span class="ps-1">OFF</span>
+                        @endif
+                    </span>
+                @endif
+
+                {{-- Small badge if variations exist --}}
+                @if($hasVariations)
+                    <span class="absolute top-2 right-2 inline-flex items-center px-2 py-1 rounded-full text-[10px] font-semibold bg-black/60 text-white z-10">
+                        Multiple Options
+                    </span>
+                @endif
+            </figure>
+
+            <div class="card-body p-3">
+                <h2 class="card-title font-medium font-oswald line-clamp-1 text-slate-900">
+                    {{ $dish->title }}
+                </h2>
+
+                <p class="font-jost line-clamp-1">{{ $dish->short_description }}</p>
+
+                <div class="flex items-center justify-between mt-2">
+                    <div class="font-oswald text-customRed-100 flex items-center gap-2">
+                        @if($hasVariations)
+                            {{-- Show "From" price using minimum variation price --}}
+                            <p class="font-medium text-lg">
+                                <span class="font-bold">&#2547;</span>
+                                From {{ $money($minVarDiscounted) }}
+                            </p>
+
+                            {{-- Optional old price compare if discount present --}}
+                            @if($dish->discount && $dish->discount_type && $minVarDiscounted < $minVarBase)
+                                <p class="font-medium line-through text-gray-500">
+                                    <span class="font-bold">&#2547;</span> {{ $money($minVarBase) }}
+                                </p>
+                            @endif
+                        @else
+                            {{-- Normal dish price --}}
+                            <p class="font-medium text-lg">
+                                <span class="font-bold">&#2547;</span>
+                                {{ $money($normalPrice) }}
+                            </p>
+
+                            @if ($normalPrice < $normalOld)
+                                <p class="font-medium line-through text-gray-500">
+                                    <span class="font-bold">&#2547;</span> {{ $money($normalOld) }}
+                                </p>
+                            @endif
+                        @endif
+                    </div>
+
+                    <button
+                        wire:click="$dispatch('open-add-to-cart', { dishId: {{ $dish->id }} })"
+                        class="inline-block relative isolate rounded px-5 py-2 mt-1 overflow-hidden cursor-pointer bg-customRed-100 font-medium text-white group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60">
+                        <span
+                            class="pointer-events-none absolute w-64 h-0 rotate-45 -translate-x-20 bg-slate-900 top-1/2 transition-all duration-300 ease-out group-hover:h-64 group-hover:-translate-y-32"></span>
+                        <span
+                            class="relative z-10 transition-colors font-medium font-oswald duration-300 group-hover:text-white">
+                            Add to Cart
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endforeach
+
                 </div>
 
                 <!-- Circular nav buttons -->

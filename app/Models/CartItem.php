@@ -15,6 +15,7 @@ class CartItem extends Model
         'crust_id',
         'bun_id',
         'addon_ids',
+        'variation_selection',
         'unit_price',
         'line_total',
         'meta',
@@ -22,6 +23,7 @@ class CartItem extends Model
 
     protected $casts = [
         'addon_ids'  => 'array',
+        'variation_selection'  => 'array',
         'meta'       => 'array',
         'unit_price' => 'decimal:2',
         'line_total' => 'decimal:2',

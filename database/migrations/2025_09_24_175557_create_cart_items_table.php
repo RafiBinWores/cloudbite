@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('crust_id')->nullable()->constrained('crusts')->nullOnDelete();
             $table->foreignId('bun_id')->nullable()->constrained('buns')->nullOnDelete();
             $table->json('addon_ids')->nullable();
+            $table->json('variation_selection')->nullable();
             $table->decimal('unit_price', 12, 2); // base + crust + bun + addons (per unit)
             $table->decimal('line_total', 12, 2); // unit_price * qty
             $table->json('meta')->nullable();

@@ -1,60 +1,12 @@
 <div>
 
-    {{-- Styles --}}
-    @push('styles')
-        <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
-
-        <style>
-            /* Dark theme override for Quill toolbar */
-            .dark .ql-toolbar {
-                background-color: none;
-                border-top-left-radius: 8px;
-                border-top-right-radius: 8px;
-            }
-
-            .dark .ql-toolbar button,
-            .dark .ql-toolbar .ql-picker {
-                color: #828690;
-                /* Tailwind gray-200 */
-            }
-
-            .dark .ql-toolbar button:hover,
-            .dark .ql-toolbar .ql-picker-label:hover {
-                color: #f87171;
-                /* Tailwind rose-400 for hover */
-            }
-
-            .dark .ql-toolbar .ql-stroke {
-                stroke: #828690 !important;
-                /* make SVG icons visible */
-            }
-
-            .dark .ql-toolbar .ql-fill {
-                fill: #828690 !important;
-            }
-
-            .dark .ql-toolbar .ql-picker-options {
-                background-color: #111827;
-                /* Tailwind neutral-900 */
-                border-color: #374151;
-            }
-
-            .dark .ql-toolbar .ql-picker-options span {
-                color: #828690;
-            }
-
-            .dark .ql-toolbar .ql-picker-options span:hover {
-                background: #374151;
-            }
-        </style>
-    @endpush
-
     {{-- Page Heading --}}
     <div class="relative mb-6 w-full">
         <flux:heading size="xl" class="mb-3" level="1">{{ __('Add New Dish') }}</flux:heading>
         <flux:breadcrumbs class="mb-6">
             <flux:breadcrumbs.item href="{{ route('dashboard') }}" icon="home" separator="slash" wire:navigate />
-            <flux:breadcrumbs.item href="{{ route('dishes.index') }}" separator="slash" wire:navigate>Dishes
+            <flux:breadcrumbs.item href="{{ route('dishes.index') }}" separator="slash" wire:navigate>
+                Dishes
             </flux:breadcrumbs.item>
             <flux:breadcrumbs.item separator="slash">Add New Dish</flux:breadcrumbs.item>
         </flux:breadcrumbs>
@@ -66,7 +18,7 @@
 
             <!-- LEFT COLUMN -->
             <div class="lg:col-span-7 space-y-6">
-                <!-- Name & Description -->
+                <!-- Name & Short Description -->
                 <section
                     class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Name and Description</h3>
@@ -79,33 +31,13 @@
                                 placeholder="eg. Chicken Fry" />
                         </div>
 
-                        {{-- Short description --}}
+                        {{-- Short description only --}}
                         <div class="from-group md:col-span-2">
                             <x-textarea label="Short Description*" rows="3" wire:model.live="short_description"
-                                class="ounded-lg !bg-white/10 !py-[9px] {{ $errors->has('short_description') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-400' }}"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('short_description') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-400' }}"
                                 placeholder="Mention about what your dish include or what item u will provide for the menu" />
                         </div>
-
-                        {{-- Description --}}
-                        <div class="form-group dark">
-                            <label for="editor">Description <span class="text-red-500">*</span></label>
-
-                            {{-- Only the editor is ignored --}}
-                            <div wire:ignore>
-                                <div id="editor" class="min-h-38 rounded-b-lg border border-gray-300"></div>
-                            </div>
-
-                            {{-- Hidden input bound to Livewire --}}
-                            <input type="hidden" id="description" wire:model.live="description">
-
-                            {{-- This will now update properly --}}
-                            @error('description')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
                     </div>
-
                 </section>
 
                 <!-- Category -->
@@ -157,6 +89,7 @@
                                 clearable searchable />
 
                         </div>
+
                         {{-- Tags --}}
                         <div class="form-group md:col-span-2">
 
@@ -174,7 +107,6 @@
                         <div class="form-group md:col-span-2">
 
                             @php
-
                                 $dishes = App\Models\Dish::where('visibility', 'Yes')->get(['id', 'title', 'thumbnail'])->map(
                                     fn($c) => [
                                         'id' => $c->id,
@@ -194,7 +126,7 @@
                     </div>
                 </section>
 
-                <!-- Manage Stock -->
+                <!-- Dish Pricing -->
                 <section
                     class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Dish Pricing</h3>
@@ -203,9 +135,12 @@
 
                         {{-- Price --}}
                         <div class="form-group md:col-span-2">
-                            <x-input type="number" min="0" step="any" label="Price (Tk)*" wire:model.live="price"
+                            <x-input type="number" min="0" step="any" label="Base Price (Tk)*" wire:model.live="price"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('price') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Price" />
+                            <small class="text-xs text-neutral-500 dark:text-neutral-300">
+                                This is default price if no variation is selected.
+                            </small>
                         </div>
 
                         {{-- discount type --}}
@@ -228,6 +163,93 @@
                                 placeholder="Vat" />
                         </div>
 
+                    </div>
+                </section>
+
+                <!-- Variations Section -->
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold dark:text-gray-100">Variations</h3>
+
+                        <flux:button type="button" variant="filled" color="rose" icon="plus-icon"
+                            wire:click="addVariationGroup" class="cursor-pointer">
+                            Add Variation
+                        </flux:button>
+                    </div>
+
+                    <div class="space-y-4">
+                        @forelse($variations as $vIndex => $variation)
+                            <div class="border border-gray-200 dark:border-neutral-600 rounded-xl p-4 bg-neutral-50 dark:bg-neutral-600">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-1">
+                                        <x-input
+                                            label="Variation Name* (ex: Size, Crust, Drink)"
+                                            wire:model.live="variations.{{ $vIndex }}.name"
+                                            placeholder="Size"
+                                            class="rounded-lg !bg-white/10 !py-[9px]" />
+                                    </div>
+
+                                    <flux:button
+                                        type="button"
+                                        icon="trash-icon"
+                                        variant="filled"
+                                        class="mt-6 cursor-pointer"
+                                        wire:click="removeVariationGroup({{ $vIndex }})">
+                                        Remove
+                                    </flux:button>
+                                </div>
+
+                                {{-- Options under variation --}}
+                                <div class="mt-4 space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <p class="font-medium text-sm dark:text-gray-100">Options</p>
+
+                                        <button type="button"
+                                            wire:click="addVariationOption({{ $vIndex }})"
+                                            class="text-sm text-rose-600 hover:underline cursor-pointer">
+                                            + Add Option
+                                        </button>
+                                    </div>
+
+                                    @foreach($variation['options'] ?? [] as $oIndex => $option)
+                                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                                            <div class="md:col-span-7">
+                                                <x-input
+                                                    label="Option Name (ex: Small, Medium)"
+                                                    wire:model.live="variations.{{ $vIndex }}.options.{{ $oIndex }}.label"
+                                                    placeholder="Small"
+                                                    class="rounded-lg !bg-white/10 !py-[9px]" />
+                                            </div>
+
+                                            <div class="md:col-span-4">
+                                                <x-input type="number" min="0" step="any"
+                                                    label="Price (Tk)"
+                                                    wire:model.live="variations.{{ $vIndex }}.options.{{ $oIndex }}.price"
+                                                    placeholder="0"
+                                                    class="rounded-lg !bg-white/10 !py-[9px]" />
+                                            </div>
+
+                                            <div class="md:col-span-1">
+                                                <button type="button"
+                                                    wire:click="removeVariationOption({{ $vIndex }}, {{ $oIndex }})"
+                                                    class="h-10 w-full rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-neutral-700 dark:hover:bg-neutral-800 cursor-pointer flex items-center justify-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x-icon lucide-circle-x"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+                                    @error("variations.$vIndex.options")
+                                        <p class="text-red-500 text-sm">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-sm text-neutral-500 dark:text-neutral-300">
+                                No variations added yet. Click “Add Variation” to create size/price options.
+                            </p>
+                        @endforelse
                     </div>
                 </section>
 
@@ -290,7 +312,6 @@
                         <div class="form-group">
 
                             @php
-
                                 $bun = App\Models\Bun::where('status', 'active')->orderBy('name', 'ASC')->get();
                             @endphp
 
@@ -304,7 +325,6 @@
                         <div class="form-group md:col-span-2">
 
                             @php
-
                                 $addOn = App\Models\AddOn::where('status', 'active')->orderBy('name', 'ASC')->get();
                             @endphp
 
@@ -372,7 +392,9 @@
                     class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
 
                     <div class="flex items-center gap-2 mb-4">
-                        <h3 class="text-lg font-semibold dark:text-gray-100">Display Image <span class="text-red-500 font-normal text-base">*</span></h3>
+                        <h3 class="text-lg font-semibold dark:text-gray-100">
+                            Display Image <span class="text-red-500 font-normal text-base">*</span>
+                        </h3>
                     </div>
 
                     <!-- Thumbnail (Big Preview) -->
@@ -382,13 +404,11 @@
                         @click="!thumbnailSrc && $refs.thumbnailInput.click()">
 
                         <template x-if="thumbnailSrc">
-                            <img :src="thumbnailSrc" class="h-full w-full object-cover object-center"
-                                alt="">
+                            <img :src="thumbnailSrc" class="h-full w-full object-cover object-center" alt="">
                         </template>
 
                         <template x-if="!thumbnailSrc">
-                            <div
-                                class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300">
+                            <div class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300">
                                 <p>
                                     Click to add Thumbnail <br>
                                     <small class="text-sm">Recommended image size for upload is 552x538 px. <br>
@@ -448,12 +468,11 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                        {{-- Visibility --}}
                         <div class="form-group md:col-span-2">
-
-                            <x-select wire:model.live="visibility" label="Turning visibility off will not show this dish in the website*" :options="['Yes', 'No']"
+                            <x-select wire:model.live="visibility"
+                                label="Turning visibility off will not show this dish in the website*"
+                                :options="['Yes', 'No']"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('visibility') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
-
                         </div>
                     </div>
                 </section>
@@ -463,7 +482,8 @@
                     <flux:spacer />
 
                     <flux:modal.close>
-                        <flux:button icon="cross-icon" variant="filled" class="cursor-pointer me-2">Cancel
+                        <flux:button icon="cross-icon" variant="filled" class="cursor-pointer me-2">
+                            Cancel
                         </flux:button>
                     </flux:modal.close>
 
@@ -476,81 +496,8 @@
             </div>
         </div>
     </form>
-    
 
     @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-        <script>
-            let quill;
-
-            document.addEventListener('livewire:navigated', () => {
-                // init once per navigation
-                quill = new Quill('#editor', {
-                    theme: 'snow',
-                    modules: {
-                        toolbar: [
-                            ['bold', 'italic', 'underline', 'strike'],
-                            ['blockquote'],
-                            ['link'],
-                            [{
-                                list: 'ordered'
-                            }, {
-                                list: 'bullet'
-                            }, {
-                                list: 'check'
-                            }],
-                            [{
-                                script: 'sub'
-                            }, {
-                                script: 'super'
-                            }],
-                            [{
-                                indent: '-1'
-                            }, {
-                                indent: '+1'
-                            }],
-                            [{
-                                direction: 'rtl'
-                            }],
-                            [{
-                                size: ['small', false, 'large', 'huge']
-                            }],
-                            [{
-                                header: [1, 2, 3, 4, 5, 6, false]
-                            }],
-                            [{
-                                color: []
-                            }, {
-                                background: []
-                            }],
-                            [{
-                                font: []
-                            }],
-                            [{
-                                align: []
-                            }],
-                            ['clean']
-                        ]
-                    }
-                });
-
-                // set initial value from Livewire (edit mode)
-                const initial = @this.get('description') ?? '';
-                if (initial) quill.root.innerHTML = initial;
-
-                // keep Livewire in sync via hidden input
-                const input = document.querySelector('#description');
-
-                quill.on('text-change', () => {
-                    const html = quill.root.innerHTML;
-                    const plain = quill.getText().trim();
-                    const input = document.getElementById('description');
-                    input.value = plain.length ? html : '';
-                    input.dispatchEvent(new Event('input'));
-                });
-            });
-        </script>
-
         <script>
             function dishImages() {
                 return {
