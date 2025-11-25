@@ -104,7 +104,7 @@ class Dish extends Model
 
     public function favoritedBy()
     {
-        return $this->belongsToMany(\App\Models\User::class, 'favorites')->withTimestamps();
+        return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
     }
 
     public function scopeVisible($q)
@@ -118,6 +118,6 @@ class Dish extends Model
     }
     public function orderItems()
     {
-        return $this->hasMany(\App\Models\OrderItem::class);
+        return $this->hasMany(OrderItem::class);
     }
 }

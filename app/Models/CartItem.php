@@ -29,6 +29,10 @@ class CartItem extends Model
         'line_total' => 'decimal:2',
     ];
 
+    protected $appends = [
+        'addon_quantities',
+    ];
+
 
     public function cart()
     {

@@ -53,140 +53,148 @@ class CartRepository
     }
 
     /** Add/update a cart line (CREATES cart if missing) */
-    public function addItem(
-        int $dishId,
-        int $qty,
-        ?int $crustId = null,
-        ?int $bunId = null,
-        array $addonIds = [],
-        array $variationsSelected = []
-    ): Cart {
-        return DB::transaction(function () use (
-            $dishId,
-            $qty,
-            $crustId,
-            $bunId,
-            $addonIds,
-            $variationsSelected
-        ) {
-            $cart = $this->ensureCart();
+public function addItem(
+    int $dishId,
+    int $qty,
+    ?int $crustId = null,
+    ?int $bunId = null,
+    array $addonIds = [],
+    array $variationsSelected = [],
+    array $addonQty = []
+): Cart {
+    return DB::transaction(function () use (
+        $dishId,
+        $qty,
+        $crustId,
+        $bunId,
+        $addonIds,
+        $variationsSelected,
+        $addonQty
+    ) {
+        $cart = $this->ensureCart();
 
-            $dish = Dish::with(['crusts', 'buns', 'addOns'])->findOrFail($dishId);
+        $dish = Dish::with(['crusts', 'buns', 'addOns'])->findOrFail($dishId);
 
-            /** ----------------------------
-             *  1) BASE PRICE (variation aware)
-             *  ---------------------------- */
-            $baseOriginal = (float) ($dish->price ?? 0);
+        /** 1) BASE PRICE + VARIATION EXTRAS */
+        $baseOriginal = (float) ($dish->price ?? 0);
 
-            $vars = (array) ($dish->variations ?? []);
-            foreach ($vars as $gIndex => $group) {
-                $optIndex = $variationsSelected[$gIndex] ?? null;
-                if ($optIndex === null) continue;
+        $variationExtraTotal = 0.0;
+        $vars = (array) ($dish->variations ?? []);
+        foreach ($vars as $gIndex => $group) {
+            $optIndex = $variationsSelected[$gIndex] ?? null;
+            if ($optIndex === null) continue;
 
-                $opt = $group['options'][$optIndex] ?? null;
-                if ($opt && isset($opt['price'])) {
-                    $baseOriginal = (float) $opt['price'];
-                }
+            $opt = $group['options'][$optIndex] ?? null;
+            if ($opt && isset($opt['price'])) {
+                $variationExtraTotal += (float) $opt['price'];
             }
+        }
+        $variationExtraTotal = round($variationExtraTotal, 2);
 
-            /** ----------------------------
-             *  2) APPLY DISH DISCOUNT on chosen base
-             *  ---------------------------- */
-            $baseAfterDiscount = $baseOriginal;
+        // final base before discount = dish base + variation extras
+        $baseOriginal = round($baseOriginal + $variationExtraTotal, 2);
 
-            if ($dish->discount_type && (float) $dish->discount > 0) {
-                if ($dish->discount_type === 'percent') {
-                    $baseAfterDiscount = $baseOriginal * (1 - ((float) $dish->discount / 100));
-                } elseif ($dish->discount_type === 'amount') {
-                    $baseAfterDiscount = max(0, $baseOriginal - (float) $dish->discount);
-                }
+        /** 2) APPLY DISH DISCOUNT */
+        $baseAfterDiscount = $baseOriginal;
+        if ($dish->discount_type && (float) $dish->discount > 0) {
+            if ($dish->discount_type === 'percent') {
+                $baseAfterDiscount = $baseOriginal * (1 - ((float) $dish->discount / 100));
+            } elseif ($dish->discount_type === 'amount') {
+                $baseAfterDiscount = max(0, $baseOriginal - (float) $dish->discount);
             }
+        }
+        $baseAfterDiscount = round($baseAfterDiscount, 2);
 
-            $baseAfterDiscount = round($baseAfterDiscount, 2);
+        /** 3) EXTRAS (crust, bun, addons with qty) */
+        $crustExtra = 0.0;
+        if ($crustId) {
+            $c = $dish->crusts->firstWhere('id', $crustId);
+            $crustExtra = (float) ($c?->price ?? 0);
+        }
 
-            /** ----------------------------
-             *  3) EXTRAS
-             *  ---------------------------- */
-            $crustExtra = 0.0;
-            if ($crustId) {
-                $c = $dish->crusts->firstWhere('id', $crustId);
-                $crustExtra = (float) ($c?->price ?? 0);
+        $bunExtra = 0.0;
+        if ($bunId) {
+            $b = $dish->buns->firstWhere('id', $bunId);
+            $bunExtra = (float) ($b?->price ?? 0);
+        }
+
+        $addonIdsSorted = array_values(array_unique(array_map('intval', $addonIds)));
+        sort($addonIdsSorted);
+
+        // Canonical qty map per addon ID
+        $addonQtyCanonical = [];
+        foreach ($addonIdsSorted as $id) {
+            $addonQtyCanonical[$id] = max(1, (int)($addonQty[$id] ?? 1));
+        }
+
+        $addonsExtra = 0.0;
+        if ($addonIdsSorted) {
+            $selected = $dish->addOns->whereIn('id', $addonIdsSorted);
+            foreach ($selected as $a) {
+                $perUnitQty = $addonQtyCanonical[$a->id] ?? 1;
+                $addonsExtra += (float) ($a->price ?? 0) * $perUnitQty;
             }
+        }
 
-            $bunExtra = 0.0;
+        /** 4) FINAL UNIT PRICE */
+        $unit = round($baseAfterDiscount + $crustExtra + $bunExtra + $addonsExtra, 2);
 
-            $addonIdsSorted = array_values(array_unique(array_map('intval', $addonIds)));
-            sort($addonIdsSorted);
+        /** 5) UNIQUE LINE KEY (variation selection) */
+        $variationsSelectedSorted = (array) $variationsSelected;
+        ksort($variationsSelectedSorted);
+        $variationKey = json_encode($variationsSelectedSorted);
 
-            $addonsExtra = 0.0;
-            if ($addonIdsSorted) {
-                $selected = $dish->addOns->whereIn('id', $addonIdsSorted);
-                foreach ($selected as $a) {
-                    $addonsExtra += (float) ($a->price ?? 0);
-                }
-            }
+        /** 6) VAT percent */
+        $vatPercent = (float) ($dish->vat ?? 0);
 
-            /** ----------------------------
-             *  4) FINAL UNIT (NET, VAT excluded)
-             *  ---------------------------- */
-            $unit = round($baseAfterDiscount + $crustExtra + $bunExtra + $addonsExtra, 2);
+        $existing = $cart->items()
+            ->where('dish_id', $dishId)
+            ->where('crust_id', $crustId)
+            ->where('bun_id', $bunId)
+            ->where('addon_ids', json_encode($addonIdsSorted))
+            ->where('variation_selection', $variationKey)
+            ->first();
 
-            /** ----------------------------
-             *  5) UNIQUE LINE KEY (addon + variation)
-             *  ---------------------------- */
-            $variationsSelectedSorted = (array) $variationsSelected;
-            ksort($variationsSelectedSorted);
-            $variationKey = json_encode($variationsSelectedSorted);
+        $metaPayload = [
+            'base_original'         => $baseOriginal,
+            'base_after_discount'   => $baseAfterDiscount,
+            'variation_extra_total' => $variationExtraTotal,
 
-            /** ----------------------------
-             *  6) VAT percent saved for cart calc
-             *  ---------------------------- */
-            $vatPercent = (float) ($dish->vat ?? 0);
+            'crust_extra'           => $crustExtra,
+            'bun_extra'             => $bunExtra,
+            'addons_extra'          => $addonsExtra,
+            'variation_selection'   => $variationsSelectedSorted,
+            'addon_qty'             => $addonQtyCanonical,
+            'vat_percent'           => $vatPercent,
+        ];
 
-            $existing = $cart->items()
-                ->where('dish_id', $dishId)
-                ->where('crust_id', $crustId)
-                ->where('bun_id', $bunId)
-                ->where('addon_ids', json_encode($addonIdsSorted))
-                ->where('variation_selection', $variationKey)
-                ->first();
-
-            $metaPayload = [
-                'base_original'       => $baseOriginal,       // ✅ needed to compute discount later
-                'base_after_discount' => $baseAfterDiscount,  // ✅ discounted base stored
-                'crust_extra'         => $crustExtra,
-                'bun_extra'           => $bunExtra,
-                'addons_extra'        => $addonsExtra,
+        if ($existing) {
+            $existing->qty += $qty;
+            $existing->unit_price = $unit;
+            $existing->line_total = $existing->qty * $unit;
+            $existing->variation_selection = $variationsSelectedSorted;
+            $existing->meta = $metaPayload;
+            $existing->save();
+        } else {
+            $cart->items()->create([
+                'dish_id'    => $dishId,
+                'qty'        => $qty,
+                'crust_id'   => $crustId,
+                'bun_id'     => $bunId,
+                'addon_ids'  => $addonIdsSorted,
                 'variation_selection' => $variationsSelectedSorted,
-                'vat_percent'         => $vatPercent,         // ✅ for cart VAT calc
-            ];
+                'unit_price' => $unit,
+                'line_total' => $unit * $qty,
+                'meta'       => $metaPayload,
+            ]);
+        }
 
-            if ($existing) {
-                $existing->qty += $qty;
-                $existing->unit_price = $unit;
-                $existing->line_total = $existing->qty * $unit;
-                $existing->variation_selection = $variationsSelectedSorted;
-                $existing->meta = $metaPayload;
-                $existing->save();
-            } else {
-                $cart->items()->create([
-                    'dish_id'    => $dishId,
-                    'qty'        => $qty,
-                    'crust_id'   => $crustId,
-                    'bun_id'     => $bunId,
-                    'addon_ids'  => $addonIdsSorted,
-                    'variation_selection' => $variationsSelectedSorted,
-                    'unit_price' => $unit,
-                    'line_total' => $unit * $qty,
-                    'meta'       => $metaPayload,
-                ]);
-            }
+        $cart->refreshTotals();
 
-            $cart->refreshTotals();
+        return $cart->fresh(['items.dish', 'items.crust', 'items.bun']);
+    });
+}
 
-            return $cart->fresh(['items.dish', 'items.crust', 'items.bun']);
-        });
-    }
 
     /** Mutations below: NEVER create cart if missing */
 

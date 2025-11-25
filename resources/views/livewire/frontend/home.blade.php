@@ -495,50 +495,66 @@
             {{-- Dishes Slider --}}
             <div class="swiper dishesSwiper mt-10">
                 <div class="swiper-wrapper pb-5">
-                    @foreach ($dishes as $dish)
+                   @foreach ($dishes as $dish)
     @php
-        // ---------- VARIATION PRICE HELPERS ----------
+        // ---------- VARIATION PRICE HELPERS (EXTRA-BASED) ----------
         $variations = collect($dish->variations ?? []);
 
-        $varPrices = $variations->flatMap(function ($g) {
-            return collect($g['options'] ?? [])->pluck('price');
-        })->filter(fn($p) => is_numeric($p))->map(fn($p) => (float)$p);
+        // Collect all option extras (treat option['price'] as EXTRA amount)
+        $varExtras = $variations
+            ->flatMap(function ($g) {
+                return collect($g['options'] ?? [])->pluck('price');
+            })
+            ->filter(fn($p) => is_numeric($p))
+            ->map(fn($p) => (float) $p);
 
-        $hasVariations = $varPrices->count() > 0;
+        $hasVariations = $varExtras->count() > 0;
 
-        $minVarBase = $hasVariations ? $varPrices->min() : null;
+        $minExtra = $hasVariations ? $varExtras->min() : 0;
+        $maxExtra = $hasVariations ? $varExtras->max() : 0;
 
-        // apply dish discount on variation base (optional but usually expected)
-        $applyDiscount = function ($price) use ($dish) {
-            $price = (float)$price;
+        // ---------- BASE PRICE ----------
+        $baseOriginal = (float) ($dish->price ?? 0);
+
+        // Apply dish discount on BASE (not on extras)
+        $applyDiscountOnBase = function ($price) use ($dish) {
+            $price = (float) $price;
+
             if ($dish->discount && $dish->discount_type) {
                 if ($dish->discount_type === 'percent') {
-                    $price = max(0, $price - ($price * ((float)$dish->discount / 100)));
+                    $price = max(0, $price - $price * ((float) $dish->discount / 100));
                 } elseif ($dish->discount_type === 'amount') {
-                    $price = max(0, $price - (float)$dish->discount);
+                    $price = max(0, $price - (float) $dish->discount);
                 }
             }
-            return $price;
+
+            return round($price, 2);
         };
 
-        $minVarDiscounted = $hasVariations ? $applyDiscount($minVarBase) : null;
+        $baseDiscounted = $applyDiscountOnBase($baseOriginal);
 
-        // For non-variation dishes, use model accessors
-        $normalPrice = (float)($dish->price_with_discount ?? $dish->price ?? 0);
-        $normalOld   = (float)($dish->display_price ?? $dish->price ?? 0);
+        // ---------- FINAL "FROM" PRICES ----------
+        // From price = discounted base + minimum extra
+        $fromPriceDiscounted = $baseDiscounted + $minExtra;
 
-        // Formatting
-        $money = fn($v) => fmod((float)$v, 1) == 0 ? number_format($v, 0) : number_format($v, 2);
+        // Old compare = original base + minimum extra
+        $fromPriceOriginal   = $baseOriginal + $minExtra;
+
+        // For non-variation dishes
+        $normalPrice = $baseDiscounted;
+        $normalOld   = $baseOriginal;
+
+        // Formatting helper
+        $money = fn($v) => fmod((float) $v, 1) == 0
+            ? number_format($v, 0)
+            : number_format($v, 2);
     @endphp
 
     <div class="swiper-slide">
         <div class="card bg-base-100 shadow-sm rounded-xl">
             <figure class="relative">
-                <img
-                    src="{{ asset($dish->thumbnail) }}"
-                    alt="{{ $dish->title }}"
-                    class="w-full h-48 object-cover rounded-t-xl"
-                />
+                <img src="{{ asset($dish->thumbnail) }}" alt="{{ $dish->title }}"
+                    class="w-full h-48 object-cover rounded-t-xl" />
 
                 {{-- Discount Badge --}}
                 @if ($dish->discount && $dish->discount_type)
@@ -562,8 +578,9 @@
                 @endif
 
                 {{-- Small badge if variations exist --}}
-                @if($hasVariations)
-                    <span class="absolute top-2 right-2 inline-flex items-center px-2 py-1 rounded-full text-[10px] font-semibold bg-black/60 text-white z-10">
+                @if ($hasVariations)
+                    <span
+                        class="absolute top-2 right-2 inline-flex items-center px-2 py-1 rounded-full text-[10px] font-semibold bg-black/60 text-white z-10">
                         Multiple Options
                     </span>
                 @endif
@@ -578,17 +595,18 @@
 
                 <div class="flex items-center justify-between mt-2">
                     <div class="font-oswald text-customRed-100 flex items-center gap-2">
-                        @if($hasVariations)
-                            {{-- Show "From" price using minimum variation price --}}
+                        @if ($hasVariations)
+                            {{-- Show "From" price using base + min extra --}}
                             <p class="font-medium text-lg">
                                 <span class="font-bold">&#2547;</span>
-                                From {{ $money($minVarDiscounted) }}
+                                From {{ $money($fromPriceDiscounted) }}
                             </p>
 
-                            {{-- Optional old price compare if discount present --}}
-                            @if($dish->discount && $dish->discount_type && $minVarDiscounted < $minVarBase)
+                            {{-- Old price compare if discount present --}}
+                            @if ($dish->discount && $dish->discount_type && $fromPriceDiscounted < $fromPriceOriginal)
                                 <p class="font-medium line-through text-gray-500">
-                                    <span class="font-bold">&#2547;</span> {{ $money($minVarBase) }}
+                                    <span class="font-bold">&#2547;</span>
+                                    {{ $money($fromPriceOriginal) }}
                                 </p>
                             @endif
                         @else
@@ -600,7 +618,8 @@
 
                             @if ($normalPrice < $normalOld)
                                 <p class="font-medium line-through text-gray-500">
-                                    <span class="font-bold">&#2547;</span> {{ $money($normalOld) }}
+                                    <span class="font-bold">&#2547;</span>
+                                    {{ $money($normalOld) }}
                                 </p>
                             @endif
                         @endif
@@ -621,6 +640,7 @@
         </div>
     </div>
 @endforeach
+
 
                 </div>
 
