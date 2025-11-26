@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use App\Enums\UserRole;
+use App\Repositories\CartRepository;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -33,6 +34,9 @@ class Login extends Component
 
         $this->ensureIsNotRateLimited();
 
+        // Keep old session ID (guest cart belongs to this)
+        $guestSessionId = session()->getId();
+
         if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
             RateLimiter::hit($this->throttleKey());
 
@@ -44,14 +48,21 @@ class Login extends Component
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
+        // Merge guest cart into authenticated user's cart
+        app(CartRepository::class)->mergeGuestCart($guestSessionId);
+
+        // Admin redirect
         if (Auth::user()->role === UserRole::Admin || Auth::user()->role === UserRole::Manager) {
             return redirect()->route("dashboard");
-        } elseif (Auth::user()->role === UserRole::User) {
-            return redirect()->route("home");
         }
 
-        $this->redirectIntended(default: route('home', absolute: false), navigate: true);
+        // User redirect (intended)
+        return $this->redirectIntended(
+            default: route('home'),
+            navigate: false
+        );
     }
+
 
     /**
      * Ensure the authentication request is not rate limited.

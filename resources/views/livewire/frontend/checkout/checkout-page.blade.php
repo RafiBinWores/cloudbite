@@ -1,9 +1,9 @@
 <div>
     {{-- Breadcrumb --}}
-    <div
+    {{-- <div
         class="bg-[url(/assets/images/breadcrumb-bg.jpg)] py-20 md:py-32 bg-no-repeat bg-cover bg-center text-center text-white grid place-items-center font-oswald">
         <h4 class="text-4xl md:text-6xl font-medium">Checkout</h4>
-    </div>
+    </div> --}}
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
