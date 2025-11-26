@@ -29,6 +29,7 @@ class CartPage extends Component
     public function refreshCart(CartRepository $repo): void
     {
         $this->loadCart($repo);
+        $this->dispatch('cart-updated');
     }
 
     protected function loadCart(CartRepository $repo): void
@@ -71,6 +72,7 @@ class CartPage extends Component
         $repo->bumpItemQty($itemId, +1);
         $this->loadCart($repo);
         $this->success(title: 'Quantity updated.', position: 'top-right', showProgress: true, showCloseIcon: true);
+        $this->dispatch('cart-updated');
     }
 
     public function decrementQty(CartRepository $repo, int $itemId): void
@@ -78,6 +80,7 @@ class CartPage extends Component
         $repo->bumpItemQty($itemId, -1);
         $this->loadCart($repo);
         $this->success(title: 'Quantity updated.', position: 'top-right', showProgress: true, showCloseIcon: true);
+        $this->dispatch('cart-updated');
     }
 
     public function changeQty(CartRepository $repo, int $itemId, int $qty): void
@@ -85,6 +88,7 @@ class CartPage extends Component
         $repo->setItemQty($itemId, max(1, min(99, $qty)));
         $this->loadCart($repo);
         $this->success(title: 'Quantity updated.', position: 'top-right', showProgress: true, showCloseIcon: true);
+        $this->dispatch('cart-updated');
     }
 
     public function removeItem(CartRepository $repo, int $itemId): void
@@ -92,6 +96,7 @@ class CartPage extends Component
         $repo->removeItem($itemId);
         $this->loadCart($repo);
         $this->success(title: 'Item removed.', position: 'top-right', showProgress: true, showCloseIcon: true);
+        $this->dispatch('cart-updated');
     }
 
     public function clearCart(CartRepository $repo): void
@@ -99,9 +104,10 @@ class CartPage extends Component
         $repo->clear();
         $this->loadCart($repo);
         $this->success(title: 'Cart cleared.', position: 'top-right', showProgress: true, showCloseIcon: true);
+        $this->dispatch('cart-updated');
     }
 
-    /** ✅ Item price WITHOUT discount (variation-aware) */
+    /** Item price WITHOUT discount (variation-aware) */
     public function getProductPriceSubtotalProperty(): float
     {
         if (!$this->cart) return 0.0;

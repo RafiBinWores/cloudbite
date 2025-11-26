@@ -52,10 +52,7 @@
                         <label for="cart-drawer"
                             class="relative inline-grid place-items-center size-9 sm:size-12 rounded-full bg-slate-900 cursor-pointer">
                             <i class="fa-solid fa-cart-shopping text-white text-lg sm:text-xl"></i>
-                            <span
-                                class="absolute -top-1 -right-1 grid place-items-center rounded-full bg-red-600 text-white text-[10px] sm:text-xs font-bold w-4 h-4 sm:w-5 sm:h-5">
-                                <span x-text="badgeCount"></span>
-                            </span>
+                            <livewire:frontend.cart.cart-badge />
                         </label>
                     </a>
                 </div>

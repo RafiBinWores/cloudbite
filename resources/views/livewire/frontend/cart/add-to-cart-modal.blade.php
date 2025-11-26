@@ -27,7 +27,8 @@
                         <div class="flex items-start justify-between">
                             <div>
                                 <div class="flex items-center gap-3">
-                                    <h3 class="text-base md:text-xl font-medium md:font-semibold text-slate-900">{{ $dish?->title }}</h3>
+                                    <h3 class="text-base md:text-xl font-medium md:font-semibold text-slate-900">
+                                        {{ $dish?->title }}</h3>
 
                                     {{-- Favorites --}}
                                     <button type="button" wire:click="toggleFavorite" wire:loading.attr="disabled"
@@ -258,61 +259,62 @@
                     @endif
 
                     {{-- Add-ons --}}
-@if ($dish && $dish->addOns->count())
-  <div class="bg-customRed-100/15 p-4 md:p-5 rounded-md shadow">
-    <div class="flex items-center justify-between mb-4">
-      <h4 class="font-oswald font-medium text-lg">Add Ons</h4>
-      <p class="bg-white text-gray-500 font-jost px-3 py-1 rounded-full text-xs">Optional</p>
-    </div>
+                    @if ($dish && $dish->addOns->count())
+                        <div class="bg-customRed-100/15 p-4 md:p-5 rounded-md shadow">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="font-oswald font-medium text-lg">Add Ons</h4>
+                                <p class="bg-white text-gray-500 font-jost px-3 py-1 rounded-full text-xs">Optional</p>
+                            </div>
 
-    <div class="font-jost text-gray-700 space-y-3 pe-2">
-      @foreach ($dish->addOns as $a)
-        @php
-          $inputId  = 'addon_'.$a->id;
-          $selected = in_array($a->id, $addon_ids ?? []);
-          $qty      = $addon_qty[$a->id] ?? 1;
-        @endphp
+                            <div class="font-jost text-gray-700 space-y-3 pe-2">
+                                @foreach ($dish->addOns as $a)
+                                    @php
+                                        $inputId = 'addon_' . $a->id;
+                                        $selected = in_array($a->id, $addon_ids ?? []);
+                                        $addonQty = $addon_qty[$a->id] ?? 1;
+                                    @endphp
 
-        <label for="{{ $inputId }}" class="flex items-center justify-between gap-3 cursor-pointer">
-          {{-- Left: checkbox + name --}}
-          <span class="flex items-center gap-3">
-            <input id="{{ $inputId }}" value="{{ $a->id }}"
-                   wire:model.live="addon_ids" type="checkbox"
-                   class="h-4 w-4 rounded border-slate-300 text-red-500 focus:ring-red-500" />
-            <span>{{ $a->name }}</span>
-          </span>
+                                    <label for="{{ $inputId }}"
+                                        class="flex items-center justify-between gap-3 cursor-pointer">
+                                        {{-- Left: checkbox + name --}}
+                                        <span class="flex items-center gap-3">
+                                            <input id="{{ $inputId }}" value="{{ $a->id }}"
+                                                wire:model.live="addon_ids" type="checkbox"
+                                                class="h-4 w-4 rounded border-slate-300 text-red-500 focus:ring-red-500" />
+                                            <span>{{ $a->name }}</span>
+                                        </span>
 
-          {{-- Right: price + qty beside price --}}
-          <span class="flex items-center gap-3">
-            <span class="text-sm">
-              + {{ number_format($a->price ?? 0, 2) }} ৳
-            </span>
+                                        {{-- Right: price + qty beside price --}}
+                                        <span class="flex items-center gap-3">
+                                            <span class="text-sm">
+                                                + {{ number_format($a->price ?? 0, 2) }} ৳
+                                            </span>
 
-            @if($selected)
-              <span class="flex items-center gap-1">
-                <button type="button"
-                        class="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-300 text-slate-700 text-xs hover:bg-slate-100 cursor-pointer"
-                        @click.stop.prevent="$wire.decrementAddon({{ $a->id }})">
-                  –
-                </button>
+                                            @if ($selected)
+                                                <span class="flex items-center gap-1">
+                                                    <button type="button"
+                                                        class="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-300 text-slate-700 text-xs hover:bg-slate-100 cursor-pointer"
+                                                        @click.stop.prevent="$wire.decrementAddon({{ $a->id }})">
+                                                        –
+                                                    </button>
 
-                <span class="w-6 text-center text-sm font-medium select-none">
-                  {{ $qty }}
-                </span>
+                                                    <span class="w-6 text-center text-sm font-medium select-none">
+                                                        {{ $addonQty }}
+                                                    </span>
 
-                <button type="button"
-                        class="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-300 text-slate-700 text-xs hover:bg-slate-100 cursor-pointer"
-                        @click.stop.prevent="$wire.incrementAddon({{ $a->id }})">
-                  +
-                </button>
-              </span>
-            @endif
-          </span>
-        </label>
-      @endforeach
-    </div>
-  </div>
-@endif
+                                                    <button type="button"
+                                                        class="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-300 text-slate-700 text-xs hover:bg-slate-100 cursor-pointer"
+                                                        @click.stop.prevent="$wire.incrementAddon({{ $a->id }})">
+                                                        +
+                                                    </button>
+                                                </span>
+                                            @endif
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
 
 
 

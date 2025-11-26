@@ -34,7 +34,7 @@
                 <i class="fa-regular fa-box-open text-8xl mb-4 text-neutral-500"></i>
                 <p class="opacity-90 text-lg font-medium mb-2">Your cart is empty!</p>
                 <p class="text-sm opacity-70">Please add some dishes from menu.</p>
-                <a href="{{ url('/') }}" class="inline-block bg-customRed-100 text-white mt-2 px-8 py-3 rounded">
+                <a href="{{ route('fontDishes.index') }}" wire:navigate class="inline-block bg-customRed-100 text-white px-8 py-3 rounded font-medium mt-5">
                     Explore Our Dishes
                 </a>
             </div>

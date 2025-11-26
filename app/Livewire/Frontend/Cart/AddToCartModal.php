@@ -95,11 +95,13 @@ class AddToCartModal extends Component
     public function incrementQty(): void
     {
         $this->qty = min(99, $this->qty + 1);
+        $this->dispatch('cart-updated');
     }
 
     public function decrementQty(): void
     {
         $this->qty = max(1, $this->qty - 1);
+        $this->dispatch('cart-updated');
     }
 
     /** ================= Price breakdown ================= */
