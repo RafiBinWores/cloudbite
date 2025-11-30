@@ -51,6 +51,10 @@
         $mainThumb = $dish->thumbnail ? Storage::url($dish->thumbnail) : $placeholder;
         $gallery = is_array($dish->gallery) ? $dish->gallery : (array) ($dish->gallery ?? []);
 
+        // HERO media
+        $heroImageUrl = $dish->hero_image ? Storage::url($dish->hero_image) : null;
+        $heroDiscountUrl = $dish->hero_discount_image ? Storage::url($dish->hero_discount_image) : null;
+
         // --- Time display (12-hour) ---
         $fromDisplay = $dish->available_from
             ? Carbon::createFromFormat('H:i:s', $dish->available_from)->format('g:i A')
@@ -111,6 +115,38 @@
                                 <img src="{{ $imgUrl }}" alt="thumb" loading="lazy"
                                     class="w-full h-20 object-cover">
                             </button>
+                        @endforeach
+                    </div>
+                @endif
+
+                <!-- Variations -->
+                @if ($variations->count())
+                    <div class="p-4 rounded-2xl border border-neutral-200 dark:border-neutral-700 space-y-3">
+                        <h3 class="font-semibold text-neutral-800 dark:text-neutral-100">Variations</h3>
+
+                        @foreach($variations as $group)
+                            <div>
+                                <p class="text-sm font-medium text-neutral-700 dark:text-neutral-200">
+                                    {{ $group['name'] ?? '—' }}
+                                </p>
+
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                    @foreach(($group['options'] ?? []) as $opt)
+                                        @php
+                                            $optPrice = (float)($opt['price'] ?? 0);
+                                            $optFinal = $finalPriceOf($optPrice);
+                                        @endphp
+
+                                        <span
+                                            class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm">
+                                            <span>{{ $opt['label'] ?? '—' }}</span>
+                                            <span class="text-neutral-500 dark:text-neutral-400">
+                                                ৳{{ $money($optFinal) }}
+                                            </span>
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 @endif
@@ -222,37 +258,61 @@
                     </div>
                 </div>
 
-                <!-- Variations -->
-                @if ($variations->count())
-                    <div class="p-4 rounded-2xl border border-neutral-200 dark:border-neutral-700 space-y-3">
-                        <h3 class="font-semibold text-neutral-800 dark:text-neutral-100">Variations</h3>
+                {{-- HERO / SLIDER SETTINGS --}}
+                <div class="p-4 rounded-2xl border border-neutral-200 dark:border-neutral-700 space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <h3 class="font-semibold text-neutral-800 dark:text-neutral-100">
+                            Hero / Slider Settings
+                        </h3>
 
-                        @foreach($variations as $group)
-                            <div>
-                                <p class="text-sm font-medium text-neutral-700 dark:text-neutral-200">
-                                    {{ $group['name'] ?? '—' }}
-                                </p>
-
-                                <div class="mt-2 flex flex-wrap gap-2">
-                                    @foreach(($group['options'] ?? []) as $opt)
-                                        @php
-                                            $optPrice = (float)($opt['price'] ?? 0);
-                                            $optFinal = $finalPriceOf($optPrice);
-                                        @endphp
-
-                                        <span
-                                            class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm">
-                                            <span>{{ $opt['label'] ?? '—' }}</span>
-                                            <span class="text-neutral-500 dark:text-neutral-400">
-                                                ৳{{ $money($optFinal) }}
-                                            </span>
-                                        </span>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endforeach
+                        <span
+                            class="px-2 py-0.5 text-xs rounded-full font-medium
+                            {{ $dish->show_in_hero
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                                : 'bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300' }}">
+                            {{ $dish->show_in_hero ? 'Shown in Hero' : 'Not in Hero' }}
+                        </span>
                     </div>
-                @endif
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+
+                        <div>
+                            <div class="text-neutral-500 dark:text-neutral-400">Price Label (pill)</div>
+                            <div class="font-medium text-neutral-800 dark:text-neutral-100">
+                                Purchase today, just Tk {{ $dish->price }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Hero images preview --}}
+                    @if($heroImageUrl || $heroDiscountUrl)
+                        <div class="grid grid-cols-2 gap-4 pt-2">
+                            @if($heroImageUrl)
+                                <div class="text-sm">
+                                    <div class="text-neutral-500 dark:text-neutral-400 mb-1">
+                                        Hero Image
+                                    </div>
+                                    <div class="w-full rounded-xl overflow-hidden bg-neutral-100 dark:bg-neutral-800">
+                                        <img src="{{ $heroImageUrl }}" alt="Hero image" class="w-full h-full object-cover">
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if($heroDiscountUrl)
+                                <div class="text-sm">
+                                    <div class="text-neutral-500 dark:text-neutral-400 mb-1">
+                                        Discount Image
+                                    </div>
+                                    <div class="w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+                                        <img src="{{ $heroDiscountUrl }}" alt="Hero discount image" class="w-full h-full object-contain">
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+                </div>
+
+
 
                 <!-- Tags -->
                 @if ($tags->count())

@@ -32,6 +32,7 @@ use App\Livewire\Frontend\Cart\CartPage;
 use App\Livewire\Frontend\Checkout\CheckoutPage;
 use App\Livewire\Frontend\Dishes\DishIndex;
 use App\Livewire\Frontend\Home;
+use App\Livewire\Frontend\MealPlan\MealPlan;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -44,6 +45,9 @@ Route::get('dishes', DishIndex::class)->name('fontDishes.index');
 
 // cart page
 Route::get('/cart', CartPage::class)->name('cart.page');
+
+// Plans
+Route::get('/meal-plans', MealPlan::class)->name('meal.plans');
 
 // SSl Payment routes
 Route::get('/payment/ssl/init/{order}', [SslCommerzController::class, 'init'])->name('ssl.init');

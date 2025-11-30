@@ -18,8 +18,14 @@ class Home extends Component
             ->where('available_till', '>=', $now)
             ->orderByDesc('created_at')
             ->get();
-        
-        return view('livewire.frontend.home', compact('dishes'))
+
+        $heroDishes = Dish::visible()
+            ->where('show_in_hero', true)
+            ->orderByDesc('id')
+            ->take(5)
+            ->get();
+
+        return view('livewire.frontend.home', compact('dishes', 'heroDishes'))
             ->title('Home - CloudBite');
     }
 }

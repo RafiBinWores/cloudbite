@@ -240,6 +240,108 @@
                     </div>
                 </section>
 
+                {{-- 🔥 Hero Section (Slider) – above Meta Info --}}
+                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                    <div class="flex items-center gap-2 mb-4">
+                        <h3 class="text-lg font-semibold dark:text-gray-100">
+                            Hero Section (Slider)
+                        </h3>
+                        <small class="text-xs text-neutral-500 dark:text-neutral-300">(Optional)</small>
+                    </div>
+
+                    <div class="space-y-4">
+                        {{-- Show in hero toggle --}}
+                        <div class="form-group">
+                            <x-select wire:model.live="show_in_hero"
+                                label="Show this dish in home hero slider?"
+                                :options="['No', 'Yes']"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('show_in_hero') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
+                            <small class="text-xs text-neutral-500 dark:text-neutral-300">
+                                Set to "Yes" for highlighted hero dishes (with PNG image).
+                            </small>
+                            @error('show_in_hero')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {{-- Hero PNG image --}}
+                            <div class="form-group">
+                                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                                    Hero PNG Image @if($show_in_hero === 'Yes') <span class="text-red-500">*</span> @endif
+                                </label>
+
+                                <div class="relative aspect-square w-full overflow-hidden rounded-xl border
+                                        {{ $errors->has('hero_image') ? 'border-red-500' : 'border-gray-200 dark:border-neutral-600' }}
+                                        bg-neutral-50 dark:bg-neutral-600 cursor-pointer"
+                                    onclick="this.querySelector('input[type=file]').click()">
+
+                                    @if($hero_image)
+                                        {{-- New upload preview --}}
+                                        <img src="{{ $hero_image->temporaryUrl() }}" class="h-full w-full object-contain p-4" alt="">
+                                    @elseif($this->dish?->hero_image)
+                                        {{-- Existing stored hero image --}}
+                                        <img src="{{ Storage::url($this->dish->hero_image) }}" class="h-full w-full object-contain p-4" alt="">
+                                    @else
+                                        <div class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300 px-3">
+                                            <p>
+                                                Upload hero PNG (transparent).<br>
+                                                <small class="text-xs">Recommended: square PNG for hero slider.</small>
+                                            </p>
+                                        </div>
+                                    @endif
+
+                                    <input type="file" class="hidden" accept="image/*" wire:model.live="hero_image">
+                                </div>
+
+                                @error('hero_image')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            {{-- Hero discount badge image --}}
+                            <div class="form-group">
+                                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                                    Hero Discount Badge (Optional)
+                                </label>
+
+                                <div class="relative aspect-square w-full overflow-hidden rounded-xl border
+                                        {{ $errors->has('hero_discount_image') ? 'border-red-500' : 'border-gray-200 dark:border-neutral-600' }}
+                                        bg-neutral-50 dark:bg-neutral-600 cursor-pointer"
+                                    onclick="this.querySelector('input[type=file]').click()">
+
+                                    @if($hero_discount_image)
+                                        {{-- New upload --}}
+                                        <img src="{{ $hero_discount_image->temporaryUrl() }}" class="h-full w-full object-contain p-4" alt="">
+                                    @elseif($this->dish?->hero_discount_image)
+                                        {{-- Existing stored badge --}}
+                                        <img src="{{ Storage::url($this->dish->hero_discount_image) }}" class="h-full w-full object-contain p-4" alt="">
+                                    @else
+                                        <div class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300 px-3">
+                                            <p>
+                                                Upload small badge (e.g. -20% OFF).<br>
+                                                <small class="text-xs">Transparent PNG badge used in hero corner.</small>
+                                            </p>
+                                        </div>
+                                    @endif
+
+                                    <input type="file" class="hidden" accept="image/*" wire:model.live="hero_discount_image">
+                                </div>
+
+                                @error('hero_discount_image')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        {{-- Uploading state for hero images --}}
+                        <div wire:loading wire:target="hero_image,hero_discount_image"
+                            class="text-xs text-neutral-500 dark:text-neutral-300 mt-1">
+                            Uploading hero images... please wait.
+                        </div>
+                    </div>
+                </section>
+
                 {{-- Meta info --}}
                 <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <div class="flex items-center gap-1 mb-4">
@@ -420,8 +522,8 @@
                         </div>
                     </div>
                 </section>
-
-                {{-- Submit & Cancel --}}
+            </div>
+            {{-- Submit & Cancel --}}
                 <div class="flex">
                     <flux:spacer />
 
@@ -437,7 +539,6 @@
                         <span wire:loading wire:target="updateDish">Updating...</span>
                     </flux:button>
                 </div>
-            </div>
         </div>
     </form>
 

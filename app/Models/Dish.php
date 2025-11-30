@@ -30,6 +30,10 @@ class Dish extends Model
         'meta_description',
         'meta_keyword',
         'variations',
+        'show_in_hero',
+        'hero_image',
+        'hero_discount_image',
+
     ];
 
     protected $casts = [
@@ -38,6 +42,7 @@ class Dish extends Model
         'tags' => 'array',
         'gallery' => 'array',
         'variations' => 'array',
+        'show_in_hero' => 'boolean',
     ];
 
     public function category()

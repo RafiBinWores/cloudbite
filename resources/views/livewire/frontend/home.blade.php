@@ -12,99 +12,163 @@
                 class="absolute -right-24 top-[65%] animate__animated animate__fadeInRight hidden lg:block" />
             <div class="swiper myHeroSwiper relative top-24">
                 <div class="swiper-wrapper">
-                    <!-- Slide 1 -->
-                    <div class="swiper-slide px-4">
-                        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 place-items-center gap-6 h-[90vh]">
-                            <!-- Left: Text -->
-                            <div class="relative z-10 text-center lg:text-left">
-                                <!-- Price pill -->
-                                <div
-                                    class="inline-flex items-center gap-2 px-5 py-2 rounded-full border-[0.5px] border-white/60 mb-6 text-white animate__animated animate__fadeInLeft">
-                                    <span class="uppercase tracking-wide text-sm md:text-base font-jost">Purchase today,
-                                        just</span>
-                                    <span class="font-bold">$58</span>
+                        @forelse($heroDishes as $dish)
+                            @php
+                                $heroSrc = $dish->hero_image
+                                    ? \Illuminate\Support\Facades\Storage::url($dish->hero_image)
+                                    : ($dish->thumbnail
+                                        ? \Illuminate\Support\Facades\Storage::url($dish->thumbnail)
+                                        : '/assets/images/pizza.png');
+
+                                $discountSrc = $dish->hero_discount_image
+                                    ? \Illuminate\Support\Facades\Storage::url($dish->hero_discount_image)
+                                    : '/assets/images/discount.png';
+                            @endphp
+
+                            <div class="swiper-slide px-4">
+                                <div class="max-w-7xl mx-auto grid lg:grid-cols-2 place-items-center gap-6 h-[90vh]">
+                                    <!-- Left: Text -->
+                                    <div class="relative z-10 text-center lg:text-left">
+                                        <!-- Price pill -->
+                                        <div
+                                            class="inline-flex items-center gap-2 px-5 py-2 rounded-full border-[0.5px] border-white/60 mb-6 text-white animate__animated animate__fadeInLeft">
+                                            <span class="uppercase tracking-wide text-sm md:text-base font-jost">
+                                                Purchase today, just
+                                            </span>
+                                            <span class="font-bold">
+                                                ৳{{ $dish->price_with_discount ?? $dish->display_price }}
+                                            </span>
+                                        </div>
+
+                                        <h2
+                                            class="font-medium font-oswald leading-[0.95] uppercase tracking-tight text-4xl text-white sm:text-5xl md:text-6xl lg:text-[80px] lg:leading-24 animate__animated animate__fadeInDown">
+                                            {{ $dish->title }}
+                                        </h2>
+
+                                        <p
+                                            class="mt-5 max-w-2xl text-white/90 text-xl md:text-lg lg:text-xl font-jost leading-9 animate__animated animate__fadeInUp">
+                                            {{ $dish->short_description }}
+                                        </p>
+
+                                        <button
+                                            wire:click="$dispatch('open-add-to-cart', { dishId: {{ $dish->id }} })"
+                                            class="mt-8 inline-flex items-center justify-center px-7 py-4 rounded-lg bg-customRed-100 cursor-pointer hover:bg-customRed-200 transition text-white font-semibold uppercase tracking-wide shadow-lg animate__animated animate__fadeInUp">
+                                            Order Now
+                                        </button>
+                                    </div>
+
+                                    <div>
+                                        <!-- Right: Image -->
+                                        <div
+                                            class="relative z-10 flex justify-center lg:justify-end animate__animated animate__fadeInDown">
+                                            <!-- Discount bubble -->
+                                            <img src="{{ $discountSrc }}" alt="Discount bubble"
+                                                class="absolute top-0 md:top-2 lg:top-8 right-2 md:right-20 lg:right-2 lg:-left-20 size-24 md:size-36 lg:size-40 z-50" />
+
+                                            <!-- Main food image -->
+                                            <img src="{{ $heroSrc }}" alt="{{ $dish->title }}"
+                                                class="relative z-10 w-[90%] md:w-[60%] lg:w-[500px] drop-shadow-2xl" />
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+                        @empty
+                            {{-- Original static slides as fallback if no hero dishes --}}
+                            <div class="swiper-slide px-4">
+                                <div class="max-w-7xl mx-auto grid lg:grid-cols-2 place-items-center gap-6 h-[90vh]">
+                                    <!-- Left: Text -->
+                                    <div class="relative z-10 text-center lg:text-left">
+                                        <!-- Price pill -->
+                                        <div
+                                            class="inline-flex items-center gap-2 px-5 py-2 rounded-full border-[0.5px] border-white/60 mb-6 text-white animate__animated animate__fadeInLeft">
+                                            <span
+                                                class="uppercase tracking-wide text-sm md:text-base font-jost">Purchase
+                                                today,
+                                                just</span>
+                                            <span class="font-bold">$58</span>
+                                        </div>
 
-                                <h2
-                                    class="font-medium font-oswald leading-[0.95] uppercase tracking-tight text-4xl text-white sm:text-5xl md:text-6xl lg:text-[80px] lg:leading-24 animate__animated animate__fadeInDown">
-                                    French Break<br />Cheesy Pizza
-                                </h2>
+                                        <h2
+                                            class="font-medium font-oswald leading-[0.95] uppercase tracking-tight text-4xl text-white sm:text-5xl md:text-6xl lg:text-[80px] lg:leading-24 animate__animated animate__fadeInDown">
+                                            French Break<br />Cheesy Pizza
+                                        </h2>
 
-                                <p
-                                    class="mt-5 max-w-2xl text-white/90 text-xl md:text-lg lg:text-xl font-jost leading-9 animate__animated animate__fadeInUp">
-                                    Plan upon yet way get cold spot its week. Almost do am or
-                                    limits hearts. Resolve parties but why she shewing know.
-                                </p>
+                                        <p
+                                            class="mt-5 max-w-2xl text-white/90 text-xl md:text-lg lg:text-xl font-jost leading-9 animate__animated animate__fadeInUp">
+                                            Plan upon yet way get cold spot its week. Almost do am or
+                                            limits hearts. Resolve parties but why she shewing know.
+                                        </p>
 
-                                <a href="#order"
-                                    class="mt-8 inline-flex items-center justify-center px-7 py-4 rounded-lg bg-customRed-100 hover:bg-customRed-200 transition text-white font-semibold uppercase tracking-wide shadow-lg animate__animated animate__fadeInUp">
-                                    Order Now
-                                </a>
+                                        <a href="#order"
+                                            class="mt-8 inline-flex items-center justify-center px-7 py-4 rounded-lg bg-customRed-100 hover:bg-customRed-200 transition text-white font-semibold uppercase tracking-wide shadow-lg animate__animated animate__fadeInUp">
+                                            Order Now
+                                        </a>
+                                    </div>
+
+                                    <div>
+                                        <!-- Right: Image -->
+                                        <div
+                                            class="relative z-10 flex justify-center lg:justify-end animate__animated animate__fadeInDown">
+                                            <!-- Discount bubble -->
+                                            <img src="./assets/images/discount.png" alt="Discount bubble"
+                                                class="absolute top-0 md:top-2 lg:top-8 right-2 md:right-20 lg:right-2 lg:-left-20 size-24 md:size-36 lg:size-40 z-50" />
+
+                                            <!-- Main food image -->
+                                            <img src="/assets/images/pizza.png" alt="Cheesy Pizza"
+                                                class="relative z-10 w-[90%] md:w-[60%] lg:w-[500px] drop-shadow-2xl" />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div>
-                                <!-- Right: Image -->
-                                <div
-                                    class="relative z-10 flex justify-center lg:justify-end animate__animated animate__fadeInDown">
-                                    <!-- Bottom accent block under image (for the cut-out look) -->
-                                    <!-- Discount bubble -->
-                                    <img src="./assets/images/discount.png" alt="Discount bubble"
-                                        class="absolute top-0 md:top-2 lg:top-8 right-2 md:right-20 lg:right-2 lg:-left-20 size-24 md:size-36 lg:size-40 z-50" />
+                            <div class="swiper-slide px-4">
+                                <div class="max-w-7xl mx-auto grid lg:grid-cols-2 place-items-center gap-6 h-[90vh]">
+                                    <!-- Left: Text -->
+                                    <div class="relative z-10 text-center lg:text-left">
+                                        <!-- Price pill -->
+                                        <div
+                                            class="inline-flex items-center gap-2 px-5 py-2 rounded-full border-[0.5px] border-white/60 mb-6 text-white animate__animated animate__fadeInLeft">
+                                            <span
+                                                class="uppercase tracking-wide text-sm md:text-base font-jost">Purchase
+                                                today,
+                                                just</span>
+                                            <span class="font-bold">$58</span>
+                                        </div>
 
-                                    <!-- Main food image -->
-                                    <img src="/assets/images/pizza.png" alt="Cheesy Pizza"
-                                        class="relative z-10 w-[90%] md:w-[60%] lg:w-[500px] drop-shadow-2xl" />
+                                        <h2
+                                            class="font-medium font-oswald leading-[0.95] uppercase tracking-tight text-4xl text-white sm:text-5xl md:text-6xl lg:text-[80px] lg:leading-24 animate__animated animate__fadeInDown">
+                                            French Break<br />Cheesy Pizza
+                                        </h2>
+
+                                        <p
+                                            class="mt-5 max-w-2xl text-white/90 text-xl md:text-lg lg:text-xl font-jost leading-9 animate__animated animate__fadeInUp">
+                                            Plan upon yet way get cold spot its week. Almost do am or
+                                            limits hearts. Resolve parties but why she shewing know.
+                                        </p>
+
+                                        <a href="#order"
+                                            class="mt-8 inline-flex items-center justify-center px-7 py-4 rounded-lg bg-customRed-100 hover:bg-customRed-200 transition text-white font-semibold uppercase tracking-wide shadow-lg animate__animated animate__fadeInUp">
+                                            Order Now
+                                        </a>
+                                    </div>
+
+                                    <div>
+                                        <!-- Right: Image -->
+                                        <div
+                                            class="relative z-10 flex justify-center lg:justify-end animate__animated animate__fadeInDown">
+                                            <!-- Discount bubble -->
+                                            <img src="./assets/images/discount.png" alt="Discount bubble"
+                                                class="absolute top-0 md:top-2 lg:top-8 right-2 md:right-20 lg:right-2 lg:-left-20 size-24 md:size-36 lg:size-40 z-50" />
+
+                                            <!-- Main food image -->
+                                            <img src="/assets/images/burger.png" alt="Cheesy Pizza"
+                                                class="relative z-10 w-[90%] md:w-[60%] lg:w-[500px] drop-shadow-2xl" />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endforelse
                     </div>
-                    <div class="swiper-slide px-4">
-                        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 place-items-center gap-6 h-[90vh]">
-                            <!-- Left: Text -->
-                            <div class="relative z-10 text-center lg:text-left">
-                                <!-- Price pill -->
-                                <div
-                                    class="inline-flex items-center gap-2 px-5 py-2 rounded-full border-[0.5px] border-white/60 mb-6 text-white animate__animated animate__fadeInLeft">
-                                    <span class="uppercase tracking-wide text-sm md:text-base font-jost">Purchase today,
-                                        just</span>
-                                    <span class="font-bold">$58</span>
-                                </div>
-
-                                <h2
-                                    class="font-medium font-oswald leading-[0.95] uppercase tracking-tight text-4xl text-white sm:text-5xl md:text-6xl lg:text-[80px] lg:leading-24 animate__animated animate__fadeInDown">
-                                    French Break<br />Cheesy Pizza
-                                </h2>
-
-                                <p
-                                    class="mt-5 max-w-2xl text-white/90 text-xl md:text-lg lg:text-xl font-jost leading-9 animate__animated animate__fadeInUp">
-                                    Plan upon yet way get cold spot its week. Almost do am or
-                                    limits hearts. Resolve parties but why she shewing know.
-                                </p>
-
-                                <a href="#order"
-                                    class="mt-8 inline-flex items-center justify-center px-7 py-4 rounded-lg bg-customRed-100 hover:bg-customRed-200 transition text-white font-semibold uppercase tracking-wide shadow-lg animate__animated animate__fadeInUp">
-                                    Order Now
-                                </a>
-                            </div>
-
-                            <div>
-                                <!-- Right: Image -->
-                                <div
-                                    class="relative z-10 flex justify-center lg:justify-end animate__animated animate__fadeInDown">
-                                    <!-- Bottom accent block under image (for the cut-out look) -->
-                                    <!-- Discount bubble -->
-                                    <img src="./assets/images/discount.png" alt="Discount bubble"
-                                        class="absolute top-0 md:top-2 lg:top-8 right-2 md:right-20 lg:right-2 lg:-left-20 size-24 md:size-36 lg:size-40 z-50" />
-
-                                    <!-- Main food image -->
-                                    <img src="/assets/images/burger.png" alt="Cheesy Pizza"
-                                        class="relative z-10 w-[90%] md:w-[60%] lg:w-[500px] drop-shadow-2xl" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- slider 2 -->
-                </div>
 
                 <!-- Circular nav buttons -->
                 <div class="hidden lg:block">
@@ -431,7 +495,7 @@
                     </div>
 
                     <!-- Button -->
-                    <a href="weekly-packages.html"
+                    <a href="{{ route('meal.plans') }}" wire:navigate
                         class="inline-block relative isolate rounded-full px-8 md:px-10 py-2.5 md:py-3 m-1 overflow-hidden cursor-pointer bg-red-500 font-medium text-white group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60 mt-4 md:mt-5">
                         <span
                             class="pointer-events-none absolute w-64 h-0 rotate-45 -translate-x-20 bg-white top-1/2 transition-all duration-300 ease-out group-hover:h-64 group-hover:-translate-y-32"></span>

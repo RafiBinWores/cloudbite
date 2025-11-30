@@ -24,6 +24,11 @@ class CreateDish extends Component
     public $thumbnail = null;
     public $gallery = [];
 
+    // 🔥 New hero fields
+    public $show_in_hero = 'No';          // Yes / No for UI
+    public $hero_image = null;            // hero PNG image
+    public $hero_discount_image = null;   // badge image
+
     public $meta_title, $meta_description, $meta_keyword;
 
     // Arrays
@@ -79,6 +84,11 @@ class CreateDish extends Component
             'variations.*.options' => 'nullable|array',
             'variations.*.options.*.label' => 'required_with:variations.*.name|string|max:100',
             'variations.*.options.*.price' => 'required_with:variations.*.name|numeric|min:0',
+
+            // Hero specific
+            'show_in_hero' => 'required|in:Yes,No',
+            'hero_image' => 'nullable|required_if:show_in_hero,Yes|image|max:5048|mimes:png,jpg,jpeg,webp,svg',
+            'hero_discount_image' => 'nullable|image|max:3048|mimes:png,webp,svg',
         ];
     }
 
@@ -186,6 +196,8 @@ class CreateDish extends Component
 
         $storedThumb = null;
         $storedGallery = [];
+        $storedHero = null;
+        $storedHeroDiscount = null;
 
         try {
             $slug = Str::slug($this->title ?: 'dish');
@@ -213,6 +225,30 @@ class CreateDish extends Component
                 );
             }
 
+            // Hero PNG image
+            if ($this->hero_image) {
+                $ext = $this->hero_image->getClientOriginalExtension()
+                    ?: $this->hero_image->extension() ?: 'png';
+
+                $storedHero = $this->hero_image->storeAs(
+                    'dishes/hero',
+                    "{$slug}-{$ts}-hero.{$ext}",
+                    'public'
+                );
+            }
+
+            // Hero discount badge image
+            if ($this->hero_discount_image) {
+                $ext = $this->hero_discount_image->getClientOriginalExtension()
+                    ?: $this->hero_discount_image->extension() ?: 'png';
+
+                $storedHeroDiscount = $this->hero_discount_image->storeAs(
+                    'dishes/hero-discount',
+                    "{$slug}-{$ts}-hero-disc.{$ext}",
+                    'public'
+                );
+            }
+
             $data = [
                 'title'             => $this->title,
                 'slug'              => $slug,
@@ -236,6 +272,10 @@ class CreateDish extends Component
 
                 'thumbnail'         => $storedThumb,
                 'gallery'           => $storedGallery,
+
+                'show_in_hero'      => $this->show_in_hero === 'Yes',
+                'hero_image'        => $storedHero,
+                'hero_discount_image' => $storedHeroDiscount,
 
                 'meta_title'        => $this->meta_title,
                 'meta_description'  => $this->meta_description,
@@ -293,10 +333,15 @@ class CreateDish extends Component
                 'addOns',
                 'related_dishes',
                 'variations',
+                'show_in_hero',
+                'hero_image',
+                'hero_discount_image',
             ]);
 
+            // defaults
             $this->track_stock = 'No';
             $this->visibility  = 'Yes';
+            $this->show_in_hero = 'No';
 
             $this->success(
                 title: 'Dish created successfully',
@@ -308,6 +353,8 @@ class CreateDish extends Component
         } catch (\Throwable $e) {
             if ($storedThumb) Storage::disk('public')->delete($storedThumb);
             if (!empty($storedGallery)) Storage::disk('public')->delete($storedGallery);
+            if ($storedHero) Storage::disk('public')->delete($storedHero);
+            if ($storedHeroDiscount) Storage::disk('public')->delete($storedHeroDiscount);
 
             report($e);
 

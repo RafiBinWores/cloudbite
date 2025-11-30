@@ -41,7 +41,6 @@ class CheckoutPage extends Component
     public ?ShippingSetting $shipSetting = null;
 
     // Saved addresses
-    /** @var \Illuminate\Support\Collection<App\Models\Address> */
     public $addresses;
     public ?int $selectedAddressId = null;
     public bool $hasExistingAddress = false;

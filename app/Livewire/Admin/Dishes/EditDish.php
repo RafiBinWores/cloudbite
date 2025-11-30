@@ -37,8 +37,13 @@ class EditDish extends Component
     public $addOns = [];
     public $related_dishes = [];
 
-    // NEW
+    // Variations
     public $variations = [];
+
+    // 🔥 Hero fields
+    public $show_in_hero = 'No';
+    public $hero_image = null;
+    public $hero_discount_image = null;
 
     public function mount(Dish $dish)
     {
@@ -75,6 +80,9 @@ class EditDish extends Component
 
         // load variations json
         $this->variations = $dish->variations ?? [];
+
+        // 🔥 hero flags from DB
+        $this->show_in_hero = $dish->show_in_hero ? 'Yes' : 'No';
     }
 
     public function rules(): array
@@ -119,6 +127,11 @@ class EditDish extends Component
             'variations.*.options' => 'nullable|array',
             'variations.*.options.*.label' => 'required_with:variations.*.name|string|max:100',
             'variations.*.options.*.price' => 'required_with:variations.*.name|numeric|min:0',
+
+            // 🔥 hero rules
+            'show_in_hero' => 'required|in:Yes,No',
+            'hero_image'   => 'nullable|image|max:5048|mimes:jpg,jpeg,png,webp,svg',
+            'hero_discount_image' => 'nullable|image|max:5048|mimes:png,webp,svg',
         ];
     }
 
@@ -227,6 +240,12 @@ class EditDish extends Component
         $oldThumb    = $this->dish->thumbnail;
         $oldGallery  = (array) ($this->dish->gallery ?? []);
 
+        // 🔥 hero old paths
+        $oldHeroImage = $this->dish->hero_image;
+        $oldHeroBadge = $this->dish->hero_discount_image;
+        $newHeroImagePath = null;
+        $newHeroBadgePath = null;
+
         try {
             $ts   = now()->format('YmdHis');
 
@@ -257,6 +276,29 @@ class EditDish extends Component
                 }
             }
 
+            // 🔥 store hero images if new ones uploaded
+            if ($this->hero_image) {
+                $ext = $this->hero_image->getClientOriginalExtension()
+                    ?: $this->hero_image->extension() ?: 'png';
+
+                $newHeroImagePath = $this->hero_image->storeAs(
+                    'dishes/hero',
+                    "{$slug}-{$ts}-hero.{$ext}",
+                    'public'
+                );
+            }
+
+            if ($this->hero_discount_image) {
+                $ext = $this->hero_discount_image->getClientOriginalExtension()
+                    ?: $this->hero_discount_image->extension() ?: 'png';
+
+                $newHeroBadgePath = $this->hero_discount_image->storeAs(
+                    'dishes/hero_badges',
+                    "{$slug}-{$ts}-badge.{$ext}",
+                    'public'
+                );
+            }
+
             $data = [
                 'title'             => $this->title,
                 'slug'              => $slug,
@@ -285,6 +327,11 @@ class EditDish extends Component
 
                 'tags'       => $this->tags ?: [],
                 'variations' => $this->normalizeVariations(),
+
+                // hero fields
+                'show_in_hero'       => $this->show_in_hero === 'Yes',
+                'hero_image'         => $newHeroImagePath ?: $oldHeroImage,
+                'hero_discount_image'=> $newHeroBadgePath ?: $oldHeroBadge,
             ];
 
             $buns    = array_values(array_filter((array)$this->buns));
@@ -300,6 +347,7 @@ class EditDish extends Component
                 $this->dish->relatedDishes()->sync($related);
             });
 
+            // cleanup old images
             if ($newThumb && $oldThumb) Storage::disk('public')->delete($oldThumb);
 
             if (!empty($newGallery) && !empty($oldGallery)) {
@@ -308,8 +356,15 @@ class EditDish extends Component
                 }
             }
 
+            if ($newHeroImagePath && $oldHeroImage) {
+                Storage::disk('public')->delete($oldHeroImage);
+            }
+
+            if ($newHeroBadgePath && $oldHeroBadge) {
+                Storage::disk('public')->delete($oldHeroBadge);
+            }
+
             $this->dispatch('dish-updated', id: $this->dish->id);
-            // $this->dispatch('toast', type: 'success', message: 'Dish updated successfully.');
             $this->success(
                 title: 'Dish updated successfully',
                 position: 'top-right',
@@ -320,9 +375,10 @@ class EditDish extends Component
         } catch (\Throwable $e) {
             if ($newThumb) Storage::disk('public')->delete($newThumb);
             if (!empty($newGallery)) Storage::disk('public')->delete($newGallery);
+            if ($newHeroImagePath) Storage::disk('public')->delete($newHeroImagePath);
+            if ($newHeroBadgePath) Storage::disk('public')->delete($newHeroBadgePath);
 
             report($e);
-            // $this->dispatch('toast', type: 'error', message: 'Failed to update dish. Please try again.');
 
             $this->error(
                 title: 'Failed to update dish. Please try again.',

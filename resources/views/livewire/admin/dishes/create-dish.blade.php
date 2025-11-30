@@ -52,15 +52,18 @@
                             @php
                                 use Illuminate\Support\Facades\Storage;
 
-                                $cat = App\Models\Category::where('status', 'active')->orderBy('name', 'ASC')->get()->map(
-                                    fn($c) => [
-                                        'id' => $c->id,
-                                        'name' => $c->name,
-                                        'avatar' => $c->image
-                                            ? Storage::url($c->image)
-                                            : asset('assets/images/placeholders/cat-placeholder.png'),
-                                    ],
-                                );
+                                $cat = App\Models\Category::where('status', 'active')
+                                    ->orderBy('name', 'ASC')
+                                    ->get()
+                                    ->map(
+                                        fn($c) => [
+                                            'id' => $c->id,
+                                            'name' => $c->name,
+                                            'avatar' => $c->image
+                                                ? Storage::url($c->image)
+                                                : asset('assets/images/placeholders/cat-placeholder.png'),
+                                        ],
+                                    );
                             @endphp
 
                             <x-select wire:model.live="category_id" label="Category*" :options="$cat"
@@ -73,15 +76,18 @@
                         <div class="form-group">
 
                             @php
-                                $cuisines = App\Models\Cuisine::where('status', 'active')->orderBy('name', 'ASC')->get()->map(
-                                    fn($c) => [
-                                        'id' => $c->id,
-                                        'name' => $c->name,
-                                        'image' => $c->image
-                                            ? Storage::url($c->image)
-                                            : asset('assets/images/placeholders/cat-placeholder.png'),
-                                    ],
-                                )
+                                $cuisines = App\Models\Cuisine::where('status', 'active')
+                                    ->orderBy('name', 'ASC')
+                                    ->get()
+                                    ->map(
+                                        fn($c) => [
+                                            'id' => $c->id,
+                                            'name' => $c->name,
+                                            'image' => $c->image
+                                                ? Storage::url($c->image)
+                                                : asset('assets/images/placeholders/cat-placeholder.png'),
+                                        ],
+                                    );
                             @endphp
 
                             <x-select wire:model.live="cuisine_id" label="Cuisine*" :options="$cuisines"
@@ -107,18 +113,21 @@
                         <div class="form-group md:col-span-2">
 
                             @php
-                                $dishes = App\Models\Dish::where('visibility', 'Yes')->get(['id', 'title', 'thumbnail'])->map(
-                                    fn($c) => [
-                                        'id' => $c->id,
-                                        'name' => $c->title,
-                                        'avatar' => $c->thumbnail
-                                            ? Storage::url($c->thumbnail)
-                                            : asset('assets/images/placeholders/cat-placeholder.png'),
-                                    ],
-                                );
+                                $dishes = App\Models\Dish::where('visibility', 'Yes')
+                                    ->get(['id', 'title', 'thumbnail'])
+                                    ->map(
+                                        fn($c) => [
+                                            'id' => $c->id,
+                                            'name' => $c->title,
+                                            'avatar' => $c->thumbnail
+                                                ? Storage::url($c->thumbnail)
+                                                : asset('assets/images/placeholders/cat-placeholder.png'),
+                                        ],
+                                    );
                             @endphp
 
-                            <x-select type="number" wire:model.live="related_dishes" label="Related Dish" :options="$dishes"
+                            <x-select type="number" wire:model.live="related_dishes" label="Related Dish"
+                                :options="$dishes"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('related_dishes') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 clearable searchable multiple />
 
@@ -135,7 +144,8 @@
 
                         {{-- Price --}}
                         <div class="form-group md:col-span-2">
-                            <x-input type="number" min="0" step="any" label="Base Price (Tk)*" wire:model.live="price"
+                            <x-input type="number" min="0" step="any" label="Base Price (Tk)*"
+                                wire:model.live="price"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('price') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Price" />
                             <small class="text-xs text-neutral-500 dark:text-neutral-300">
@@ -151,7 +161,8 @@
 
                         {{-- Discount --}}
                         <div class="form-group">
-                            <x-input type="number" min="0" step="any" label="Discount" wire:model.live="discount"
+                            <x-input type="number" min="0" step="any" label="Discount"
+                                wire:model.live="discount"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('discount') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Discount" />
                         </div>
@@ -180,20 +191,16 @@
 
                     <div class="space-y-4">
                         @forelse($variations as $vIndex => $variation)
-                            <div class="border border-gray-200 dark:border-neutral-600 rounded-xl p-4 bg-neutral-50 dark:bg-neutral-600">
+                            <div
+                                class="border border-gray-200 dark:border-neutral-600 rounded-xl p-4 bg-neutral-50 dark:bg-neutral-600">
                                 <div class="flex items-start gap-3">
                                     <div class="flex-1">
-                                        <x-input
-                                            label="Variation Name* (ex: Size, Crust, Drink)"
-                                            wire:model.live="variations.{{ $vIndex }}.name"
-                                            placeholder="Size"
+                                        <x-input label="Variation Name* (ex: Size, Crust, Drink)"
+                                            wire:model.live="variations.{{ $vIndex }}.name" placeholder="Size"
                                             class="rounded-lg !bg-white/10 !py-[9px]" />
                                     </div>
 
-                                    <flux:button
-                                        type="button"
-                                        icon="trash-icon"
-                                        variant="filled"
+                                    <flux:button type="button" icon="trash-icon" variant="filled"
                                         class="mt-6 cursor-pointer"
                                         wire:click="removeVariationGroup({{ $vIndex }})">
                                         Remove
@@ -205,36 +212,41 @@
                                     <div class="flex items-center justify-between">
                                         <p class="font-medium text-sm dark:text-gray-100">Options</p>
 
-                                        <button type="button"
-                                            wire:click="addVariationOption({{ $vIndex }})"
+                                        <button type="button" wire:click="addVariationOption({{ $vIndex }})"
                                             class="text-sm text-rose-600 hover:underline cursor-pointer">
                                             + Add Option
                                         </button>
                                     </div>
 
-                                    @foreach($variation['options'] ?? [] as $oIndex => $option)
+                                    @foreach ($variation['options'] ?? [] as $oIndex => $option)
                                         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
                                             <div class="md:col-span-7">
-                                                <x-input
-                                                    label="Option Name (ex: Small, Medium)"
+                                                <x-input label="Option Name (ex: Small, Medium)"
+                                                class="!border !border-neutral-300"
                                                     wire:model.live="variations.{{ $vIndex }}.options.{{ $oIndex }}.label"
-                                                    placeholder="Small"
-                                                    class="rounded-lg !bg-white/10 !py-[9px]" />
+                                                    placeholder="Small" class="rounded-lg !bg-white/10 !py-[9px]" />
                                             </div>
 
                                             <div class="md:col-span-4">
                                                 <x-input type="number" min="0" step="any"
                                                     label="Price (Tk)"
                                                     wire:model.live="variations.{{ $vIndex }}.options.{{ $oIndex }}.price"
-                                                    placeholder="0"
-                                                    class="rounded-lg !bg-white/10 !py-[9px]" />
+                                                    placeholder="0" class="rounded-lg !bg-white/10 !py-[9px]" />
                                             </div>
 
                                             <div class="md:col-span-1">
                                                 <button type="button"
                                                     wire:click="removeVariationOption({{ $vIndex }}, {{ $oIndex }})"
                                                     class="h-10 w-full rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-neutral-700 dark:hover:bg-neutral-800 cursor-pointer flex items-center justify-center">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x-icon lucide-circle-x"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                        height="24" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        class="lucide lucide-circle-x-icon lucide-circle-x">
+                                                        <circle cx="12" cy="12" r="10" />
+                                                        <path d="m15 9-6 6" />
+                                                        <path d="m9 9 6 6" />
+                                                    </svg>
                                                 </button>
                                             </div>
                                         </div>
@@ -250,6 +262,110 @@
                                 No variations added yet. Click “Add Variation” to create size/price options.
                             </p>
                         @endforelse
+                    </div>
+                </section>
+
+                {{-- Hero Section --}}
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                    <div class="flex items-center gap-2 mb-4">
+                        <h3 class="text-lg font-semibold dark:text-gray-100">
+                            Hero Section (Slider)
+                        </h3>
+                        <small class="text-xs text-neutral-500 dark:text-neutral-300">(Optional)</small>
+                    </div>
+
+                    <div class="space-y-4">
+                        {{-- Show in hero toggle --}}
+                        <div class="form-group">
+                            <x-select wire:model.live="show_in_hero" label="Show this dish in home hero slider?"
+                                :options="['No', 'Yes']"
+                                class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('show_in_hero') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
+                            <small class="text-xs text-neutral-500 dark:text-neutral-300">
+                                Set to "Yes" for highlighted hero dishes (with PNG image).
+                            </small>
+                            @error('show_in_hero')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {{-- Hero PNG image --}}
+                            <div class="form-group">
+                                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                                    Hero PNG Image @if ($show_in_hero === 'Yes')
+                                        <span class="text-red-500">*</span>
+                                    @endif
+                                </label>
+
+                                <div class="relative aspect-square w-full overflow-hidden rounded-xl border
+                                        {{ $errors->has('hero_image') ? 'border-red-500' : 'border-gray-200 dark:border-neutral-600' }}
+                                        bg-neutral-50 dark:bg-neutral-600 cursor-pointer"
+                                    onclick="this.querySelector('input[type=file]').click()">
+
+                                    @if ($hero_image)
+                                        <img src="{{ $hero_image->temporaryUrl() }}"
+                                            class="h-full w-full object-contain p-4" alt="temp image">
+                                    @else
+                                        <div
+                                            class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300 px-3">
+                                            <p>
+                                                Upload hero PNG (transparent).<br>
+                                                <small class="text-xs">Recommended: square png for hero slider.</small>
+                                            </p>
+                                        </div>
+                                    @endif
+
+                                    <input type="file" class="hidden" accept="image/*"
+                                        wire:model.live="hero_image">
+                                </div>
+
+                                @error('hero_image')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            {{-- Hero discount badge image --}}
+                            <div class="form-group">
+                                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                                    Hero Discount Badge (Optional)
+                                </label>
+
+                                <div class="relative aspect-square w-full overflow-hidden rounded-xl border
+                                        {{ $errors->has('hero_discount_image') ? 'border-red-500' : 'border-gray-200 dark:border-neutral-600' }}
+                                        bg-neutral-50 dark:bg-neutral-600 cursor-pointer"
+                                    onclick="this.querySelector('input[type=file]').click()">
+
+                                    @if ($hero_discount_image)
+                                        <img src="{{ $hero_discount_image->temporaryUrl() }}"
+                                            class="h-full w-full object-contain p-4" alt="temp image">
+                                    @else
+                                        <div
+                                            class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300 px-3">
+                                            <p>
+                                                Click to Add Badge(e.g. -20% OFF).<br>
+                                                <small class="text-xs">Transparent PNG badge used in hero
+                                                    corner.</small>
+                                                <small class="text-xs">Recommended: square PNG image.</small>
+                                            </p>
+                                        </div>
+                                    @endif
+
+                                    <input type="file" class="hidden" accept="image/*"
+                                        wire:model.live="hero_discount_image">
+                                </div>
+
+                                @error('hero_discount_image')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        {{-- Uploading state for hero images --}}
+                        <div wire:loading wire:target="hero_image,hero_discount_image"
+                            class="text-xs text-neutral-500 dark:text-neutral-300 mt-1">
+                            Uploading hero images... please wait.
+                        </div>
                     </div>
                 </section>
 
@@ -404,15 +520,17 @@
                         @click="!thumbnailSrc && $refs.thumbnailInput.click()">
 
                         <template x-if="thumbnailSrc">
-                            <img :src="thumbnailSrc" class="h-full w-full object-cover object-center" alt="">
+                            <img :src="thumbnailSrc" class="h-full w-full object-cover object-center"
+                                alt="">
                         </template>
 
                         <template x-if="!thumbnailSrc">
-                            <div class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300">
+                            <div
+                                class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300">
                                 <p>
                                     Click to add Thumbnail <br>
                                     <small class="text-sm">Recommended image size for upload is 552x538 px. <br>
-                                    Support png/jpg/jpeg/svg/webp • up to 5MB</small>
+                                        Support png/jpg/jpeg/svg/webp • up to 5MB</small>
                                 </p>
                             </div>
                         </template>
@@ -477,22 +595,23 @@
                     </div>
                 </section>
 
-                {{-- Submit & Cancel button --}}
-                <div class="flex">
-                    <flux:spacer />
 
-                    <flux:modal.close>
-                        <flux:button icon="cross-icon" variant="filled" class="cursor-pointer me-2">
-                            Cancel
-                        </flux:button>
-                    </flux:modal.close>
+            </div>
+            {{-- Submit & Cancel button --}}
+            <div class="flex">
+                <flux:spacer />
 
-                    <flux:button type="submit" icon="fileAdd-icon" class="cursor-pointer" variant="primary"
-                        color="rose" wire:loading.attr="disabled" wire:target="submit">
-                        <span wire:loading.remove wire:target="submit">Add Dish</span>
-                        <span wire:loading wire:target="submit">Creating...</span>
+                <flux:modal.close>
+                    <flux:button icon="cross-icon" variant="filled" class="cursor-pointer me-2">
+                        Cancel
                     </flux:button>
-                </div>
+                </flux:modal.close>
+
+                <flux:button type="submit" icon="fileAdd-icon" class="cursor-pointer" variant="primary"
+                    color="rose" wire:loading.attr="disabled" wire:target="submit">
+                    <span wire:loading.remove wire:target="submit">Add Dish</span>
+                    <span wire:loading wire:target="submit">Creating...</span>
+                </flux:button>
             </div>
         </div>
     </form>

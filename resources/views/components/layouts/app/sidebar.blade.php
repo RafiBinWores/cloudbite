@@ -104,7 +104,7 @@
             </flux:navlist.group>
         </flux:navlist>
 
-                {{-- Order Management --}}
+        {{-- Order Management --}}
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Order Management')" class="grid">
 

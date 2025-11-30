@@ -125,7 +125,7 @@ class CartPage extends Component
         return round($sum, 2);
     }
 
-    /** ✅ Only product discount amount */
+    /** Only product discount amount */
     public function getProductDiscountSubtotalProperty(): float
     {
         if (!$this->cart) return 0.0;
@@ -150,7 +150,7 @@ class CartPage extends Component
         return round($sum, 2);
     }
 
-    /** ✅ Price after discount (base only, no addons) */
+    /** Price after discount */
     public function getProductAfterDiscountSubtotalProperty(): float
     {
         return round($this->product_price_subtotal - $this->product_discount_subtotal, 2);
@@ -203,7 +203,6 @@ class CartPage extends Component
 
     public function render()
     {
-        return view('livewire.frontend.cart.cart-page')
-            ->title('Cart - CloudBite');
+        return view('livewire.frontend.cart.cart-page');
     }
 }
