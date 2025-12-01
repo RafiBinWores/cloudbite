@@ -2,10 +2,8 @@
     @push('styles')
     @endpush
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-10 pb-20">
-        <div class="max-w-6xl mx-auto px-4 py-10 space-y-6">
-
-            {{-- Plan toggle + header --}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-10 pb-20 space-y-6">
+                    {{-- Plan toggle + header --}}
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                     <h1 class="text-slate-900 font-oswald text-3xl md:text-4xl lg:text-5xl font-medium capitalize mb-1">
@@ -564,7 +562,7 @@
                 x-cloak
                 x-show="open"
                 class="fixed inset-0 z-40 flex items-center justify-center bg-black/50 px-3"
-            >
+             >
                 <div
                     class="bg-white w-full max-w-5xl rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]"
                 >
@@ -1197,6 +1195,5 @@
                 </div>
             </div>
 
-        </div>
     </div>
 </div>
