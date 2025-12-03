@@ -108,16 +108,16 @@
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Order Management')" class="grid">
 
-                {{-- Verify Offline Payment --}}
-                {{-- <flux:navlist.item icon="shopping-bag" :href="route('categories.index')"
-                    :current="request()->routeIs('categories.index')" wire:navigate>
-                    {{ __('Verify Offline Payment') }}</flux:navlist.item> --}}
-
-
                 {{-- Order --}}
                 <flux:navlist.item icon="shopping-cart" :href="route('orders.index')"
                     :current="request()->routeIs('orders.index')" wire:navigate>
                     {{ __('Orders') }}</flux:navlist.item>
+
+                    
+                {{-- Meal Booking --}}
+                <flux:navlist.item icon="shopping-bag" :href="route('mealBooking.index')"
+                    :current="request()->routeIs('mealBooking.index')" wire:navigate>
+                    {{ __('Meal Booking') }}</flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
 

@@ -19,6 +19,7 @@ use App\Livewire\Admin\Dishes\CreateDish;
 use App\Livewire\Admin\Dishes\Dishes;
 use App\Livewire\Admin\Dishes\EditDish;
 use App\Livewire\Admin\Dishes\ShowDish;
+use App\Livewire\Admin\Orders\MealPlanBooking;
 use App\Livewire\Admin\Orders\Orders;
 use App\Livewire\Admin\Orders\Show;
 use App\Livewire\Admin\Tags\Tags;
@@ -26,13 +27,17 @@ use App\Livewire\Frontend\Account\Account;
 use App\Livewire\Frontend\Account\Address;
 use App\Livewire\Frontend\Account\AddressForm;
 use App\Livewire\Frontend\Account\Favorites;
+use App\Livewire\Frontend\Account\MealPlanOrder;
+use App\Livewire\Frontend\Account\MealPlanOrderDetails;
 use App\Livewire\Frontend\Account\OrderDetails;
 use App\Livewire\Frontend\Account\OrdersPage;
 use App\Livewire\Frontend\Cart\CartPage;
 use App\Livewire\Frontend\Checkout\CheckoutPage;
+use App\Livewire\Frontend\Checkout\PlanCheckoutPage;
 use App\Livewire\Frontend\Dishes\DishIndex;
 use App\Livewire\Frontend\Home;
 use App\Livewire\Frontend\MealPlan\MealPlan;
+use App\Livewire\Frontend\MealPlan\PlanThankYou;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -62,12 +67,21 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('checkout', CheckoutPage::class)->name('checkout');
     Route::get('/order/thank-you/{code}', OrderThankYouController::class)->name('orders.thankyou');
 
+    Route::get('/plan-checkout', PlanCheckoutPage::class)->name('plans.checkout');
+
+    Route::get('/meal-plan/thank-you/{code}', PlanThankYou::class)->name('meal-plan.thankyou');
+
+    Route::get('/ssl/plan/init/{booking}', [SslCommerzController::class, 'init'])
+        ->name('ssl.plan.init');
+
     // Account Routes
     Route::get('account', Account::class)->name('account');
     Route::get('account/profile', Profile::class)->name('account.profile');
     Route::get('/account/favorites', Favorites::class)->name('account.favorites');
     Route::get('/account/orders', OrdersPage::class)->name('account.orders');
     Route::get('/account/orders/{code}', OrderDetails::class)->name('account.orders.show');
+    Route::get('/account/meal-plan-order-history', MealPlanOrder::class)->name('meal-plan.history');
+    Route::get('/account/meal-plans/{code}', MealPlanOrderDetails::class)->name('meal-plan.booking.show');
 
     Route::get('/account/address', Address::class)->name('account.address');
     Route::get('/create-address/{label?}', AddressForm::class)->name('address.create');
@@ -124,7 +138,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     // Orders Route
     Route::get('orders', Orders::class)->name('orders.index');
     Route::get('orders/{code}', Show::class)->name('orders.show');
-    Route::get('/admin/orders/{code}/print', [OrderPrintController::class, 'show'])->name('orders.print');
+    Route::get('orders/{code}/print', [OrderPrintController::class, 'show'])->name('orders.print');
+
+    // Meal Booking Route
+    Route::get('meal-booking', MealPlanBooking::class)->name('mealBooking.index');
 
     // Customers Route
     Route::get('customers', Customers::class)->name('customers.index');

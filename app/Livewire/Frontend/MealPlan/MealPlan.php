@@ -11,6 +11,8 @@ use Livewire\Component;
 #[Layout('components.layouts.frontend')]
 class MealPlan extends Component
 {
+    private const SESSION_KEY = 'meal_plan_state';
+
     public string $planType = 'weekly'; // weekly | monthly
     public ?string $startDate = null;
 
@@ -63,16 +65,11 @@ class MealPlan extends Component
     public bool $dishConfigOpen = false;
     public ?int $configDishId = null;
 
-    // Cache for decoded variant data per dish
-    protected array $variantDataCache = [];
-
-    protected const SESSION_KEY = 'meal_plan.state';
-
     public const SLOTS = ['breakfast', 'lunch', 'tiffin', 'dinner'];
 
     public function mount(): void
     {
-        // Load dishes
+        // Load dishes (always fresh)
         $this->dishes = Dish::query()
             ->visible()
             ->with([
@@ -94,28 +91,25 @@ class MealPlan extends Component
                 'variations',
             ]);
 
-        // Try to restore from session
-        if (session()->has(self::SESSION_KEY)) {
-            $state = session(self::SESSION_KEY);
+        // Load saved state if exists
+        $saved = session(self::SESSION_KEY, null);
 
-            $this->planType    = $state['planType']    ?? 'weekly';
-            $this->startDate   = $state['startDate']   ?? Carbon::today()->toDateString();
-            $this->currentWeek = (int) ($state['currentWeek'] ?? 1);
+        if (is_array($saved)) {
+            $this->planType      = $saved['planType']  ?? $this->planType;
+            $this->startDate     = $saved['startDate'] ?? null;
+            $this->currentWeek   = (int) ($saved['currentWeek'] ?? 1);
+            $this->mealPrefs     = $saved['mealPrefs'] ?? $this->mealPrefs;
+            $this->days          = $saved['days'] ?? [];
 
-            $this->mealPrefs = array_merge($this->mealPrefs, $state['mealPrefs'] ?? []);
-            $this->days      = $state['days'] ?? [];
-
-            // Safety: if days are empty for some reason, init new days
+            // Fallback if saved days are somehow empty
             if (empty($this->days)) {
-                $this->startDate ??= Carbon::today()->toDateString();
+                $this->startDate = $this->startDate ?: Carbon::today()->toDateString();
                 $this->initDays();
                 $this->persistState();
             }
         } else {
-            // First load: build default days and persist
-            if (!$this->startDate) {
-                $this->startDate = Carbon::today()->toDateString();
-            }
+            // First time visit: build fresh plan
+            $this->startDate = $this->startDate ?: Carbon::today()->toDateString();
             $this->initDays();
             $this->persistState();
         }
@@ -134,9 +128,11 @@ class MealPlan extends Component
         for ($i = 0; $i < $totalDays; $i++) {
             $date = $start->copy()->addDays($i);
 
-            $name = $this->planType === 'weekly'
-                ? strtoupper($date->format('l')) . ' (' . strtoupper($date->format('d M')) . ')'
-                : strtoupper($date->format('d M (D)'));
+            if ($this->planType === 'weekly') {
+                $name = strtoupper($date->format('l')) . ' (' . strtoupper($date->format('d M')) . ')';
+            } else {
+                $name = strtoupper($date->format('d M (D)'));
+            }
 
             $this->days[$i] = [
                 'name'  => $name,
@@ -153,10 +149,7 @@ class MealPlan extends Component
         $this->currentWeek = 1;
     }
 
-    /**
-     * Persist current plan state into session.
-     */
-    protected function persistState(): void
+    private function persistState(): void
     {
         session([
             self::SESSION_KEY => [
@@ -173,55 +166,42 @@ class MealPlan extends Component
      * React to changes
      * ------------------------*/
 
-    /**
-     * Do NOT reset content on plan type change.
-     * Just reset currentWeek, keep selections, and persist.
-     */
     public function updatedPlanType(): void
     {
-        $this->currentWeek = 1;
+        // Change plan type = new calendar, clear items
+        $this->showModal        = false;
+        $this->dishConfigOpen   = false;
+        $this->configDishId     = null;
+        $this->currentWeek      = 1;
+
+        $this->initDays();
         $this->persistState();
     }
 
-    /**
-     * Do NOT reset selections on start date change.
-     * Only update the date labels for existing days, then persist.
-     */
     public function updatedStartDate(): void
     {
-        if (!$this->startDate) {
-            return;
+        if ($this->startDate) {
+            $this->startDate = Carbon::parse($this->startDate)->toDateString();
+        } else {
+            $this->startDate = Carbon::today()->toDateString();
         }
 
-        $this->startDate = Carbon::parse($this->startDate)->toDateString();
+        // When user changes start date:
+        // - rebuild days with new base date
+        // - keep mealPrefs and planType
+        // - clear UI modals
+        $this->showModal        = false;
+        $this->dishConfigOpen   = false;
+        $this->configDishId     = null;
+        $this->currentWeek      = 1;
 
-        $totalDays = count($this->days);
-        if ($totalDays === 0) {
-            return;
-        }
-
-        $start = Carbon::parse($this->startDate)->startOfDay();
-
-        for ($i = 0; $i < $totalDays; $i++) {
-            $date = $start->copy()->addDays($i);
-
-            $name = $this->planType === 'weekly'
-                ? strtoupper($date->format('l')) . ' (' . strtoupper($date->format('d M')) . ')'
-                : strtoupper($date->format('d M (D)'));
-
-            if (isset($this->days[$i])) {
-                $this->days[$i]['name'] = $name;
-            }
-        }
-
+        $this->initDays();
         $this->persistState();
     }
 
-    /**
-     * Persist when meal preferences change.
-     */
-    public function updatedMealPrefs($value): void
+    public function updatedMealPrefs(): void
     {
+        // Just persist; days themselves stay same
         $this->persistState();
     }
 
@@ -232,26 +212,31 @@ class MealPlan extends Component
     public function getSelectedSlotsProperty(): array
     {
         return array_values(
-            array_filter(self::SLOTS, fn($slot) => !empty($this->mealPrefs[$slot]))
+            array_filter(self::SLOTS, fn ($slot) => !empty($this->mealPrefs[$slot]))
         );
     }
 
     /**
      * Visible days:
-     * - Weekly: all current days (usually 7)
+     * - Weekly: all 7 days
      * - Monthly: 7-day slice by currentWeek
      */
     public function getVisibleDaysProperty(): array
     {
+        $result = [];
+
         if (empty($this->days)) {
-            return [];
+            return $result;
         }
 
         if ($this->planType === 'weekly') {
-            return collect($this->days)
-                ->map(fn($day, $idx) => ['index' => $idx, 'day' => $day])
-                ->values()
-                ->all();
+            foreach ($this->days as $idx => $day) {
+                $result[] = [
+                    'index' => $idx,
+                    'day'   => $day,
+                ];
+            }
+            return $result;
         }
 
         $weekSize   = 7;
@@ -261,7 +246,6 @@ class MealPlan extends Component
         $start = ($weekNumber - 1) * $weekSize;
         $end   = min($start + $weekSize, $totalDays);
 
-        $result = [];
         for ($i = $start; $i < $end; $i++) {
             $result[] = [
                 'index' => $i,
@@ -285,14 +269,14 @@ class MealPlan extends Component
     /** Plan total (discounted base price + options). */
     public function getPlanTotalProperty(): float
     {
-        $total = 0.0;
+        $total = 0;
 
         foreach ($this->days as $day) {
             foreach ($this->selectedSlots as $slot) {
                 $items = $day['slots'][$slot]['items'] ?? [];
 
                 foreach ($items as $item) {
-                    /** @var Dish|null $dish */
+                    /** @var \App\Models\Dish|null $dish */
                     $dish = $this->dishes->firstWhere('id', $item['dish_id'] ?? null);
                     if (!$dish) {
                         continue;
@@ -311,16 +295,20 @@ class MealPlan extends Component
 
     public function getWeeklyTotalProperty(): float
     {
-        return $this->planType === 'weekly'
-            ? $this->planTotal
-            : $this->planTotal / 4;
+        if ($this->planType === 'weekly') {
+            return $this->planTotal;
+        }
+
+        return $this->planTotal / 4;
     }
 
     public function getMonthlyTotalProperty(): float
     {
-        return $this->planType === 'monthly'
-            ? $this->planTotal
-            : $this->planTotal * 4;
+        if ($this->planType === 'monthly') {
+            return $this->planTotal;
+        }
+
+        return $this->planTotal * 4;
     }
 
     /* -------------------------
@@ -329,7 +317,11 @@ class MealPlan extends Component
 
     public function openSlot(int $dayIndex, string $slot): void
     {
-        if (!in_array($slot, self::SLOTS, true) || !isset($this->days[$dayIndex])) {
+        if (!in_array($slot, self::SLOTS, true)) {
+            return;
+        }
+
+        if (!isset($this->days[$dayIndex])) {
             return;
         }
 
@@ -363,7 +355,7 @@ class MealPlan extends Component
                 ];
             }
 
-            $existingMap[$dishId]['qty']         += $qty;
+            $existingMap[$dishId]['qty'] += $qty;
             $existingMap[$dishId]['variant_key'] = $item['variant_key'] ?? $existingMap[$dishId]['variant_key'];
             $existingMap[$dishId]['crust_key']   = $item['crust_key']   ?? $existingMap[$dishId]['crust_key'];
             $existingMap[$dishId]['bun_key']     = $item['bun_key']     ?? $existingMap[$dishId]['bun_key'];
@@ -429,7 +421,8 @@ class MealPlan extends Component
         }
 
         $qty = (int) ($this->tempSelection['dishes'][$dishId]['qty'] ?? 1);
-        $this->tempSelection['dishes'][$dishId]['qty'] = max(1, $qty - 1);
+        $qty = max(1, $qty - 1);
+        $this->tempSelection['dishes'][$dishId]['qty'] = $qty;
     }
 
     // Open per-dish customization modal (card click)
@@ -450,7 +443,9 @@ class MealPlan extends Component
             ];
         }
 
-        if (($this->tempSelection['dishes'][$dishId]['qty'] ?? 0) < 1) {
+        $entry = $this->tempSelection['dishes'][$dishId];
+
+        if (($entry['qty'] ?? 0) < 1) {
             $this->tempSelection['dishes'][$dishId]['qty'] = 1;
         }
 
@@ -468,10 +463,8 @@ class MealPlan extends Component
 
     /**
      * Save & Continue button: validate required fields and mark dish as selected.
-     * Field-level errors:
-     * - config.variant
-     * - config.crust
-     * - config.bun
+     * We use field-level error keys: config.variant, config.crust, config.bun
+     * so Blade can add red borders.
      */
     public function applyDishConfig(int $dishId): void
     {
@@ -485,53 +478,75 @@ class MealPlan extends Component
             return;
         }
 
-        // Clear previous errors
-        $this->resetErrorBag();
-
         $entry = &$this->tempSelection['dishes'][$dishId];
 
-        $hasVariant = $this->dishHasVariants($dish);
-        $hasCrusts  = $dish->crusts && $dish->crusts->count() > 0;
-        $hasBuns    = $dish->buns   && $dish->buns->count()   > 0;
+        $this->resetErrorBag();
 
-        $hasAnyError = false;
+        // Determine requirement (has options => required)
+        $rawVars    = $dish->variations ?? [];
+        if (is_string($rawVars)) {
+            $decoded = json_decode($rawVars, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $rawVars = $decoded;
+            } else {
+                $rawVars = [];
+            }
+        }
 
-        // VARIANT
+        $hasVariant = false;
+        if (is_array($rawVars)) {
+            if (!empty($rawVars['variants']) && is_array($rawVars['variants'])) {
+                $hasVariant = count($rawVars['variants']) > 0;
+            } elseif (!empty($rawVars['options']) && is_array($rawVars['options'])) {
+                $hasVariant = count($rawVars['options']) > 0;
+            } else {
+                foreach ($rawVars as $g) {
+                    if (!empty($g['options']) && is_array($g['options'])) {
+                        $hasVariant = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        $hasCrusts = $dish->crusts && $dish->crusts->count() > 0;
+        $hasBuns   = $dish->buns   && $dish->buns->count()   > 0;
+
+        $hasErrors = false;
+
+        // Variant
         $variantKey = $entry['variant_key'] ?? null;
         if ($hasVariant && ($variantKey === null || $variantKey === '')) {
-            $this->addError('config.variant', 'Please choose a variant.');
-            $hasAnyError = true;
+            $this->addError('config.variant', 'Variant required.');
+            $hasErrors = true;
         }
 
-        // CRUST
+        // Crust
         $crustKey = $entry['crust_key'] ?? null;
         if ($hasCrusts && ($crustKey === null || $crustKey === '')) {
-            $this->addError('config.crust', 'Please choose a crust.');
-            $hasAnyError = true;
+            $this->addError('config.crust', 'Crust required.');
+            $hasErrors = true;
         }
 
-        // BUN
+        // Bun
         $bunKey = $entry['bun_key'] ?? null;
         if ($hasBuns && ($bunKey === null || $bunKey === '')) {
-            $this->addError('config.bun', 'Please choose a bun.');
-            $hasAnyError = true;
+            $this->addError('config.bun', 'Bun required.');
+            $hasErrors = true;
         }
 
-        // If anything failed, keep modal open and show errors in containers
-        if ($hasAnyError) {
+        if ($hasErrors) {
+            // Blade only uses $errors->has(...) to make red borders, no messages shown.
             return;
         }
 
-        // Fix qty
         $qty = (int) ($entry['qty'] ?? 1);
         if ($qty < 1) {
             $entry['qty'] = 1;
         }
 
-        // Mark dish selected
         $entry['selected'] = true;
 
-        // close modal
         $this->resetErrorBag();
         $this->dishConfigOpen = false;
         $this->configDishId   = null;
@@ -587,7 +602,6 @@ class MealPlan extends Component
         $this->configDishId   = null;
         $this->resetErrorBag();
 
-        // days changed → persist
         $this->persistState();
     }
 
@@ -632,7 +646,7 @@ class MealPlan extends Component
 
         $this->initDays();
 
-        // Clear and reset session state
+        // Clear and re-save clean state
         session()->forget(self::SESSION_KEY);
         $this->persistState();
     }
@@ -669,86 +683,6 @@ class MealPlan extends Component
         $this->persistState();
     }
 
-    /* -------------------------
-     * Variants helpers
-     * ------------------------*/
-
-    /**
-     * Decode and normalize variations from Dish, cached per dish.
-     */
-    protected function getVariantData(Dish $dish): array
-    {
-        $id = (int) $dish->id;
-
-        if (array_key_exists($id, $this->variantDataCache)) {
-            return $this->variantDataCache[$id];
-        }
-
-        $raw = $dish->variations ?? [];
-
-        if (is_string($raw)) {
-            $decoded = json_decode($raw, true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                $raw = $decoded;
-            } else {
-                $raw = [];
-            }
-        }
-
-        if (!is_array($raw)) {
-            $raw = [];
-        }
-
-        return $this->variantDataCache[$id] = $raw;
-    }
-
-    /**
-     * Does this dish have any variant options?
-     */
-    protected function dishHasVariants(Dish $dish): bool
-    {
-        $vars = $this->getVariantData($dish);
-
-        if (isset($vars['variants']) && is_array($vars['variants']) && count($vars['variants']) > 0) {
-            return true;
-        }
-
-        if (isset($vars['options']) && is_array($vars['options']) && count($vars['options']) > 0) {
-            return true;
-        }
-
-        foreach ($vars as $group) {
-            if (!empty($group['options']) && is_array($group['options'])) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Flatten all variant options into a single list for price calculation.
-     */
-    protected function flattenVariantOptions(Dish $dish): array
-    {
-        $vars = $this->getVariantData($dish);
-        $options = [];
-
-        if (isset($vars['variants']) && is_array($vars['variants'])) {
-            $options = $vars['variants'];
-        } elseif (isset($vars['options']) && is_array($vars['options'])) {
-            $options = $vars['options'];
-        } else {
-            foreach ($vars as $group) {
-                if (!empty($group['options']) && is_array($group['options'])) {
-                    $options = array_merge($options, $group['options']);
-                }
-            }
-        }
-
-        return $options;
-    }
-
     /**
      * Calculate unit price using discounted base price + variant/crust/bun/add-ons.
      */
@@ -761,7 +695,38 @@ class MealPlan extends Component
         // =============== VARIANT (optional, but price-affected) ===============
         $variantKey = $item['variant_key'] ?? null;
         if ($variantKey !== null && $variantKey !== '') {
-            $variantOptions = $this->flattenVariantOptions($dish);
+            $vars = $dish->variations ?? [];
+
+            // ensure array (handle JSON string)
+            if (is_string($vars)) {
+                $decoded = json_decode($vars, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    $vars = $decoded;
+                } else {
+                    $vars = [];
+                }
+            }
+
+            $variantOptions = [];
+
+            if (is_array($vars)) {
+                // Case 1: ['variants' => [ ... ]]
+                if (isset($vars['variants']) && is_array($vars['variants'])) {
+                    $variantOptions = $vars['variants'];
+
+                // Case 2: ['options' => [ ... ]]
+                } elseif (isset($vars['options']) && is_array($vars['options'])) {
+                    $variantOptions = $vars['options'];
+
+                // Case 3: [ { name: 'Size', options: [...] }, ... ]
+                } else {
+                    foreach ($vars as $g) {
+                        if (!empty($g['options']) && is_array($g['options'])) {
+                            $variantOptions = array_merge($variantOptions, $g['options']);
+                        }
+                    }
+                }
+            }
 
             foreach ($variantOptions as $index => $opt) {
                 // fallback to $index when no explicit id/key
@@ -803,6 +768,23 @@ class MealPlan extends Component
 
         return $total;
     }
+
+    public function goToPlanCheckout()
+{
+    // Save current plan state into session
+    session([
+        'meal_plan_state' => [
+            'planType'   => $this->planType,
+            'startDate'  => $this->startDate,
+            'mealPrefs'  => $this->mealPrefs,
+            'days'       => $this->days,
+        ],
+    ]);
+
+    // Redirect to plan checkout page
+    return redirect()->route('plans.checkout');
+}
+
 
     public function render()
     {

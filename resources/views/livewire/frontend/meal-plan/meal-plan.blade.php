@@ -534,6 +534,7 @@
 
                         <button
                             type="button"
+                            wire:click="goToPlanCheckout"
                             class="group relative inline-flex w-full items-center justify-center rounded-md px-8 md:px-10 py-3 overflow-hidden bg-customRed-100 font-oswald text-white no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60 cursor-pointer"
                         >
                             <span class="pointer-events-none absolute inset-0 bg-slate-900 transform origin-center scale-0 rotate-45 transition-transform duration-500 ease-out group-hover:scale-1125"></span>

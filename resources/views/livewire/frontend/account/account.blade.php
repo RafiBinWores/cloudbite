@@ -57,6 +57,13 @@
             <p class="text-slate-900 mt-1.5 group-hover:text-customRed-100">Orders</p>
         </a>
 
+        {{-- Meal Booking History --}}
+        <a href="{{ route('meal-plan.history') }}" wire:navigate
+            class="py-5 bg-gray-100/80 rounded-xl h-[130px] flex items-center justify-center flex-col group border border-transparent duration-150 hover:border-customRed-100/60">
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-12 text-slate-800 group-hover:text-customRed-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cooking-pot-icon lucide-cooking-pot"><path d="M2 12h20"/><path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/><path d="m4 8 16-4"/><path d="m8.86 6.78-.45-1.81a2 2 0 0 1 1.45-2.43l1.94-.48a2 2 0 0 1 2.43 1.46l.45 1.8"/></svg>
+            <p class="text-slate-900 mt-1.5 group-hover:text-customRed-100">Meal Booking</p>
+        </a>
+
         {{-- Favorites --}}
         <a href="{{ route('account.favorites') }}" wire:navigate
             class="py-5 bg-gray-100/80 rounded-xl h-[130px] flex items-center justify-center flex-col group border border-transparent duration-150 hover:border-customRed-100/60">
