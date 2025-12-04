@@ -375,7 +375,7 @@
                                 <div class="flex gap-2">
                                     {{-- Details --}}
                                     <flux:button
-                                        href=""
+                                        href="{{ route('meal-plan-bookings.details', ['code' => $booking->booking_code]) }}"
                                         wire:navigate
                                         class="min-h-[40px] cursor-pointer"
                                         icon="eye"

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MealPlanBookingPrintController;
 use App\Http\Controllers\OrderPrintController;
 use App\Http\Controllers\OrderThankYouController;
 use App\Http\Controllers\SslCommerzController;
@@ -20,6 +21,7 @@ use App\Livewire\Admin\Dishes\Dishes;
 use App\Livewire\Admin\Dishes\EditDish;
 use App\Livewire\Admin\Dishes\ShowDish;
 use App\Livewire\Admin\MealPlanBooking\MealPlanBooking;
+use App\Livewire\Admin\MealPlanBooking\MealPlanBookingDetails;
 use App\Livewire\Admin\Orders\Orders;
 use App\Livewire\Admin\Orders\Show;
 use App\Livewire\Admin\Tags\Tags;
@@ -145,6 +147,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
     // Meal Booking Route
     Route::get('meal-booking', MealPlanBooking::class)->name('mealBooking.index');
+    Route::get('meal-bookings-details/{code}', MealPlanBookingDetails::class)->name('meal-plan-bookings.details');
+    Route::get('/admin/meal-plan-bookings/{code}/print', [MealPlanBookingPrintController::class, 'thermal'])->name('meal-plan-bookings.thermalPrint');
 
     // Customers Route
     Route::get('customers', Customers::class)->name('customers.index');
