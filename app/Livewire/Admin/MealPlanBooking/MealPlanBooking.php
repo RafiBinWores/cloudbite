@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin\Orders;
+namespace App\Livewire\Admin\MealPlanBooking;
 
 use App\Exports\MealPlanBookingsExport;
 use App\Models\CompanyInfo;
@@ -128,7 +128,7 @@ class MealPlanBooking extends Component
     {
         [$companyName, $logoPath] = $this->companyExportMeta();
 
-        $bookings = \App\Models\MealPlanBooking::query()
+        $bookings = ModelsMealPlanBooking::query()
             ->when($this->search, function ($q) {
                 $s = '%' . $this->search . '%';
                 $q->where(function ($sub) use ($s) {
@@ -145,7 +145,7 @@ class MealPlanBooking extends Component
             ->limit(5000)
             ->get();
 
-        $pdf = Pdf::loadView('livewire.admin.orders.exports.bookings-pdf', [
+        $pdf = Pdf::loadView('livewire.admin.meal-plan-booking.exports.bookings-pdf', [
             'bookings'    => $bookings,
             'status'      => $this->status,
             'dateFrom'    => $this->dateFrom,
@@ -190,7 +190,7 @@ class MealPlanBooking extends Component
             ->orderBy('created_at', 'DESC')
             ->paginate($this->perPage);
 
-        return view('livewire.admin.orders.meal-plan-booking', [
+        return view('livewire.admin.meal-plan-booking.meal-plan-booking', [
             'bookings' => $bookings,
             'stats'    => $this->stats(),
         ]);

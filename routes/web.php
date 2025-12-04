@@ -19,7 +19,7 @@ use App\Livewire\Admin\Dishes\CreateDish;
 use App\Livewire\Admin\Dishes\Dishes;
 use App\Livewire\Admin\Dishes\EditDish;
 use App\Livewire\Admin\Dishes\ShowDish;
-use App\Livewire\Admin\Orders\MealPlanBooking;
+use App\Livewire\Admin\MealPlanBooking\MealPlanBooking;
 use App\Livewire\Admin\Orders\Orders;
 use App\Livewire\Admin\Orders\Show;
 use App\Livewire\Admin\Tags\Tags;
@@ -86,6 +86,9 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/account/address', Address::class)->name('account.address');
     Route::get('/create-address/{label?}', AddressForm::class)->name('address.create');
 });
+
+
+
 
 // Admin Dashboard Route Starts
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {

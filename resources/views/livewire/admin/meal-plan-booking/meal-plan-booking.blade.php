@@ -3,7 +3,7 @@
     <div class="relative mb-6 w-full">
         <flux:heading size="xl" class="mb-4 flex items-center gap-2" level="1">
             <img class="w-8" src="{{ asset('assets/images/icons/checklist.png') }}" alt="Meal plan icon">
-            {{ __('Meal Plan Bookings') }}
+            {{ __('Meal Booking') }}
         </flux:heading>
         <flux:separator variant="subtle" />
     </div>
@@ -11,7 +11,7 @@
     {{-- Status wise booking count (static placeholders – hook from Livewire if you want) --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {{-- Pending --}}
-        <div class="bg-accent/60 dark:bg-neutral-700 rounded-xl px-4 py-6">
+        <div class="bg-accent/80 dark:bg-neutral-700 rounded-xl px-4 py-6">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <img src="{{ asset('assets/images/icons/order-processing.png') }}" alt="Pending icon" class="w-8">
@@ -25,7 +25,7 @@
         </div>
 
         {{-- Confirmed --}}
-        <div class="bg-accent/60 dark:bg-neutral-700 rounded-xl px-4 py-6">
+        <div class="bg-accent/80 dark:bg-neutral-700 rounded-xl px-4 py-6">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <img src="{{ asset('assets/images/icons/confirm.png') }}" alt="Confirmed icon" class="w-8">
@@ -38,7 +38,7 @@
         </div>
 
         {{-- Ongoing / Active --}}
-        <div class="bg-accent/60 dark:bg-neutral-700 rounded-xl px-4 py-6">
+        <div class="bg-accent/80 dark:bg-neutral-700 rounded-xl px-4 py-6">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <img src="{{ asset('assets/images/icons/cooking.png') }}" alt="Ongoing icon" class="w-8">
@@ -51,7 +51,7 @@
         </div>
 
         {{-- Completed --}}
-        <div class="bg-accent/60 dark:bg-neutral-700 rounded-xl px-4 py-6">
+        <div class="bg-accent/80 dark:bg-neutral-700 rounded-xl px-4 py-6">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <img src="{{ asset('assets/images/icons/complete.png') }}" alt="Completed icon" class="w-8">
@@ -64,7 +64,7 @@
         </div>
 
         {{-- Cancelled --}}
-        <div class="bg-accent/60 dark:bg-neutral-700 rounded-xl px-4 py-6">
+        <div class="bg-accent/80 dark:bg-neutral-700 rounded-xl px-4 py-6">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <img src="{{ asset('assets/images/icons/cancel-order.png') }}" alt="Cancelled icon" class="w-8">
@@ -155,11 +155,12 @@
                 <button
                     type="button"
                     wire:click="clearFilters"
-                    class="inline-flex items-center rounded-lg border px-3 py-2 text-sm dark:border-none dark:bg-neutral-600 hover:opacity-90"
+                    class="inline-flex items-center rounded-lg border px-3 py-2.5 text-sm dark:border-none dark:bg-neutral-600 hover:opacity-90"
                 >
                     Clear
                 </button>
             </div>
+
 
             {{-- Export --}}
             <div class="flex items-center gap-2 dark:text-white">
@@ -169,10 +170,10 @@
                     wire:click="exportExcel"
                     wire:loading.attr="disabled"
                     wire:target="exportExcel"
-                    class="inline-flex items-center rounded-lg border px-3 py-2 text-sm dark:border-none dark:bg-neutral-600 hover:opacity-90 cursor-pointer hover:bg-accent/70 hover:text-white disabled:opacity-60 disabled:cursor-not-allowed"
+                    class="inline-flex items-center rounded-lg border px-3 py-2.5 text-sm dark:border-none dark:bg-neutral-600 hover:opacity-90 cursor-pointer hover:bg-accent/80 hover:text-white disabled:opacity-60 disabled:cursor-not-allowed"
                     aria-busy="false"
                 >
-                    <span wire:loading.remove wire:target="exportExcel">Export Excel</span>
+                    <span wire:loading.remove wire:target="exportExcel" class="inline-flex items-center"><img src="{{ asset('assets/images/icons/xls.png') }}" alt="Excel icon" class="w-5"> Excel</span>
 
                     <span class="inline-flex items-center gap-2" wire:loading wire:target="exportExcel">
                         <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -190,10 +191,10 @@
                     wire:click="exportPdf"
                     wire:loading.attr="disabled"
                     wire:target="exportPdf"
-                    class="inline-flex items-center rounded-lg border px-3 py-2 text-sm dark:border-none dark:bg-neutral-600 cursor-pointer hover:opacity-90 hover:bg-accent/70 hover:text-white disabled:opacity-60 disabled:cursor-not-allowed"
+                    class="inline-flex items-center rounded-lg border px-3 py-2.5 text-sm dark:border-none dark:bg-neutral-600 cursor-pointer hover:opacity-90 hover:bg-accent/80 hover:text-white disabled:opacity-60 disabled:cursor-not-allowed"
                     aria-busy="false"
                 >
-                    <span wire:loading.remove wire:target="exportPdf">Export PDF</span>
+                    <span wire:loading.remove wire:target="exportPdf" class="flex"><img src="{{ asset('assets/images/icons/pdf.png') }}" alt="pdf icon" class="w-5"> Pdf</span>
                     <span class="inline-flex items-center gap-2" wire:loading wire:target="exportPdf">
                         <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
@@ -373,22 +374,22 @@
                             <td class="px-4 lg:px-6 py-3">
                                 <div class="flex gap-2">
                                     {{-- Details --}}
-                                    {{-- <flux:button
+                                    <flux:button
                                         href=""
                                         wire:navigate
-                                        class="min-h-[40px]"
+                                        class="min-h-[40px] cursor-pointer"
                                         icon="eye"
                                         variant="primary"
                                         color="yellow"
-                                    ></flux:button> --}}
+                                    ></flux:button>
 
                                     {{-- Print (optional) --}}
-                                    {{-- <flux:button
-                                        onclick="window.open('{{ route('admin.meal-plans.print', $booking->booking_code) }}','_blank','noopener')"
+                                    <flux:button
+                                        onclick=""
                                         class="min-h-[40px] cursor-pointer"
                                         icon="printer"
                                         variant="primary"
-                                    /> --}}
+                                    />
                                 </div>
                             </td>
                         </tr>
