@@ -20,6 +20,7 @@ use App\Livewire\Admin\Dishes\CreateDish;
 use App\Livewire\Admin\Dishes\Dishes;
 use App\Livewire\Admin\Dishes\EditDish;
 use App\Livewire\Admin\Dishes\ShowDish;
+use App\Livewire\Admin\EmailTemplate\EmailTemplates;
 use App\Livewire\Admin\MealPlanBooking\MealPlanBooking;
 use App\Livewire\Admin\MealPlanBooking\MealPlanBookingDetails;
 use App\Livewire\Admin\Orders\Orders;
@@ -152,6 +153,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
     // Customers Route
     Route::get('customers', Customers::class)->name('customers.index');
+
+    // Email Templates Route
+    Route::get('email-templates', EmailTemplates::class)->name('email-templates');
 });
 
 // Auth Routes

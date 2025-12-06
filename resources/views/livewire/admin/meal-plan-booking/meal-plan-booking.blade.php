@@ -385,7 +385,7 @@
 
                                     {{-- Print (optional) --}}
                                     <flux:button
-                                        onclick=""
+                                        onclick="window.open('{{ route('meal-plan-bookings.thermalPrint', $booking->booking_code) }}','_blank','noopener')"
                                         class="min-h-[40px] cursor-pointer"
                                         icon="printer"
                                         variant="primary"

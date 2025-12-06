@@ -232,6 +232,11 @@
                     :current="request()->routeIs('business_setup.index')" wire:navigate>
                     {{ __('Business Setup') }}</flux:navlist.item>
 
+                {{-- Email Template Setup --}}
+                <flux:navlist.item icon="envelope" :href="route('email-templates')"
+                    :current="request()->routeIs('email-templates')" wire:navigate>
+                    {{ __('Email Template') }}</flux:navlist.item>
+
                 {{-- Pages --}}
                 <flux:navlist.item icon="window" :href="route('delivery.index')"
                     :current="request()->routeIs('delivery.index')" wire:navigate>

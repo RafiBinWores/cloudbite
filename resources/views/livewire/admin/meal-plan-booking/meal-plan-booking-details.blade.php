@@ -109,30 +109,10 @@
                 Placed: {{ $booking->created_at?->format('d M Y, h:i A') }}
             </p>
         </div>
-
-        {{-- <div class="flex flex-col md:flex-row gap-2">
-            <flux:button href="{{ route('meal-plan-bookings.details', $booking->booking_code) }}"
-                icon="arrow-path" wire:navigate>
-                Refresh
-            </flux:button>
-
-            <flux:button href="{{ route('mealBooking.index') }}" icon="arrow-uturn-left"
-                wire:navigate>
-                Back to list
-            </flux:button>
-
-            <flux:button type="button" icon="printer" class="cursor-pointer" onclick="window.print()">
-                Print (A4)
-            </flux:button>
-        </div> --}}
         <div class="flex flex-col md:flex-row gap-2">
             <flux:button href="{{ route('meal-plan-bookings.details', $booking->booking_code) }}" icon="arrow-path"
                 wire:navigate>
                 Refresh
-            </flux:button>
-
-            <flux:button href="{{ route('mealBooking.index') }}" icon="arrow-uturn-left" wire:navigate>
-                Back to list
             </flux:button>
 
             <flux:button type="button" icon="printer" class="cursor-pointer" onclick="window.print()">
@@ -141,7 +121,7 @@
 
             <flux:button type="button" icon="printer" variant="primary" class="cursor-pointer"
                 onclick="window.open('{{ route('meal-plan-bookings.thermalPrint', $booking->booking_code) }}','_blank','noopener')">
-                Thermal Print (80mm)
+                Print (80mm)
             </flux:button>
 
         </div>
@@ -181,16 +161,16 @@
                             Grand Total
                         </p>
                         <p class="text-2xl font-semibold text-slate-900 dark:text-slate-50">
-                            {{ number_format($booking->grand_total, 2) }} ৳
+                            {{ number_format($booking->grand_total, 2) }} <span class="font-medium font-oswald"><span class="font-oswald">৳</span></span>
                         </p>
                         <p class="text-[11px] text-slate-500 dark:text-slate-300">
                             Paid:
                             <span class="text-emerald-600 font-semibold">
-                                {{ number_format($booking->pay_now, 2) }} ৳
+                                {{ number_format($booking->pay_now, 2) }} <span class="font-oswald">৳</span>
                             </span>
                             · Due:
                             <span class="text-rose-500 font-semibold">
-                                {{ number_format($booking->due_amount, 2) }} ৳
+                                {{ number_format($booking->due_amount, 2) }} <span class="font-oswald">৳</span>
                             </span>
                         </p>
                     </div>
@@ -316,7 +296,7 @@
                                         <div class="mt-1 space-y-0.5 text-[11px] text-slate-600 dark:text-slate-300">
                                             <div>
                                                 <span class="font-medium">Base:</span>
-                                                {{ number_format($basePrice, 2) }} ৳
+                                                {{ number_format($basePrice, 2) }} <span class="font-oswald">৳</span>
                                             </div>
 
                                             @if ($variantInfo['label'])
@@ -328,7 +308,7 @@
                                                     @if ($variantInfo['price'] != 0)
                                                         <span class="text-slate-400">
                                                             ({{ $variantInfo['price'] > 0 ? '+' : '' }}{{ number_format($variantInfo['price'], 2) }}
-                                                            ৳)
+                                                            <span class="font-oswald">৳</span>)
                                                         </span>
                                                     @endif
                                                 </div>
@@ -341,7 +321,7 @@
                                                     @if ($crustInfo['price'] != 0)
                                                         <span class="text-slate-400">
                                                             ({{ $crustInfo['price'] > 0 ? '+' : '' }}{{ number_format($crustInfo['price'], 2) }}
-                                                            ৳)
+                                                            <span class="font-oswald">৳</span>)
                                                         </span>
                                                     @endif
                                                 </div>
@@ -354,7 +334,7 @@
                                                     @if ($bunInfo['price'] != 0)
                                                         <span class="text-slate-400">
                                                             ({{ $bunInfo['price'] > 0 ? '+' : '' }}{{ number_format($bunInfo['price'], 2) }}
-                                                            ৳)
+                                                            <span class="font-oswald">৳</span>)
                                                         </span>
                                                     @endif
                                                 </div>
@@ -369,7 +349,7 @@
                                                                 {{ $ao['name'] }}
                                                                 @if (($ao['price'] ?? 0) != 0)
                                                                     <span class="text-slate-400">
-                                                                        (+{{ number_format($ao['price'], 2) }} ৳)
+                                                                        (+{{ number_format($ao['price'], 2) }} <span class="font-oswald">৳</span>)
                                                                     </span>
                                                                 @endif
                                                             </li>
@@ -380,14 +360,14 @@
                                         </div>
                                     </td>
                                     <td class="py-3 px-3 sm:px-4 text-right align-middle whitespace-nowrap">
-                                        {{ number_format($unitPrice, 2) }} ৳
+                                        {{ number_format($unitPrice, 2) }} <span class="font-oswald"><span class="font-oswald">৳</span></span>
                                     </td>
                                     <td class="py-3 px-3 sm:px-4 text-center align-middle">
                                         {{ $qty }}
                                     </td>
                                     <td class="py-3 px-3 sm:px-4 text-right align-middle whitespace-nowrap">
                                         <span class="font-semibold">
-                                            {{ number_format($lineTotal, 2) }} ৳
+                                            {{ number_format($lineTotal, 2) }} <span class="font-oswald"><span class="font-oswald">৳</span></span>
                                         </span>
                                     </td>
                                 </tr>
@@ -408,24 +388,24 @@
                         class="w-full sm:w-80 rounded-xl border dark:border-neutral-700 p-4 bg-slate-50/60 dark:bg-neutral-700/40 text-sm">
                         <div class="flex justify-between py-1">
                             <span>Plan subtotal</span>
-                            <span>{{ number_format($booking->plan_subtotal, 2) }} ৳</span>
+                            <span>{{ number_format($booking->plan_subtotal, 2) }} <span class="font-oswald">৳</span></span>
                         </div>
                         <div class="flex justify-between py-1">
                             <span>Shipping</span>
-                            <span>{{ number_format($booking->shipping_total, 2) }} ৳</span>
+                            <span>{{ number_format($booking->shipping_total, 2) }} <span class="font-oswald">৳</span></span>
                         </div>
                         <div class="border-t border-slate-200 dark:border-neutral-600 my-2"></div>
                         <div class="flex justify-between py-1 text-base font-semibold">
                             <span>Total</span>
-                            <span>{{ number_format($booking->grand_total, 2) }} ৳</span>
+                            <span>{{ number_format($booking->grand_total, 2) }} <span class="font-oswald">৳</span></span>
                         </div>
                         <div class="flex justify-between py-1 text-xs text-slate-500 dark:text-slate-300 mt-1">
                             <span>Paid now</span>
-                            <span>{{ number_format($booking->pay_now, 2) }} ৳</span>
+                            <span>{{ number_format($booking->pay_now, 2) }} <span class="font-oswald">৳</span></span>
                         </div>
                         <div class="flex justify-between py-1 text-xs text-slate-500 dark:text-slate-300">
                             <span>Due amount</span>
-                            <span>{{ number_format($booking->due_amount, 2) }} ৳</span>
+                            <span>{{ number_format($booking->due_amount, 2) }} <span class="font-oswald">৳</span></span>
                         </div>
                     </div>
                 </div>
