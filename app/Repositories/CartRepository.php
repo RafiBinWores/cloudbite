@@ -38,7 +38,7 @@ class CartRepository
         return Cart::create([
             'user_id'    => Auth::id(),
             'session_id' => session()->getId(),
-            'meta' => [
+            'meta'       => [
                 'prices_include_tax' => false, // NET prices by default
             ],
         ]);
@@ -79,16 +79,30 @@ class CartRepository
             $baseOriginal = (float) ($dish->price ?? 0);
 
             $variationExtraTotal = 0.0;
-            $vars = (array) ($dish->variations ?? []);
+            $variationDetails    = [];                // 👈 NEW: human readable info
+            $vars                = (array) ($dish->variations ?? []);
+
             foreach ($vars as $gIndex => $group) {
                 $optIndex = $variationsSelected[$gIndex] ?? null;
                 if ($optIndex === null) continue;
 
-                $opt = $group['options'][$optIndex] ?? null;
-                if ($opt && isset($opt['price'])) {
-                    $variationExtraTotal += (float) $opt['price'];
-                }
+                $options = $group['options'] ?? [];
+                $opt     = $options[$optIndex] ?? null;
+                if (!$opt) continue;
+
+                $price = (float) ($opt['price'] ?? 0);
+                $variationExtraTotal += $price;
+
+                // Build snapshot for later display (invoice/email/Excel)
+                $variationDetails[] = [
+                    'group_index'  => $gIndex,
+                    'group_name'   => $group['name'] ?? 'Variation',
+                    'option_index' => $optIndex,
+                    'label'        => $opt['label'] ?? ($opt['name'] ?? 'Option'),
+                    'price'        => $price,
+                ];
             }
+
             $variationExtraTotal = round($variationExtraTotal, 2);
 
             // final base before discount = dish base + variation extras
@@ -131,7 +145,7 @@ class CartRepository
             if ($addonIdsSorted) {
                 $selected = $dish->addOns->whereIn('id', $addonIdsSorted);
                 foreach ($selected as $a) {
-                    $perUnitQty = $addonQtyCanonical[$a->id] ?? 1;
+                    $perUnitQty  = $addonQtyCanonical[$a->id] ?? 1;
                     $addonsExtra += (float) ($a->price ?? 0) * $perUnitQty;
                 }
             }
@@ -166,6 +180,9 @@ class CartRepository
                 'variation_selection'   => $variationsSelectedSorted,
                 'addon_qty'             => $addonQtyCanonical,
                 'vat_percent'           => $vatPercent,
+
+                // 👇 NEW: full variation snapshot (for invoice/email/Excel)
+                'variation_details'     => $variationDetails,
             ];
 
             if ($existing) {
@@ -177,15 +194,15 @@ class CartRepository
                 $existing->save();
             } else {
                 $cart->items()->create([
-                    'dish_id'    => $dishId,
-                    'qty'        => $qty,
-                    'crust_id'   => $crustId,
-                    'bun_id'     => $bunId,
-                    'addon_ids'  => $addonIdsSorted,
+                    'dish_id'             => $dishId,
+                    'qty'                 => $qty,
+                    'crust_id'            => $crustId,
+                    'bun_id'              => $bunId,
+                    'addon_ids'           => $addonIdsSorted,
                     'variation_selection' => $variationsSelectedSorted,
-                    'unit_price' => $unit,
-                    'line_total' => $unit * $qty,
-                    'meta'       => $metaPayload,
+                    'unit_price'          => $unit,
+                    'line_total'          => $unit * $qty,
+                    'meta'                => $metaPayload,
                 ]);
             }
 
@@ -361,7 +378,7 @@ class CartRepository
         CouponUsage::create([
             'coupon_id' => $couponId,
             'user_id'   => $userId,
-            'session_id' => $userId ? null : $sessionId,
+            'session_id'=> $userId ? null : $sessionId,
             'order_id'  => $orderId,
             'used_at'   => now(),
             'meta'      => null,
@@ -369,57 +386,57 @@ class CartRepository
     }
 
     public function mergeGuestCart(?string $oldSessionId = null): void
-{
-    if (!Auth::check()) return;
+    {
+        if (!Auth::check()) return;
 
-    // Use the session ID before login
-    $sessionId = $oldSessionId ?? session()->getId();
-    $userId = Auth::id();
+        // Use the session ID before login
+        $sessionId = $oldSessionId ?? session()->getId();
+        $userId    = Auth::id();
 
-    // Guest cart BEFORE login
-    $guestCart = Cart::where('session_id', $sessionId)
-        ->whereNull('user_id')
-        ->first();
-
-    if (!$guestCart) return;
-
-    // User cart AFTER login
-    $userCart = Cart::where('user_id', $userId)->first();
-
-    // If user has no cart yet → assign guest cart
-    if (!$userCart) {
-        $guestCart->update([
-            'user_id' => $userId,
-            'session_id' => session()->getId(), // ← update to new session
-        ]);
-        return;
-    }
-
-    // Merge items
-    foreach ($guestCart->items as $item) {
-        $existing = $userCart->items()
-            ->where('dish_id', $item->dish_id)
-            ->where('crust_id', $item->crust_id)
-            ->where('bun_id', $item->bun_id)
-            ->where('addon_ids', json_encode($item->addon_ids))
-            ->where('variation_selection', json_encode($item->variation_selection))
+        // Guest cart BEFORE login
+        $guestCart = Cart::where('session_id', $sessionId)
+            ->whereNull('user_id')
             ->first();
 
-        if ($existing) {
-            $existing->qty += $item->qty;
-            $existing->line_total = $existing->qty * $existing->unit_price;
-            $existing->save();
-        } else {
-            $item->cart_id = $userCart->id;
-            $item->save();
+        if (!$guestCart) return;
+
+        // User cart AFTER login
+        $userCart = Cart::where('user_id', $userId)->first();
+
+        // If user has no cart yet → assign guest cart
+        if (!$userCart) {
+            $guestCart->update([
+                'user_id'    => $userId,
+                'session_id' => session()->getId(), // ← update to new session
+            ]);
+            return;
         }
+
+        // Merge items
+        foreach ($guestCart->items as $item) {
+            $existing = $userCart->items()
+                ->where('dish_id', $item->dish_id)
+                ->where('crust_id', $item->crust_id)
+                ->where('bun_id', $item->bun_id)
+                ->where('addon_ids', json_encode($item->addon_ids))
+                ->where('variation_selection', json_encode($item->variation_selection))
+                ->first();
+
+            if ($existing) {
+                $existing->qty += $item->qty;
+                $existing->line_total = $existing->qty * $existing->unit_price;
+                $existing->save();
+            } else {
+                $item->cart_id = $userCart->id;
+                $item->save();
+            }
+        }
+
+        $userCart->refreshTotals();
+
+        // Delete old guest cart
+        $guestCart->items()->delete();
+        $guestCart->delete();
     }
-
-    $userCart->refreshTotals();
-
-    // Delete old guest cart
-    $guestCart->items()->delete();
-    $guestCart->delete();
-}
 
 }
