@@ -495,7 +495,7 @@
                     </div>
 
                     <!-- Button -->
-                    <a href="{{ route('meal.plans') }}" wire:navigate
+                    <a href="{{ route('meal.plans', ['plan' => 'weekly']) }}" wire:navigate wire:navigate
                         class="inline-block relative isolate rounded-full px-8 md:px-10 py-2.5 md:py-3 m-1 overflow-hidden cursor-pointer bg-red-500 font-medium text-white group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60 mt-4 md:mt-5">
                         <span
                             class="pointer-events-none absolute w-64 h-0 rotate-45 -translate-x-20 bg-white top-1/2 transition-all duration-300 ease-out group-hover:h-64 group-hover:-translate-y-32"></span>
@@ -524,7 +524,7 @@
                     </div>
 
                     <!-- Button -->
-                    <a href="monthly-packages.html"
+                    <a href="{{ route('meal.plans', ['plan' => 'monthly']) }}" wire:navigate
                         class="inline-block relative isolate rounded-full px-8 md:px-10 py-2.5 md:py-3 m-1 overflow-hidden cursor-pointer bg-slate-900 font-medium text-white group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60 mt-4 md:mt-5">
                         <span
                             class="pointer-events-none absolute w-64 h-0 rotate-45 -translate-x-20 bg-white top-1/2 transition-all duration-300 ease-out group-hover:h-64 group-hover:-translate-y-32"></span>

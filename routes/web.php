@@ -55,7 +55,10 @@ Route::get('dishes', DishIndex::class)->name('fontDishes.index');
 Route::get('/cart', CartPage::class)->name('cart.page');
 
 // Plans
-Route::get('/meal-plans', MealPlan::class)->name('meal.plans');
+// Route::get('/meal-plans', MealPlan::class)->name('meal.plans');
+Route::get('/meal-plans/{plan?}', MealPlan::class)
+    ->name('meal.plans');
+
 
 // SSl Payment routes
 Route::get('/payment/ssl/init/{order}', [SslCommerzController::class, 'init'])->name('ssl.init');

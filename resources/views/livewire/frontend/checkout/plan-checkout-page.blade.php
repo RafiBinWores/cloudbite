@@ -11,8 +11,7 @@
                         <div class="flex items-center gap-3">
                             <div
                                 class="size-10 rounded-xl grid place-items-center bg-gradient-to-tr from-customRed-100/25 to-customRed-200/10 text-customRed-100">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24"
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round">
                                     <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
@@ -39,8 +38,7 @@
                         @endphp
 
                         @if ($addresses && $addresses->count())
-                            <button type="button"
-                                class="text-amber-500 hover:text-amber-600 text-sm font-medium"
+                            <button type="button" class="text-amber-500 hover:text-amber-600 text-sm font-medium"
                                 x-data
                                 @click="$dispatch('address-modal:open', { selectedId: {{ $selectedAddressId ?? 'null' }} })">
                                 Update Info
@@ -52,8 +50,7 @@
                         <div class="space-y-4 text-[15px]">
                             {{-- Name --}}
                             <div class="flex items-start gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-70"
-                                    viewBox="0 0 24 24"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-70" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round">
                                     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
@@ -83,8 +80,7 @@
 
                             {{-- Address --}}
                             <div class="flex items-start gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="size-9 opacity-70"
-                                    viewBox="0 0 24 24"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="size-9 opacity-70" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round">
                                     <path
@@ -108,11 +104,9 @@
                                 <label class="text-sm font-medium">Note to rider (optional)</label>
                                 <div class="flex items-center justify-between">
                                     <span class="text-[11px] opacity-60">You can update this for this plan.</span>
-                                    <span class="text-[11px] opacity-60"
-                                        x-text="`${(note || '').length}/200`"></span>
+                                    <span class="text-[11px] opacity-60" x-text="`${(note || '').length}/200`"></span>
                                 </div>
-                                <textarea x-model="note" @blur="$wire.set('customer_note', note, true)"
-                                    rows="3" maxlength="200"
+                                <textarea x-model="note" @blur="$wire.set('customer_note', note, true)" rows="3" maxlength="200"
                                     class="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-400 focus:ring-2 focus:ring-red-200"></textarea>
                                 @error('customer_note')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -130,9 +124,7 @@
 
                 {{-- Address Select Modal --}}
                 @if ($addresses && $addresses->count())
-                    <livewire:frontend.checkout.modal.address-modal
-                        :addresses="$addresses"
-                        :selected-address-id="$selectedAddressId" />
+                    <livewire:frontend.checkout.modal.address-modal :addresses="$addresses" :selected-address-id="$selectedAddressId" />
                 @endif
 
                 {{-- Payment --}}
@@ -140,9 +132,8 @@
                     <header class="flex items-center gap-3 mb-5">
                         <div
                             class="size-10 rounded-xl grid place-items-center bg-gradient-to-tr from-customRed-100/25 to-customRed-200/10 text-customRed-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path
                                     d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
                                 <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
@@ -158,18 +149,14 @@
                     <div class="mb-5">
                         <h3 class="text-sm font-medium">Payment option</h3>
                         <div class="mt-2 flex flex-wrap gap-3">
-                            <button
-                                type="button"
-                                wire:click="$set('payment_option','full')"
+                            <button type="button" wire:click="$set('payment_option','full')"
                                 class="px-3 py-1.5 rounded-full text-xs border
                                     {{ $payment_option === 'full'
                                         ? 'bg-slate-900 text-white border-slate-900'
                                         : 'border-slate-300 text-slate-700 hover:bg-slate-100' }}">
                                 Pay full amount
                             </button>
-                            <button
-                                type="button"
-                                wire:click="$set('payment_option','half')"
+                            <button type="button" wire:click="$set('payment_option','half')"
                                 class="px-3 py-1.5 rounded-full text-xs border
                                     {{ $payment_option === 'half'
                                         ? 'bg-slate-900 text-white border-slate-900'
@@ -250,26 +237,51 @@
                     </p>
 
                     @php
-                        $payNow = $payment_option === 'half'
-                            ? $grand_total / 2
-                            : $grand_total;
+                        $payNow = $payment_option === 'half' ? $grand_total / 2 : $grand_total;
                         $dueLater = max(0, $grand_total - $payNow);
                     @endphp
 
                     {{-- Plan Total --}}
+                    {{-- Subtotal (before coupon) --}}
+                    {{-- <div class="flex items-center justify-between text-sm">
+    <span class="opacity-80">Subtotal</span>
+    <span>
+        {{ number_format($plan_total, 2) }}
+        <span class="font-oswald">৳</span>
+    </span>
+</div> --}}
+
+                    {{-- Coupon Discount --}}
+                    {{-- @if (!empty($couponApplied) && ($coupon_discount_total ?? 0) > 0)
+    <div class="flex items-center justify-between text-sm">
+        <span class="opacity-80">
+            Coupon discount
+            @if (!empty($couponCode))
+                <span class="text-xs opacity-60">({{ $couponCode }})</span>
+            @endif
+        </span>
+        <span class="text-emerald-600">
+            (-) {{ number_format($coupon_discount_total, 2) }}
+            <span class="font-oswald">৳</span>
+        </span>
+    </div>
+@endif --}}
+
+                    {{-- Meal Plan Total (after coupon) --}}
                     <div class="flex items-center justify-between text-sm">
                         <span class="opacity-80">Meal plan total</span>
-                        <span>
-                            {{ number_format($plan_total, 2) }}
+                        <span class="font-semibold">
+                            {{ number_format($net_total, 2) }}
                             <span class="font-oswald">৳</span>
                         </span>
                     </div>
+
 
                     {{-- Delivery Fee --}}
                     @if ($shipSetting)
                         @php
                             $freeMin = (float) ($shipSetting->free_minimum ?? 0);
-                            $isFree  = (bool) ($shipSetting->free_delivery ?? false);
+                            $isFree = (bool) ($shipSetting->free_delivery ?? false);
                         @endphp
 
                         <div class="flex items-center justify-between text-sm">
@@ -325,12 +337,8 @@
                         </span>
                     </div>
 
-                    <button
-                        wire:click="placePlanBooking"
-                        wire:loading.attr="disabled"
-                        wire:target="placePlanBooking"
-                        class="btn bg-customRed-100 text-white w-full h-12 rounded-xl disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4"
-                    >
+                    {{-- <button wire:click="placePlanBooking" wire:loading.attr="disabled" wire:target="placePlanBooking"
+                        class="btn bg-customRed-100 text-white w-full h-12 rounded-xl disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 font-oswald uppercase lg:text-lg cursor-pointer">
                         <span wire:loading.remove wire:target="placePlanBooking">
                             Confirm plan booking
                         </span>
@@ -342,6 +350,14 @@
                                     d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z" />
                             </svg>
                             Booking…
+                        </span>
+                    </button> --}}
+
+                    <button type="button" wire:click="placePlanBooking" wire:loading.attr="disabled" wire:target="placePlanBooking"
+                        class="group relative inline-flex w-full items-center justify-center rounded-md px-8 md:px-10 py-3 overflow-hidden bg-customRed-100 font-oswald text-white no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60 cursor-pointer">
+                        <span class="pointer-events-none absolute inset-0 bg-slate-900 transform origin-center scale-0 rotate-45 transition-transform duration-500 ease-out group-hover:scale-1125"></span>
+                        <span class="relative z-10 transition-colors duration-300 group-hover:text-white uppercase">
+                            Confirm plan booking
                         </span>
                     </button>
 
