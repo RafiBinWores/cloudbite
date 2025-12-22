@@ -9,7 +9,7 @@
             <p class="text-slate-600 text-sm">
                 You don’t have any meal plan bookings yet.
             </p>
-            <a href="{{ route('meal.plan') }}"
+            <a href="{{ route('meal.plans') }}"
                class="inline-flex items-center justify-center mt-4 px-4 py-2 rounded-xl bg-customRed-100 text-white text-sm font-medium hover:bg-customRed-200">
                 Create your first meal plan
             </a>
@@ -164,11 +164,13 @@
                             </a>
                         </div>
                     </div>
-
-                    {{-- (No more collapsible day summary; full details live on details page) --}}
                 </div>
             @endforeach
         </div>
     @endif
+
+    <div class="mt-6">
+        {{ $bookings->links() }}
+    </div>
 
 </div>

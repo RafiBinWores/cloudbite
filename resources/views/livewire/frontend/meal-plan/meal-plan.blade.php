@@ -16,19 +16,20 @@
                 </p>
             </div>
 
-            <div class="inline-flex rounded-full border border-slate-200 bg-white overflow-hidden">
-                <a type="button" wire:click="$set('planType', 'weekly')"
-                    class="px-4 py-2 text-sm font-medium font-jost cursor-pointer
-                           {{ $planType === 'weekly' ? 'bg-customRed-100 text-white' : 'text-slate-700 hover:bg-slate-50' }}">
-                    Weekly
-                </a>
+            <div class="inline-flex w-fit shrink-0 rounded-full border border-slate-200 bg-white overflow-hidden">
+    <button type="button" wire:click="$set('planType', 'weekly')"
+        class="px-4 py-2 text-sm font-medium font-jost cursor-pointer
+               {{ $planType === 'weekly' ? 'bg-customRed-100 text-white' : 'text-slate-700 hover:bg-slate-50' }}">
+        Weekly
+    </button>
 
-                <button type="button" wire:click="$set('planType', 'monthly')"
-                    class="px-4 py-2 text-sm font-medium font-jost border-l border-slate-200 cursor-pointer
-                           {{ $planType === 'monthly' ? 'bg-customRed-100 text-white' : 'text-slate-700 hover:bg-slate-50' }}">
-                    Monthly
-                </button>
-            </div>
+    <button type="button" wire:click="$set('planType', 'monthly')"
+        class="px-4 py-2 text-sm font-medium font-jost border-l border-slate-200 cursor-pointer
+               {{ $planType === 'monthly' ? 'bg-customRed-100 text-white' : 'text-slate-700 hover:bg-slate-50' }}">
+        Monthly
+    </button>
+</div>
+
         </div>
 
         {{-- Start Date --}}
@@ -125,7 +126,7 @@
 
                         @if ($planType === 'monthly')
                             <button type="button" wire:click="copyWeekOneToAll"
-                                class="text-xs md:text-sm inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:bg-white bg-slate-50 cursor-pointer font-medium">
+                                class="text-xs inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:bg-white bg-slate-50 cursor-pointer font-medium">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round">
