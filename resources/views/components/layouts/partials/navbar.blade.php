@@ -10,7 +10,7 @@
 
             <!-- Logo (centered on sm & md) -->
             <a href="/" class="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
-                <img src="{{ asset($businessSetting->logo_dark) }}" alt="Logo" class="h-10 md:h-12" />
+                <img src="{{ asset($businessSetting->logo_dark) }}" alt="Logo" class="h-10 md:h-14" />
             </a>
 
             <!-- Desktop Menu -->
@@ -74,7 +74,7 @@
             <!-- Menu Items -->
             <ul class="flex flex-col font-oswald text-lg font-medium text-slate-900 mt-4">
                 <li>
-                    <a href="/" class="block px-5 py-4 hover:bg-slate-100">Home</a>
+                    <a href="/" wire:navigate class="block px-5 py-4 hover:bg-slate-100">Home</a>
                 </li>
 
                 <!-- Dropdown -->
@@ -91,19 +91,18 @@
                     <!-- Inline Dropdown -->
                     <ul x-show="catOpen" x-transition class="pl-8 pr-4 bg-slate-50 text-base text-slate-800">
                         <li>
-                            <a href="{{ route('fontDishes.index') }}" wire:navigate class="block py-2 hover:text-rose-600">All</a>
+                            <a href="/" wire:navigate class="block py-2 hover:text-rose-600">All</a>
                         </li>
                         @foreach ($navbarCategories as $cat)
                             <li>
-                                <a href="{{ route('fontDishes.index', ['categories' => [$cat->slug]]) }}" wire:navigate
-                                    class="block py-2 hover:text-rose-600">{{ $cat->name }}</a>
-                            </li>
+                            <a href="{{ route('fontDishes.index', ['categories' => [$cat->slug]]) }}" wire:navigate class="block py-2 hover:text-rose-600">{{ $cat->name }}</a>
+                        </li>
                         @endforeach
                     </ul>
                 </li>
 
                 <li>
-                    <a href="{{ route('fontDishes.index') }}" class="block px-5 py-4 hover:bg-slate-100">Dishes</a>
+                    <a href="#" class="block px-5 py-4 hover:bg-slate-100">Dishes</a>
                 </li>
                 <li>
                     <a href="#" class="block px-5 py-4 hover:bg-slate-100">Contact</a>

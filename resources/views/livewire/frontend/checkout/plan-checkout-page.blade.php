@@ -38,7 +38,7 @@
                         @endphp
 
                         @if ($addresses && $addresses->count())
-                            <button type="button" class="text-amber-500 hover:text-amber-600 text-sm font-medium"
+                            <button type="button" class="text-amber-500 hover:text-amber-600 text-sm font-medium cursor-pointer"
                                 x-data
                                 @click="$dispatch('address-modal:open', { selectedId: {{ $selectedAddressId ?? 'null' }} })">
                                 Update Info
@@ -150,14 +150,14 @@
                         <h3 class="text-sm font-medium">Payment option</h3>
                         <div class="mt-2 flex flex-wrap gap-3">
                             <button type="button" wire:click="$set('payment_option','full')"
-                                class="px-3 py-1.5 rounded-full text-xs border
+                                class="px-3 py-1.5 rounded-full text-xs border cursor-pointer
                                     {{ $payment_option === 'full'
                                         ? 'bg-slate-900 text-white border-slate-900'
                                         : 'border-slate-300 text-slate-700 hover:bg-slate-100' }}">
                                 Pay full amount
                             </button>
                             <button type="button" wire:click="$set('payment_option','half')"
-                                class="px-3 py-1.5 rounded-full text-xs border
+                                class="px-3 py-1.5 rounded-full text-xs border cursor-pointer
                                     {{ $payment_option === 'half'
                                         ? 'bg-slate-900 text-white border-slate-900'
                                         : 'border-slate-300 text-slate-700 hover:bg-slate-100' }}">
@@ -361,7 +361,7 @@
                         </span>
                     </button>
 
-                    <p class="text-xs opacity-60">
+                    <p class="text-xs opacity-60 text-center">
                         By confirming this plan, you agree to our Terms & Refund Policy.
                     </p>
                 </div>

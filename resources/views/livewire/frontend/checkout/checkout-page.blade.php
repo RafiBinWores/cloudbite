@@ -40,7 +40,8 @@
                                     collect($addresses ?? [])->first());
                         @endphp
 
-                        <button type="button" class="text-amber-500 hover:text-amber-600 text-sm font-medium" x-data
+                        <button type="button"
+                            class="text-amber-500 hover:text-amber-600 text-sm font-medium cursor-pointer" x-data
                             @click="$dispatch('address-modal:open', { selectedId: {{ $selectedAddressId ?? 'null' }} })">
                             Update Info
                         </button>
@@ -253,9 +254,9 @@
                         </span>
                     </div>
 
-                    <button wire:click="placeOrder" wire:loading.attr="disabled" wire:target="placeOrder"
-                        class="btn bg-customRed-100 text-white w-full h-12 rounded-xl disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                        <span wire:loading.remove wire:target="placeOrder">Place order</span>
+                    {{-- <button wire:click="placeOrder" wire:loading.attr="disabled" wire:target="placeOrder"
+                        class="btn bg-customRed-100 text-white w-full h-12 rounded-xl disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold cursor-pointer">
+                        <span wire:loading.remove wire:target="placeOrder">Place Order</span>
                         <span wire:loading wire:target="placeOrder" class="inline-flex items-center gap-2">
                             <svg class="animate-spin size-4" viewBox="0 0 24 24" fill="none">
                                 <circle class="opacity-25" cx="12" cy="12" r="10"
@@ -264,6 +265,16 @@
                                     d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z" />
                             </svg>
                             Placing…
+                        </span>
+                    </button> --}}
+
+                    <button type="button" wire:click="placeOrder" wire:loading.attr="disabled"
+                        wire:target="placeOrder"
+                        class="group relative inline-flex w-full items-center justify-center rounded-md px-8 md:px-10 py-3 overflow-hidden bg-customRed-100 font-oswald text-white no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60 cursor-pointer">
+                        <span
+                            class="pointer-events-none absolute inset-0 bg-slate-900 transform origin-center scale-0 rotate-45 transition-transform duration-500 ease-out group-hover:scale-1125"></span>
+                        <span class="relative z-10 transition-colors duration-300 group-hover:text-white uppercase">
+                            Place Order
                         </span>
                     </button>
 

@@ -56,7 +56,7 @@ class CheckoutPage extends Component
     {
         return [
             'contact_name'   => 'required|string|max:191',
-            'phone'          => ['required','regex:/^(?:\+?88)?01[3-9]\d{8}$/'],
+            'phone'          => ['required', 'regex:/^(?:\+?88)?01[3-9]\d{8}$/'],
             'email'          => 'nullable|email',
             'address_line1'  => 'required|string|max:255',
             'city'           => 'required|string|max:120',
@@ -80,12 +80,15 @@ class CheckoutPage extends Component
         $user = Auth::user();
         $sessionId = Session::getId();
 
-        $this->cart = Cart::with(['items.dish','items.crust','items.bun'])
+        $this->cart = Cart::with(['items.dish', 'items.crust', 'items.bun'])
             ->when($user, fn($q) => $q->where('user_id', $user->id))
             ->when(!$user, fn($q) => $q->where('session_id', $sessionId))
             ->latest('id')->first();
 
-        abort_unless($this->cart && $this->cart->items->isNotEmpty(), 404, 'Your cart is empty.');
+        if (! $this->cart || $this->cart->items->isEmpty()) {
+            redirect()->route('fontDishes.index');
+            return;
+        }
 
         $this->shipSetting = ShippingSetting::query()->latest('id')->first();
 
@@ -128,7 +131,7 @@ class CheckoutPage extends Component
     public function useAddress(int $addressId): void
     {
         $addr = $this->addresses->firstWhere('id', $addressId)
-              ?? Address::where('user_id', Auth::id())->find($addressId);
+            ?? Address::where('user_id', Auth::id())->find($addressId);
 
         if (! $addr) return;
 
@@ -182,7 +185,7 @@ class CheckoutPage extends Component
 
     public function updated($field): void
     {
-        if (in_array($field, ['address_line1','city','postcode'])) {
+        if (in_array($field, ['address_line1', 'city', 'postcode'])) {
             $this->hydrateTotals();
         }
     }
@@ -224,8 +227,8 @@ class CheckoutPage extends Component
                 ->where('order_code', 'like', "{$year}%")
                 ->orderByDesc('id')->first();
 
-            $nextNumber = ($lastOrder && preg_match('/'.$year.'(\d{4})$/', $lastOrder->order_code, $m))
-                        ? (int)$m[1] + 1 : 1;
+            $nextNumber = ($lastOrder && preg_match('/' . $year . '(\d{4})$/', $lastOrder->order_code, $m))
+                ? (int)$m[1] + 1 : 1;
 
             $code = $year . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 

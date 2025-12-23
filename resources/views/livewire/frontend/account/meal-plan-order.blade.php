@@ -139,14 +139,14 @@
 
                         <div class="flex items-center gap-2 justify-end">
                             {{-- Re-order button (only if completed) --}}
-                            @if($booking->status === 'completed')
+                            {{-- @if($booking->status === 'completed')
                                 <button
                                     wire:click="reorder('{{ $booking->booking_code }}')"
                                     class="px-3 py-2 rounded-xl border border-customRed-100 text-customRed-100 text-xs font-medium hover:bg-customRed-50 transition"
                                 >
                                     Re-order this plan
                                 </button>
-                            @endif
+                            @endif --}}
 
                             <a href="{{ route('meal-plan.booking.show', $booking->booking_code) }}"
                                class="px-3 py-2 rounded-xl text-xs font-medium border border-slate-200 hover:bg-slate-50 flex items-center gap-1">

@@ -95,7 +95,7 @@
                     <!-- Inline Dropdown -->
                     <ul x-show="catOpen" x-transition class="pl-8 pr-4 bg-slate-50 text-base text-slate-800">
                         <li>
-                            <a href="/" wire:navigate class="block py-2 hover:text-rose-600">All</a>
+                            <a href="{{ route('fontDishes.index') }}" wire:navigate class="block py-2 hover:text-rose-600">All</a>
                         </li>
                         @foreach ($navbarCategories as $cat)
                             <li>
@@ -106,7 +106,7 @@
                 </li>
 
                 <li>
-                    <a href="#" class="block px-5 py-4 hover:bg-slate-100">Dishes</a>
+                    <a href="{{ route('fontDishes.index') }}" class="block px-5 py-4 hover:bg-slate-100">Dishes</a>
                 </li>
                 <li>
                     <a href="#" class="block px-5 py-4 hover:bg-slate-100">Contact</a>

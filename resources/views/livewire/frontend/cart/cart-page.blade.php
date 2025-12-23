@@ -11,6 +11,7 @@
                     transform: translateX(-100%);
                 }
             }
+
             .animate-marquee {
                 animation: marqueeScroll 12s linear infinite;
                 will-change: transform;
@@ -380,12 +381,22 @@
                             </span>
                         </div>
 
-                        <div class="flex text-center">
-                            <a href="{{ route('checkout') }}"
+                        {{-- <div class="flex text-center">
+                            <a href="{{ route('checkout') }}" wire:navigate
                                 class="bg-customRed-100 hover:bg-customRed-200 duration-200 text-white w-full py-3 rounded-xl flex gap-2 items-center justify-center font-semibold">
                                 Proceed to checkout
                             </a>
-                        </div>
+                        </div> --}}
+
+                        <a href="{{ route('checkout') }}" wire:navigate
+                            class="group relative inline-flex w-full items-center justify-center rounded-md px-8 md:px-10 py-3 overflow-hidden bg-customRed-100 font-oswald text-white no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60 cursor-pointer">
+                            <span
+                                class="pointer-events-none absolute inset-0 bg-slate-900 transform origin-center scale-0 rotate-45 transition-transform duration-500 ease-out group-hover:scale-1125"></span>
+                            <span
+                                class="relative z-10 transition-colors duration-300 group-hover:text-white uppercase">
+                                Proceed to checkout
+                            </span>
+                        </a>
                     </div>
                 </div>
 

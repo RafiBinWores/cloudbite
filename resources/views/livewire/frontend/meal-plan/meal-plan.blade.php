@@ -387,7 +387,7 @@
                                     placeholder="Enter coupon code"
                                     class="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-jost text-slate-700 focus:outline-none focus:ring-2 focus:ring-customRed-100" />
                                 <button type="button" wire:click="applyCoupon"
-                                    class="h-11 px-4 rounded-lg bg-customRed-100 text-white font-oswald hover:bg-customRed-100/90">
+                                    class="h-11 px-4 rounded-lg bg-customRed-100 text-white font-oswald hover:bg-customRed-100/90 cursor-pointer">
                                     Apply
                                 </button>
                             </div>
