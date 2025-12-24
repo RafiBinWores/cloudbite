@@ -40,10 +40,14 @@ class EditDish extends Component
     // Variations
     public $variations = [];
 
-    // 🔥 Hero fields
+    // Hero fields
     public $show_in_hero = 'No';
     public $hero_image = null;
     public $hero_discount_image = null;
+
+    // Menu fields
+    public $show_in_menu = 'No';
+    public $menu_sort = 0;
 
     public function mount(Dish $dish)
     {
@@ -81,8 +85,12 @@ class EditDish extends Component
         // load variations json
         $this->variations = $dish->variations ?? [];
 
-        // 🔥 hero flags from DB
+        // hero flags from DB
         $this->show_in_hero = $dish->show_in_hero ? 'Yes' : 'No';
+
+        // menu flags from DB
+        $this->show_in_menu = $dish->show_in_menu ? 'Yes' : 'No';
+        $this->menu_sort    = (int) ($dish->menu_sort ?? 0);
     }
 
     public function rules(): array
@@ -128,10 +136,14 @@ class EditDish extends Component
             'variations.*.options.*.label' => 'required_with:variations.*.name|string|max:100',
             'variations.*.options.*.price' => 'required_with:variations.*.name|numeric|min:0',
 
-            // 🔥 hero rules
+            // hero rules
             'show_in_hero' => 'required|in:Yes,No',
             'hero_image'   => 'nullable|image|max:5048|mimes:jpg,jpeg,png,webp,svg',
             'hero_discount_image' => 'nullable|image|max:5048|mimes:png,webp,svg',
+
+            // menu rules
+            'show_in_menu' => 'required|in:Yes,No',
+            'menu_sort'    => 'nullable|integer|min:0',
         ];
     }
 
@@ -331,7 +343,11 @@ class EditDish extends Component
                 // hero fields
                 'show_in_hero'       => $this->show_in_hero === 'Yes',
                 'hero_image'         => $newHeroImagePath ?: $oldHeroImage,
-                'hero_discount_image'=> $newHeroBadgePath ?: $oldHeroBadge,
+                'hero_discount_image' => $newHeroBadgePath ?: $oldHeroBadge,
+
+                // menu fields
+                'show_in_menu' => $this->show_in_menu === 'Yes',
+                'menu_sort'    => (int) ($this->menu_sort ?? 0),
             ];
 
             $buns    = array_values(array_filter((array)$this->buns));
@@ -371,7 +387,6 @@ class EditDish extends Component
                 showProgress: true,
                 showCloseIcon: true,
             );
-
         } catch (\Throwable $e) {
             if ($newThumb) Storage::disk('public')->delete($newThumb);
             if (!empty($newGallery)) Storage::disk('public')->delete($newGallery);

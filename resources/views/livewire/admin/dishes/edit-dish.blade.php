@@ -2,8 +2,8 @@
     {{-- Preload existing image URLs for Alpine fallbacks --}}
     @php
         use Illuminate\Support\Facades\Storage;
-        $existingThumb   = $this->dish?->thumbnail ? Storage::url($this->dish->thumbnail) : null;
-        $existingGallery = collect((array)($this->dish?->gallery ?? []))
+        $existingThumb = $this->dish?->thumbnail ? Storage::url($this->dish->thumbnail) : null;
+        $existingGallery = collect((array) ($this->dish?->gallery ?? []))
             ->map(fn($p) => Storage::url($p))
             ->filter()
             ->values()
@@ -30,7 +30,8 @@
             <!-- LEFT COLUMN -->
             <div class="lg:col-span-7 space-y-6">
                 <!-- Name & Short Description -->
-                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Name and Short Description</h3>
 
                     <div class="space-y-6">
@@ -51,7 +52,8 @@
                 </section>
 
                 <!-- Product Details -->
-                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Product Details</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -59,14 +61,16 @@
                         <div class="form-group">
                             @php
                                 $cat = App\Models\Category::where('status', 'active')
-                                    ->get(['id','name','image'])
-                                    ->map(fn($c) => [
-                                        'id' => $c->id,
-                                        'name' => $c->name,
-                                        'avatar' => $c->image
-                                            ? Storage::url($c->image)
-                                            : asset('assets/images/placeholders/cat-placeholder.png'),
-                                    ]);
+                                    ->get(['id', 'name', 'image'])
+                                    ->map(
+                                        fn($c) => [
+                                            'id' => $c->id,
+                                            'name' => $c->name,
+                                            'avatar' => $c->image
+                                                ? Storage::url($c->image)
+                                                : asset('assets/images/placeholders/cat-placeholder.png'),
+                                        ],
+                                    );
                             @endphp
 
                             <x-select wire:model.live="category_id" label="Category*" :options="$cat"
@@ -78,14 +82,16 @@
                         <div class="form-group">
                             @php
                                 $cuisines = App\Models\Cuisine::where('status', 'active')
-                                    ->get(['id','name','image'])
-                                    ->map(fn($c) => [
-                                        'id' => $c->id,
-                                        'name' => $c->name,
-                                        'image' => $c->image
-                                            ? Storage::url($c->image)
-                                            : asset('assets/images/placeholders/cat-placeholder.png'),
-                                    ]);
+                                    ->get(['id', 'name', 'image'])
+                                    ->map(
+                                        fn($c) => [
+                                            'id' => $c->id,
+                                            'name' => $c->name,
+                                            'image' => $c->image
+                                                ? Storage::url($c->image)
+                                                : asset('assets/images/placeholders/cat-placeholder.png'),
+                                        ],
+                                    );
                             @endphp
 
                             <x-select wire:model.live="cuisine_id" label="Cuisine*" :options="$cuisines"
@@ -105,14 +111,16 @@
                         <div class="form-group md:col-span-2">
                             @php
                                 $dishes = App\Models\Dish::where('visibility', 'Yes')
-                                    ->get(['id','title','thumbnail'])
-                                    ->map(fn($d) => [
-                                        'id' => $d->id,
-                                        'name' => $d->title,
-                                        'avatar' => $d->thumbnail
-                                            ? Storage::url($d->thumbnail)
-                                            : asset('assets/images/placeholders/cat-placeholder.png'),
-                                    ]);
+                                    ->get(['id', 'title', 'thumbnail'])
+                                    ->map(
+                                        fn($d) => [
+                                            'id' => $d->id,
+                                            'name' => $d->title,
+                                            'avatar' => $d->thumbnail
+                                                ? Storage::url($d->thumbnail)
+                                                : asset('assets/images/placeholders/cat-placeholder.png'),
+                                        ],
+                                    );
                             @endphp
 
                             <x-select wire:model.live="related_dishes" label="Related Dishes" :options="$dishes"
@@ -123,13 +131,15 @@
                 </section>
 
                 <!-- Pricing -->
-                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Dish Pricing</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {{-- Base Price --}}
                         <div class="form-group md:col-span-2">
-                            <x-input type="number" min="0" step="any" label="Base Price (Tk)*" wire:model.live="price"
+                            <x-input type="number" min="0" step="any" label="Base Price (Tk)*"
+                                wire:model.live="price"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('price') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Price" />
                             <small class="text-xs text-neutral-500 dark:text-neutral-300">
@@ -145,7 +155,8 @@
 
                         {{-- Discount --}}
                         <div class="form-group">
-                            <x-input type="number" min="0" step="any" label="Discount" wire:model.live="discount"
+                            <x-input type="number" min="0" step="any" label="Discount"
+                                wire:model.live="discount"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('discount') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
                                 placeholder="Discount" />
                         </div>
@@ -160,7 +171,8 @@
                 </section>
 
                 <!-- Variations -->
-                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-semibold dark:text-gray-100">Variations</h3>
 
@@ -172,21 +184,16 @@
 
                     <div class="space-y-4">
                         @forelse($variations as $vIndex => $variation)
-                            <div class="border border-gray-200 dark:border-neutral-600 rounded-xl p-4 bg-neutral-50 dark:bg-neutral-600">
+                            <div
+                                class="border border-gray-200 dark:border-neutral-600 rounded-xl p-4 bg-neutral-50 dark:bg-neutral-600">
                                 <div class="flex items-start gap-3">
                                     <div class="flex-1">
-                                        <x-input
-                                            label="Variation Name* (ex: Size, Crust, Drink)"
-                                            wire:model.live="variations.{{ $vIndex }}.name"
-                                            placeholder="Size"
+                                        <x-input label="Variation Name* (ex: Size, Crust, Drink)"
+                                            wire:model.live="variations.{{ $vIndex }}.name" placeholder="Size"
                                             class="rounded-lg !bg-white/10 !py-[9px]" />
                                     </div>
 
-                                    <flux:button
-                                        type="button"
-                                        icon="trash-icon"
-                                        variant="filled"
-                                        class="mt-6"
+                                    <flux:button type="button" icon="trash-icon" variant="filled" class="mt-6"
                                         wire:click="removeVariationGroup({{ $vIndex }})">
                                         Remove
                                     </flux:button>
@@ -196,29 +203,25 @@
                                     <div class="flex items-center justify-between">
                                         <p class="font-medium text-sm dark:text-gray-100">Options</p>
 
-                                        <button type="button"
-                                            wire:click="addVariationOption({{ $vIndex }})"
+                                        <button type="button" wire:click="addVariationOption({{ $vIndex }})"
                                             class="text-sm text-rose-600 hover:underline">
                                             + Add Option
                                         </button>
                                     </div>
 
-                                    @foreach(($variation['options'] ?? []) as $oIndex => $option)
+                                    @foreach ($variation['options'] ?? [] as $oIndex => $option)
                                         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
                                             <div class="md:col-span-7">
-                                                <x-input
-                                                    label="Option Name* (ex: Small, Medium)"
+                                                <x-input label="Option Name* (ex: Small, Medium)"
                                                     wire:model.live="variations.{{ $vIndex }}.options.{{ $oIndex }}.label"
-                                                    placeholder="Small"
-                                                    class="rounded-lg !bg-white/10 !py-[9px]" />
+                                                    placeholder="Small" class="rounded-lg !bg-white/10 !py-[9px]" />
                                             </div>
 
                                             <div class="md:col-span-4">
                                                 <x-input type="number" min="0" step="any"
                                                     label="Price (Tk)*"
                                                     wire:model.live="variations.{{ $vIndex }}.options.{{ $oIndex }}.price"
-                                                    placeholder="0"
-                                                    class="rounded-lg !bg-white/10 !py-[9px]" />
+                                                    placeholder="0" class="rounded-lg !bg-white/10 !py-[9px]" />
                                             </div>
 
                                             <div class="md:col-span-1">
@@ -241,19 +244,18 @@
                 </section>
 
                 {{-- 🔥 Hero Section (Slider) – above Meta Info --}}
-                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <div class="flex items-center gap-2 mb-4">
                         <h3 class="text-lg font-semibold dark:text-gray-100">
                             Hero Section (Slider)
                         </h3>
-                        <small class="text-xs text-neutral-500 dark:text-neutral-300">(Optional)</small>
                     </div>
 
                     <div class="space-y-4">
                         {{-- Show in hero toggle --}}
                         <div class="form-group">
-                            <x-select wire:model.live="show_in_hero"
-                                label="Show this dish in home hero slider?"
+                            <x-select wire:model.live="show_in_hero" label="Show this dish in home hero slider?"
                                 :options="['No', 'Yes']"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('show_in_hero') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
                             <small class="text-xs text-neutral-500 dark:text-neutral-300">
@@ -268,7 +270,9 @@
                             {{-- Hero PNG image --}}
                             <div class="form-group">
                                 <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
-                                    Hero PNG Image @if($show_in_hero === 'Yes') <span class="text-red-500">*</span> @endif
+                                    Hero PNG Image @if ($show_in_hero === 'Yes')
+                                        <span class="text-red-500">*</span>
+                                    @endif
                                 </label>
 
                                 <div class="relative aspect-square w-full overflow-hidden rounded-xl border
@@ -276,14 +280,17 @@
                                         bg-neutral-50 dark:bg-neutral-600 cursor-pointer"
                                     onclick="this.querySelector('input[type=file]').click()">
 
-                                    @if($hero_image)
+                                    @if ($hero_image)
                                         {{-- New upload preview --}}
-                                        <img src="{{ $hero_image->temporaryUrl() }}" class="h-full w-full object-contain p-4" alt="">
+                                        <img src="{{ $hero_image->temporaryUrl() }}"
+                                            class="h-full w-full object-contain p-4" alt="">
                                     @elseif($this->dish?->hero_image)
                                         {{-- Existing stored hero image --}}
-                                        <img src="{{ Storage::url($this->dish->hero_image) }}" class="h-full w-full object-contain p-4" alt="">
+                                        <img src="{{ Storage::url($this->dish->hero_image) }}"
+                                            class="h-full w-full object-contain p-4" alt="">
                                     @else
-                                        <div class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300 px-3">
+                                        <div
+                                            class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300 px-3">
                                             <p>
                                                 Upload hero PNG (transparent).<br>
                                                 <small class="text-xs">Recommended: square PNG for hero slider.</small>
@@ -291,7 +298,8 @@
                                         </div>
                                     @endif
 
-                                    <input type="file" class="hidden" accept="image/*" wire:model.live="hero_image">
+                                    <input type="file" class="hidden" accept="image/*"
+                                        wire:model.live="hero_image">
                                 </div>
 
                                 @error('hero_image')
@@ -302,7 +310,7 @@
                             {{-- Hero discount badge image --}}
                             <div class="form-group">
                                 <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
-                                    Hero Discount Badge (Optional)
+                                    Hero Discount Badge
                                 </label>
 
                                 <div class="relative aspect-square w-full overflow-hidden rounded-xl border
@@ -310,22 +318,27 @@
                                         bg-neutral-50 dark:bg-neutral-600 cursor-pointer"
                                     onclick="this.querySelector('input[type=file]').click()">
 
-                                    @if($hero_discount_image)
+                                    @if ($hero_discount_image)
                                         {{-- New upload --}}
-                                        <img src="{{ $hero_discount_image->temporaryUrl() }}" class="h-full w-full object-contain p-4" alt="">
+                                        <img src="{{ $hero_discount_image->temporaryUrl() }}"
+                                            class="h-full w-full object-contain p-4" alt="">
                                     @elseif($this->dish?->hero_discount_image)
                                         {{-- Existing stored badge --}}
-                                        <img src="{{ Storage::url($this->dish->hero_discount_image) }}" class="h-full w-full object-contain p-4" alt="">
+                                        <img src="{{ Storage::url($this->dish->hero_discount_image) }}"
+                                            class="h-full w-full object-contain p-4" alt="">
                                     @else
-                                        <div class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300 px-3">
+                                        <div
+                                            class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300 px-3">
                                             <p>
                                                 Upload small badge (e.g. -20% OFF).<br>
-                                                <small class="text-xs">Transparent PNG badge used in hero corner.</small>
+                                                <small class="text-xs">Transparent PNG badge used in hero
+                                                    corner.</small>
                                             </p>
                                         </div>
                                     @endif
 
-                                    <input type="file" class="hidden" accept="image/*" wire:model.live="hero_discount_image">
+                                    <input type="file" class="hidden" accept="image/*"
+                                        wire:model.live="hero_discount_image">
                                 </div>
 
                                 @error('hero_discount_image')
@@ -343,7 +356,8 @@
                 </section>
 
                 {{-- Meta info --}}
-                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <div class="flex items-center gap-1 mb-4">
                         <h3 class="text-lg font-semibold dark:text-gray-100">Meta Information</h3>
                         <small>(Optional)</small>
@@ -374,7 +388,8 @@
             <!-- RIGHT COLUMN -->
             <div class="lg:col-span-5 space-y-6">
                 <!-- Dish Customization -->
-                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Dish Customization</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -405,7 +420,8 @@
                 </section>
 
                 <!-- Manage stock -->
-                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Manage Stock</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -416,7 +432,7 @@
                         </div>
 
                         <div class="form-group">
-                            <x-select wire:model.live="track_stock" label="Track Stock" :options="['Yes','No']"
+                            <x-select wire:model.live="track_stock" label="Track Stock" :options="['Yes', 'No']"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('track_stock') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
                         </div>
 
@@ -430,7 +446,8 @@
                 </section>
 
                 {{-- Availability --}}
-                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Availability</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="form-group">
@@ -445,9 +462,7 @@
                 </section>
 
                 <!-- Product Image -->
-                <section
-                    x-data="dishImages({ existingThumb: @js($existingThumb), existingGallery: @js($existingGallery) })"
-                    x-init="init()"
+                <section x-data="dishImages({ existingThumb: @js($existingThumb), existingGallery: @js($existingGallery) })" x-init="init()"
                     class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
 
                     <div class="flex items-center gap-2 mb-4">
@@ -463,14 +478,17 @@
                         @click="!thumbnailSrc && $refs.thumbnailInput.click()">
 
                         <template x-if="thumbnailSrc">
-                            <img :src="thumbnailSrc" class="h-full w-full object-cover object-center" alt="">
+                            <img :src="thumbnailSrc" class="h-full w-full object-cover object-center"
+                                alt="">
                         </template>
 
                         <template x-if="!thumbnailSrc">
-                            <div class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300">
+                            <div
+                                class="h-full w-full grid place-items-center text-center text-neutral-400 dark:text-neutral-300">
                                 <p>
                                     Click to add Thumbnail <br>
-                                    <small class="text-sm">Recommended 552x538 • png/jpg/jpeg/svg/webp • up to 5MB</small>
+                                    <small class="text-sm">Recommended 552x538 • png/jpg/jpeg/svg/webp • up to
+                                        5MB</small>
                                 </p>
                             </div>
                         </template>
@@ -478,11 +496,15 @@
                         <button x-show="thumbnailSrc" @click.stop="removeThumbnail()" type="button"
                             class="absolute m-2 right-0 top-0 inline-flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white text-sm">×</button>
                     </div>
-                    @error('thumbnail') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                    @error('thumbnail')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
 
                     <!-- Hidden inputs -->
-                    <input x-ref="thumbnailInput" type="file" accept="image/*" class="hidden" wire:model.live="thumbnail">
-                    <input x-ref="galleryInput" type="file" accept="image/*" multiple class="hidden" wire:model.live="gallery">
+                    <input x-ref="thumbnailInput" type="file" accept="image/*" class="hidden"
+                        wire:model.live="thumbnail">
+                    <input x-ref="galleryInput" type="file" accept="image/*" multiple class="hidden"
+                        wire:model.live="gallery">
 
                     <!-- Gallery row -->
                     <p class="mt-3">Images</p>
@@ -511,40 +533,82 @@
                 </section>
 
                 {{-- Visibility --}}
-                <section class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
                     <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Visibility</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="form-group md:col-span-2">
                             <x-select wire:model.live="visibility"
                                 label="Turning visibility off will not show this dish on the website*"
-                                :options="['Yes','No']"
+                                :options="['Yes', 'No']"
                                 class="rounded-lg !bg-white/10 !py-[9px] {{ $errors->has('visibility') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
                         </div>
                     </div>
                 </section>
+
+                {{-- ✅ Menu Page Section --}}
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                    <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Menu Page Section</h3>
+
+                    <div class="form-group mb-3">
+                            <x-select wire:model.live="show_in_menu" label="Show this dish in Menu page section?"
+                                :options="['No', 'Yes']"
+                                class="rounded-lg !bg-white/10 !py-[9px]
+                    {{ $errors->has('show_in_menu') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}" />
+
+                            @error('show_in_menu')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+
+                            <small class="text-xs text-neutral-500 dark:text-neutral-300">
+                                Set "Yes" to show this dish in the Menu list section
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <x-input type="number" min="0" wire:model.live="menu_sort"
+                                label="Menu sort order"
+                                class="rounded-lg !bg-white/10 !py-[9px]
+                    {{ $errors->has('menu_sort') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                                placeholder="0" />
+
+                            @error('menu_sort')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+
+                            <small class="text-xs text-neutral-500 dark:text-neutral-300">
+                                Lower number shows first.
+                            </small>
+                        </div>
+                </section>
+
             </div>
             {{-- Submit & Cancel --}}
-                <div class="flex">
-                    <flux:spacer />
+            <div class="flex">
+                <flux:spacer />
 
-                    <flux:modal.close>
-                        <flux:button icon="cross-icon" variant="filled" class="cursor-pointer me-2">
-                            Cancel
-                        </flux:button>
-                    </flux:modal.close>
-
-                    <flux:button type="submit" icon="fileAdd-icon" class="cursor-pointer" variant="primary"
-                        color="rose" wire:loading.attr="disabled" wire:target="updateDish">
-                        <span wire:loading.remove wire:target="updateDish">Update Dish</span>
-                        <span wire:loading wire:target="updateDish">Updating...</span>
+                <flux:modal.close>
+                    <flux:button icon="cross-icon" variant="filled" class="cursor-pointer me-2">
+                        Cancel
                     </flux:button>
-                </div>
+                </flux:modal.close>
+
+                <flux:button type="submit" icon="fileAdd-icon" class="cursor-pointer" variant="primary"
+                    color="rose" wire:loading.attr="disabled" wire:target="updateDish">
+                    <span wire:loading.remove wire:target="updateDish">Update Dish</span>
+                    <span wire:loading wire:target="updateDish">Updating...</span>
+                </flux:button>
+            </div>
         </div>
     </form>
 
     @push('scripts')
         <script>
-            function dishImages({ existingThumb = null, existingGallery = [] } = {}) {
+            function dishImages({
+                existingThumb = null,
+                existingGallery = []
+            } = {}) {
                 return {
                     displaySrc: null,
                     thumbnailSrc: null,
@@ -569,7 +633,9 @@
                         }
                     },
 
-                    setDisplay(src) { if (src) this.displaySrc = src; },
+                    setDisplay(src) {
+                        if (src) this.displaySrc = src;
+                    },
 
                     removeThumbnail() {
                         this.$wire.clearThumbnail();
@@ -581,7 +647,9 @@
                         this.gallerySrcs.splice(i, 1);
                     },
 
-                    canAddMore() { return this.gallerySrcs.length < this.maxGallery; },
+                    canAddMore() {
+                        return this.gallerySrcs.length < this.maxGallery;
+                    },
                 }
             }
         </script>

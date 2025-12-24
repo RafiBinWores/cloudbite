@@ -12,163 +12,160 @@
                 class="absolute -right-24 top-[65%] animate__animated animate__fadeInRight hidden lg:block" />
             <div class="swiper myHeroSwiper relative top-24">
                 <div class="swiper-wrapper">
-                        @forelse($heroDishes as $dish)
-                            @php
-                                $heroSrc = $dish->hero_image
-                                    ? \Illuminate\Support\Facades\Storage::url($dish->hero_image)
-                                    : ($dish->thumbnail
-                                        ? \Illuminate\Support\Facades\Storage::url($dish->thumbnail)
-                                        : '/assets/images/pizza.png');
+                    @forelse($heroDishes as $dish)
+                        @php
+                            $heroSrc = $dish->hero_image
+                                ? \Illuminate\Support\Facades\Storage::url($dish->hero_image)
+                                : ($dish->thumbnail
+                                    ? \Illuminate\Support\Facades\Storage::url($dish->thumbnail)
+                                    : '/assets/images/pizza.png');
 
-                                $discountSrc = $dish->hero_discount_image
-                                    ? \Illuminate\Support\Facades\Storage::url($dish->hero_discount_image)
-                                    : '/assets/images/discount.png';
-                            @endphp
+                            $discountSrc = $dish->hero_discount_image
+                                ? \Illuminate\Support\Facades\Storage::url($dish->hero_discount_image)
+                                : '/assets/images/discount.png';
+                        @endphp
 
-                            <div class="swiper-slide px-4">
-                                <div class="max-w-7xl mx-auto grid lg:grid-cols-2 place-items-center gap-6 h-[90vh]">
-                                    <!-- Left: Text -->
-                                    <div class="relative z-10 text-center lg:text-left">
-                                        <!-- Price pill -->
-                                        <div
-                                            class="inline-flex items-center gap-2 px-5 py-2 rounded-full border-[0.5px] border-white/60 mb-6 text-white animate__animated animate__fadeInLeft">
-                                            <span class="uppercase tracking-wide text-sm md:text-base font-jost">
-                                                Purchase today, just
-                                            </span>
-                                            <span class="font-bold">
-                                                ৳{{ $dish->price_with_discount ?? $dish->display_price }}
-                                            </span>
-                                        </div>
-
-                                        <h2
-                                            class="font-medium font-oswald leading-[0.95] uppercase tracking-tight text-4xl text-white sm:text-5xl md:text-6xl lg:text-[80px] lg:leading-24 animate__animated animate__fadeInDown">
-                                            {{ $dish->title }}
-                                        </h2>
-
-                                        <p
-                                            class="mt-5 max-w-2xl text-white/90 text-xl md:text-lg lg:text-xl font-jost leading-9 animate__animated animate__fadeInUp">
-                                            {{ $dish->short_description }}
-                                        </p>
-
-                                        <button
-                                            wire:click="$dispatch('open-add-to-cart', { dishId: {{ $dish->id }} })"
-                                            class="mt-8 inline-flex items-center justify-center px-7 py-4 rounded-lg bg-customRed-100 cursor-pointer hover:bg-customRed-200 transition text-white font-semibold uppercase tracking-wide shadow-lg animate__animated animate__fadeInUp">
-                                            Order Now
-                                        </button>
+                        <div class="swiper-slide px-4">
+                            <div class="max-w-7xl mx-auto grid lg:grid-cols-2 place-items-center gap-6 h-[90vh]">
+                                <!-- Left: Text -->
+                                <div class="relative z-10 text-center lg:text-left">
+                                    <!-- Price pill -->
+                                    <div
+                                        class="inline-flex items-center gap-2 px-5 py-2 rounded-full border-[0.5px] border-white/60 mb-6 text-white animate__animated animate__fadeInLeft">
+                                        <span class="uppercase tracking-wide text-sm md:text-base font-jost">
+                                            Purchase today, just
+                                        </span>
+                                        <span class="font-bold">
+                                            ৳{{ $dish->price_with_discount ?? $dish->display_price }}
+                                        </span>
                                     </div>
 
-                                    <div>
-                                        <!-- Right: Image -->
-                                        <div
-                                            class="relative z-10 flex justify-center lg:justify-end animate__animated animate__fadeInDown">
-                                            <!-- Discount bubble -->
-                                            <img src="{{ $discountSrc }}" alt="Discount bubble"
-                                                class="absolute top-0 md:top-2 lg:top-8 right-2 md:right-20 lg:right-2 lg:-left-20 size-24 md:size-36 lg:size-40 z-50" />
+                                    <h2
+                                        class="font-medium font-oswald leading-[0.95] uppercase tracking-tight text-4xl text-white sm:text-5xl md:text-6xl lg:text-[80px] lg:leading-24 animate__animated animate__fadeInDown">
+                                        {{ $dish->title }}
+                                    </h2>
 
-                                            <!-- Main food image -->
-                                            <img src="{{ $heroSrc }}" alt="{{ $dish->title }}"
-                                                class="relative z-10 w-[90%] md:w-[60%] lg:w-[500px] drop-shadow-2xl" />
-                                        </div>
+                                    <p
+                                        class="mt-5 max-w-2xl text-white/90 text-xl md:text-lg lg:text-xl font-jost leading-9 animate__animated animate__fadeInUp">
+                                        {{ $dish->short_description }}
+                                    </p>
+
+                                    <button wire:click="$dispatch('open-add-to-cart', { dishId: {{ $dish->id }} })"
+                                        class="mt-8 inline-flex items-center justify-center px-7 py-4 rounded-lg bg-customRed-100 cursor-pointer hover:bg-customRed-200 transition text-white font-semibold uppercase tracking-wide shadow-lg animate__animated animate__fadeInUp">
+                                        Order Now
+                                    </button>
+                                </div>
+
+                                <div>
+                                    <!-- Right: Image -->
+                                    <div
+                                        class="relative z-10 flex justify-center lg:justify-end animate__animated animate__fadeInDown">
+                                        <!-- Discount bubble -->
+                                        <img src="{{ $discountSrc }}" alt="Discount bubble"
+                                            class="absolute top-0 md:top-2 lg:top-8 right-2 md:right-20 lg:right-2 lg:-left-20 size-24 md:size-36 lg:size-40 z-50" />
+
+                                        <!-- Main food image -->
+                                        <img src="{{ $heroSrc }}" alt="{{ $dish->title }}"
+                                            class="relative z-10 w-[90%] md:w-[60%] lg:w-[500px] drop-shadow-2xl" />
                                     </div>
                                 </div>
                             </div>
-                        @empty
-                            {{-- Original static slides as fallback if no hero dishes --}}
-                            <div class="swiper-slide px-4">
-                                <div class="max-w-7xl mx-auto grid lg:grid-cols-2 place-items-center gap-6 h-[90vh]">
-                                    <!-- Left: Text -->
-                                    <div class="relative z-10 text-center lg:text-left">
-                                        <!-- Price pill -->
-                                        <div
-                                            class="inline-flex items-center gap-2 px-5 py-2 rounded-full border-[0.5px] border-white/60 mb-6 text-white animate__animated animate__fadeInLeft">
-                                            <span
-                                                class="uppercase tracking-wide text-sm md:text-base font-jost">Purchase
-                                                today,
-                                                just</span>
-                                            <span class="font-bold">$58</span>
-                                        </div>
-
-                                        <h2
-                                            class="font-medium font-oswald leading-[0.95] uppercase tracking-tight text-4xl text-white sm:text-5xl md:text-6xl lg:text-[80px] lg:leading-24 animate__animated animate__fadeInDown">
-                                            French Break<br />Cheesy Pizza
-                                        </h2>
-
-                                        <p
-                                            class="mt-5 max-w-2xl text-white/90 text-xl md:text-lg lg:text-xl font-jost leading-9 animate__animated animate__fadeInUp">
-                                            Plan upon yet way get cold spot its week. Almost do am or
-                                            limits hearts. Resolve parties but why she shewing know.
-                                        </p>
-
-                                        <a href="#order"
-                                            class="mt-8 inline-flex items-center justify-center px-7 py-4 rounded-lg bg-customRed-100 hover:bg-customRed-200 transition text-white font-semibold uppercase tracking-wide shadow-lg animate__animated animate__fadeInUp">
-                                            Order Now
-                                        </a>
+                        </div>
+                    @empty
+                        {{-- Original static slides as fallback if no hero dishes --}}
+                        <div class="swiper-slide px-4">
+                            <div class="max-w-7xl mx-auto grid lg:grid-cols-2 place-items-center gap-6 h-[90vh]">
+                                <!-- Left: Text -->
+                                <div class="relative z-10 text-center lg:text-left">
+                                    <!-- Price pill -->
+                                    <div
+                                        class="inline-flex items-center gap-2 px-5 py-2 rounded-full border-[0.5px] border-white/60 mb-6 text-white animate__animated animate__fadeInLeft">
+                                        <span class="uppercase tracking-wide text-sm md:text-base font-jost">Purchase
+                                            today,
+                                            just</span>
+                                        <span class="font-bold">$58</span>
                                     </div>
 
-                                    <div>
-                                        <!-- Right: Image -->
-                                        <div
-                                            class="relative z-10 flex justify-center lg:justify-end animate__animated animate__fadeInDown">
-                                            <!-- Discount bubble -->
-                                            <img src="./assets/images/discount.png" alt="Discount bubble"
-                                                class="absolute top-0 md:top-2 lg:top-8 right-2 md:right-20 lg:right-2 lg:-left-20 size-24 md:size-36 lg:size-40 z-50" />
+                                    <h2
+                                        class="font-medium font-oswald leading-[0.95] uppercase tracking-tight text-4xl text-white sm:text-5xl md:text-6xl lg:text-[80px] lg:leading-24 animate__animated animate__fadeInDown">
+                                        French Break<br />Cheesy Pizza
+                                    </h2>
 
-                                            <!-- Main food image -->
-                                            <img src="/assets/images/pizza.png" alt="Cheesy Pizza"
-                                                class="relative z-10 w-[90%] md:w-[60%] lg:w-[500px] drop-shadow-2xl" />
-                                        </div>
+                                    <p
+                                        class="mt-5 max-w-2xl text-white/90 text-xl md:text-lg lg:text-xl font-jost leading-9 animate__animated animate__fadeInUp">
+                                        Plan upon yet way get cold spot its week. Almost do am or
+                                        limits hearts. Resolve parties but why she shewing know.
+                                    </p>
+
+                                    <a href="#order"
+                                        class="mt-8 inline-flex items-center justify-center px-7 py-4 rounded-lg bg-customRed-100 hover:bg-customRed-200 transition text-white font-semibold uppercase tracking-wide shadow-lg animate__animated animate__fadeInUp">
+                                        Order Now
+                                    </a>
+                                </div>
+
+                                <div>
+                                    <!-- Right: Image -->
+                                    <div
+                                        class="relative z-10 flex justify-center lg:justify-end animate__animated animate__fadeInDown">
+                                        <!-- Discount bubble -->
+                                        <img src="./assets/images/discount.png" alt="Discount bubble"
+                                            class="absolute top-0 md:top-2 lg:top-8 right-2 md:right-20 lg:right-2 lg:-left-20 size-24 md:size-36 lg:size-40 z-50" />
+
+                                        <!-- Main food image -->
+                                        <img src="/assets/images/pizza.png" alt="Cheesy Pizza"
+                                            class="relative z-10 w-[90%] md:w-[60%] lg:w-[500px] drop-shadow-2xl" />
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="swiper-slide px-4">
-                                <div class="max-w-7xl mx-auto grid lg:grid-cols-2 place-items-center gap-6 h-[90vh]">
-                                    <!-- Left: Text -->
-                                    <div class="relative z-10 text-center lg:text-left">
-                                        <!-- Price pill -->
-                                        <div
-                                            class="inline-flex items-center gap-2 px-5 py-2 rounded-full border-[0.5px] border-white/60 mb-6 text-white animate__animated animate__fadeInLeft">
-                                            <span
-                                                class="uppercase tracking-wide text-sm md:text-base font-jost">Purchase
-                                                today,
-                                                just</span>
-                                            <span class="font-bold">$58</span>
-                                        </div>
-
-                                        <h2
-                                            class="font-medium font-oswald leading-[0.95] uppercase tracking-tight text-4xl text-white sm:text-5xl md:text-6xl lg:text-[80px] lg:leading-24 animate__animated animate__fadeInDown">
-                                            French Break<br />Cheesy Pizza
-                                        </h2>
-
-                                        <p
-                                            class="mt-5 max-w-2xl text-white/90 text-xl md:text-lg lg:text-xl font-jost leading-9 animate__animated animate__fadeInUp">
-                                            Plan upon yet way get cold spot its week. Almost do am or
-                                            limits hearts. Resolve parties but why she shewing know.
-                                        </p>
-
-                                        <a href="#order"
-                                            class="mt-8 inline-flex items-center justify-center px-7 py-4 rounded-lg bg-customRed-100 hover:bg-customRed-200 transition text-white font-semibold uppercase tracking-wide shadow-lg animate__animated animate__fadeInUp">
-                                            Order Now
-                                        </a>
+                        <div class="swiper-slide px-4">
+                            <div class="max-w-7xl mx-auto grid lg:grid-cols-2 place-items-center gap-6 h-[90vh]">
+                                <!-- Left: Text -->
+                                <div class="relative z-10 text-center lg:text-left">
+                                    <!-- Price pill -->
+                                    <div
+                                        class="inline-flex items-center gap-2 px-5 py-2 rounded-full border-[0.5px] border-white/60 mb-6 text-white animate__animated animate__fadeInLeft">
+                                        <span class="uppercase tracking-wide text-sm md:text-base font-jost">Purchase
+                                            today,
+                                            just</span>
+                                        <span class="font-bold">$58</span>
                                     </div>
 
-                                    <div>
-                                        <!-- Right: Image -->
-                                        <div
-                                            class="relative z-10 flex justify-center lg:justify-end animate__animated animate__fadeInDown">
-                                            <!-- Discount bubble -->
-                                            <img src="./assets/images/discount.png" alt="Discount bubble"
-                                                class="absolute top-0 md:top-2 lg:top-8 right-2 md:right-20 lg:right-2 lg:-left-20 size-24 md:size-36 lg:size-40 z-50" />
+                                    <h2
+                                        class="font-medium font-oswald leading-[0.95] uppercase tracking-tight text-4xl text-white sm:text-5xl md:text-6xl lg:text-[80px] lg:leading-24 animate__animated animate__fadeInDown">
+                                        French Break<br />Cheesy Pizza
+                                    </h2>
 
-                                            <!-- Main food image -->
-                                            <img src="/assets/images/burger.png" alt="Cheesy Pizza"
-                                                class="relative z-10 w-[90%] md:w-[60%] lg:w-[500px] drop-shadow-2xl" />
-                                        </div>
+                                    <p
+                                        class="mt-5 max-w-2xl text-white/90 text-xl md:text-lg lg:text-xl font-jost leading-9 animate__animated animate__fadeInUp">
+                                        Plan upon yet way get cold spot its week. Almost do am or
+                                        limits hearts. Resolve parties but why she shewing know.
+                                    </p>
+
+                                    <a href="#order"
+                                        class="mt-8 inline-flex items-center justify-center px-7 py-4 rounded-lg bg-customRed-100 hover:bg-customRed-200 transition text-white font-semibold uppercase tracking-wide shadow-lg animate__animated animate__fadeInUp">
+                                        Order Now
+                                    </a>
+                                </div>
+
+                                <div>
+                                    <!-- Right: Image -->
+                                    <div
+                                        class="relative z-10 flex justify-center lg:justify-end animate__animated animate__fadeInDown">
+                                        <!-- Discount bubble -->
+                                        <img src="./assets/images/discount.png" alt="Discount bubble"
+                                            class="absolute top-0 md:top-2 lg:top-8 right-2 md:right-20 lg:right-2 lg:-left-20 size-24 md:size-36 lg:size-40 z-50" />
+
+                                        <!-- Main food image -->
+                                        <img src="/assets/images/burger.png" alt="Cheesy Pizza"
+                                            class="relative z-10 w-[90%] md:w-[60%] lg:w-[500px] drop-shadow-2xl" />
                                     </div>
                                 </div>
                             </div>
-                        @endforelse
-                    </div>
+                        </div>
+                    @endforelse
+                </div>
 
                 <!-- Circular nav buttons -->
                 <div class="hidden lg:block">
@@ -185,11 +182,11 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
             <div class="text-center font-oswald animate__animated animate__fadeInDown">
                 <div class="flex items-center justify-center gap-3">
-                    <img src="./assets/images/icons/arrow.png" alt="Arrow icon" class="h-3 rotate-180" />
-                    <p class="uppercase text-lg md:text-xl text-customRed-100 font-medium">Best deal</p>
-                    <img src="./assets/images/icons/arrow.png" alt="Arrow icon" class="h-3" />
+                    <img src="{{ asset('assets/images/icons/arrow.png') }}" alt="Arrow icon" class="h-2.5 rotate-180" />
+                    <p class="uppercase text-base md:text-xl text-customRed-100 font-medium">Best deal</p>
+                    <img src="{{ asset('assets/images/icons/arrow.png') }}" alt="Arrow icon" class="h-2.5" />
                 </div>
-                <h3 class="capitalize font-medium text-4xl md:text-5xl lg:text-6xl">Our Popular category</h3>
+                <h3 class="capitalize font-medium text-4xl md:text-5xl lg:text-6xl">Our Popular Dishes</h3>
             </div>
 
             <div class="swiper categoriesSwiper mt-10">
@@ -197,12 +194,12 @@
                     @foreach ($navbarCategories as $cat)
                         <div class="swiper-slide">
                             <a href="{{ route('fontDishes.index', ['categories' => [$cat->slug]]) }}" wire:navigate
-                                class="group p-[30px] bg-[linear-gradient(180deg,rgba(255,255,255,0.8)_0%,#ECF0F3_100%)] 
+                                class="group p-5 md:p-[30px] bg-[linear-gradient(180deg,rgba(255,255,255,0.8)_0%,#ECF0F3_100%)] 
                            border-gray-200 border rounded-md overflow-hidden block">
 
                                 <!-- Product Image -->
                                 <img src="{{ asset($cat->image) }}" alt="{{ $cat->name }}"
-                                    class="mx-auto size-[150px] object-cover rounded" />
+                                    class="mx-auto size-[100px] md:size-[150px] object-cover rounded" />
 
                                 <!-- Product Info -->
                                 <div class="text-center mt-6 font-oswald space-y-5">
@@ -217,8 +214,12 @@
     </section>
 
     <!-- Feature dish section start -->
+    @php
+        $menuCategories = $menuDishes->groupBy('category_id');
+    @endphp
+
     <section
-        class="bg-[url(/assets/images/feature-dish-bg.jpg)] w-full bg-center bg-cover bg-no-repeat relative overflow-hidden">
+        class="bg-[url({{ asset('assets/images/feature-dish-bg.jpg') }})] w-full bg-center bg-cover bg-no-repeat relative overflow-hidden">
         <!-- Left white split: hide on mobile, show from md+ -->
         <div class="pointer-events-none hidden lg:block absolute inset-y-0 left-0 w-[37%] bg-white z-30"></div>
 
@@ -231,7 +232,7 @@
                     <div
                         class="size-20 sm:size-24 md:size-[120px] border-customRed-100 rounded-full border-2 grid place-items-center shrink-0">
                         <!-- Dish icon -->
-                        <img src="./assets/images/icons/serving-dish.png" alt="Serving Dish Icon"
+                        <img src="{{ asset('assets/images/icons/serving-dish.png') }}" alt="Serving Dish Icon"
                             class="size-10 sm:size-12 md:size-[60px]" />
                     </div>
                     <div class="font-oswald">
@@ -246,18 +247,17 @@
                 </div>
 
                 <!-- Dish image -->
-                <img src="./assets/images/feature-dish.jpg" alt="Feature Dish"
+                <img src="{{ asset('assets/images/feature-dish.jpg') }}" alt="Feature Dish"
                     class="w-full lg:max-w-[500px] h-auto lg:h-[470px] object-cover animate__animated animate__fadeInDown" />
             </div>
 
             <!-- Right column (Menus) -->
             <div class="w-full">
                 <div class="flex items-center gap-3 mb-2 animate__animated animate__fadeInDown">
-                    <p
-                        class="uppercase text-customRed-100 font-medium font-oswald text-base mb-2 sm:text-lg md:text-xl">
+                    <p class="uppercase text-customRed-100 font-medium font-oswald text-base sm:text-lg md:text-xl">
                         Food Items
                     </p>
-                    <img src="./assets/images/icons/arrow.png" alt="Arrow icon" class="h-3" />
+                    <img src="{{ asset('assets/images/icons/arrow.png') }}" alt="Arrow icon" class="h-3" />
                 </div>
 
                 <h3
@@ -268,175 +268,67 @@
                 <!-- Tabs -->
                 <div id="menuTabs"
                     class="flex flex-wrap items-center gap-2 sm:gap-3 font-oswald font-medium mt-6 sm:mt-8 mb-4 sm:mb-5 animate__animated animate__fadeInRight">
-                    <a class="bg-customRed-100 text-white px-6 py-4 rounded-xl" href="#" data-tab="main">Main
-                        Dishes</a>
-                    <a class="bg-white px-6 py-4 rounded-xl" href="#" data-tab="sea">Sea Food</a>
-                    <a class="bg-white px-6 py-4 rounded-xl" href="#" data-tab="burger">Burger</a>
-                    <a class="bg-white px-6 py-4 rounded-xl" href="#" data-tab="pizza">Pizza</a>
-                </div>
 
-                <!-- price for half and full plate -->
-                <div
-                    class="flex items-center justify-end gap-6 sm:gap-10 font-jost font-bold mb-4 animate__animated animate__fadeInRight">
-                    <p class="border-2 text-slate-500 px-3 py-1 border-slate-500">
-                        Half
-                    </p>
-                    <p class="border-2 text-slate-500 px-3 py-1 border-slate-500">
-                        Full
-                    </p>
+                    @forelse ($menuCategories as $categoryId => $items)
+                        @php
+                            $catName = optional($items->first()->category)->name ?? 'Menu';
+                            $tabKey = 'cat-' . $categoryId;
+                        @endphp
+
+                        <a class="{{ $loop->first ? 'bg-customRed-100 text-white' : 'bg-white' }} px-6 py-4 rounded-xl"
+                            href="#" data-tab="{{ $tabKey }}">
+                            {{ $catName }}
+                        </a>
+                    @empty
+                        <a class="bg-customRed-100 text-white px-6 py-4 rounded-xl" href="#"
+                            data-tab="cat-empty">
+                            Menu
+                        </a>
+                    @endforelse
                 </div>
 
                 <!-- PANES -->
                 <div id="menuPanes" class="space-y-6 animate__animated animate__fadeInRight">
-                    <!-- Main Dishes -->
-                    <div data-pane="main" class="space-y-6">
-                        <!-- Item -->
-                        <article class="space-y-2">
-                            <div class="flex flex-wrap items-baseline gap-3 font-oswald">
-                                <a href=""
-                                    class="text-lg sm:text-xl md:text-[22px] tracking-wide font-medium hover:text-customRed-100">
-                                    Chicken Alfredo
-                                </a>
-                                <div class="min-w-0 flex-1 border-t-2 mx-4 border-dashed border-gray-400"></div>
-                                <div class="flex items-center gap-4 sm:gap-5 whitespace-nowrap">
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;220</span>
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;330</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 font-jost">
-                                <p class="text-slate-600">Ricotta / Goat Cheese / Beetroot</p>
-                                <p class="text-slate-700">Extra Free Juice.</p>
-                            </div>
-                        </article>
+                    @forelse ($menuCategories as $categoryId => $items)
+                        @php $paneKey = 'cat-' . $categoryId; @endphp
 
-                        <!-- Item -->
-                        <article class="space-y-2">
-                            <div class="flex flex-wrap items-baseline gap-3 font-oswald">
-                                <a href=""
-                                    class="text-lg sm:text-xl md:text-[22px] tracking-wide font-medium hover:text-customRed-100">
-                                    Turkey Alfredo
-                                </a>
-                                <div class="min-w-0 flex-1 border-t-2 mx-4 border-dashed border-gray-400"></div>
-                                <div class="flex items-center gap-4 sm:gap-5 whitespace-nowrap">
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;220</span>
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;330</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 font-jost">
-                                <p class="text-slate-600">Ricotta / Goat Cheese / Beetroot</p>
-                                <p class="text-slate-700">Extra Free Juice.</p>
-                            </div>
-                        </article>
+                        <div data-pane="{{ $paneKey }}" class="space-y-6 {{ $loop->first ? '' : 'hidden' }}">
+                            @foreach ($items->take(4) as $dish)
+                                <article class="space-y-2">
+                                    <div class="flex flex-wrap items-baseline gap-3 font-oswald">
+                                        <button
+                                            wire:click="$dispatch('open-add-to-cart', { dishId: {{ $dish->id }} })"
+                                            class="text-lg sm:text-xl md:text-[22px] tracking-wide font-medium hover:text-customRed-100 cursor-pointer">
+                                            {{ $dish->title }}
+                                        </button>
 
-                        <!-- Item -->
-                        <article class="space-y-2">
-                            <div class="flex flex-wrap items-baseline gap-3 font-oswald">
-                                <a href=""
-                                    class="text-lg sm:text-xl md:text-[22px] tracking-wide font-medium hover:text-customRed-100">
-                                    Mutton Alfredo
-                                </a>
-                                <div class="min-w-0 flex-1 border-t-2 mx-4 border-dashed border-gray-400"></div>
-                                <div class="flex items-center gap-4 sm:gap-5 whitespace-nowrap">
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;220</span>
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;330</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 font-jost">
-                                <p class="text-slate-600">Ricotta / Goat Cheese / Beetroot</p>
-                                <p class="text-slate-700">Extra Free Juice.</p>
-                            </div>
-                        </article>
+                                        <div class="min-w-0 flex-1 border-t-2 mx-4 border-dashed border-gray-400">
+                                        </div>
 
-                        <!-- Item -->
-                        <article class="space-y-2">
-                            <div class="flex flex-wrap items-baseline gap-3 font-oswald">
-                                <a href=""
-                                    class="text-lg sm:text-xl md:text-[22px] tracking-wide font-medium hover:text-customRed-100">
-                                    Beef Alfredo
-                                </a>
-                                <div class="min-w-0 flex-1 border-t-2 mx-4 border-dashed border-gray-400"></div>
-                                <div class="flex items-center gap-4 sm:gap-5 whitespace-nowrap">
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;220</span>
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;330</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 font-jost">
-                                <p class="text-slate-600">Ricotta / Goat Cheese / Beetroot</p>
-                                <p class="text-slate-700">Extra Free Juice.</p>
-                            </div>
-                        </article>
-                    </div>
+                                        <div class="flex items-center gap-4 sm:gap-5 whitespace-nowrap">
+                                            <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">
+                                                &#2547;{{ number_format((float) $dish->price, 0) }}
+                                            </span>
+                                        </div>
+                                    </div>
 
-                    <!-- Sea Food -->
-                    <div data-pane="sea" class="space-y-6 hidden">
-                        <article class="space-y-2">
-                            <div class="flex flex-wrap items-baseline gap-3 font-oswald">
-                                <a href=""
-                                    class="text-lg sm:text-xl md:text-[22px] tracking-wide font-medium hover:text-customRed-100">
-                                    Fish & Chips
-                                </a>
-                                <div class="min-w-0 flex-1 border-t-2 mx-4 border-dashed border-gray-400"></div>
-                                <div class="flex items-center gap-4 sm:gap-5 whitespace-nowrap">
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;360</span>
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;550</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 font-jost">
-                                <p class="text-slate-600">
-                                    Atlantic / Chips / Salad / Tartare
-                                </p>
-                                <p class="text-slate-700">Extra Free Juice.</p>
-                            </div>
-                        </article>
-                    </div>
-
-                    <!-- Burger -->
-                    <div data-pane="burger" class="space-y-6 hidden">
-                        <article class="space-y-2">
-                            <div class="flex flex-wrap items-baseline gap-3 font-oswald">
-                                <a href=""
-                                    class="text-lg sm:text-xl md:text-[22px] tracking-wide font-medium hover:text-customRed-100">
-                                    Classic Beef Burger
-                                </a>
-                                <div class="min-w-0 flex-1 border-t-2 mx-4 border-dashed border-gray-400"></div>
-                                <div class="flex items-center gap-4 sm:gap-5 whitespace-nowrap">
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;250</span>
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;380</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 font-jost">
-                                <p class="text-slate-600">
-                                    Cheddar / Lettuce / Tomato / Sauce
-                                </p>
-                                <p class="text-slate-700">Extra Free Juice.</p>
-                            </div>
-                        </article>
-                    </div>
-
-                    <!-- Pizza -->
-                    <div data-pane="pizza" class="space-y-6 hidden">
-                        <article class="space-y-2">
-                            <div class="flex flex-wrap items-baseline gap-3 font-oswald">
-                                <a href=""
-                                    class="text-lg sm:text-xl md:text-[22px] tracking-wide font-medium hover:text-customRed-100">
-                                    Margherita Pizza
-                                </a>
-                                <div class="min-w-0 flex-1 border-t-2 mx-4 border-dashed border-gray-400"></div>
-                                <div class="flex items-center gap-4 sm:gap-5 whitespace-nowrap">
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;420</span>
-                                    <span class="text-customRed-100 text-2xl sm:text-3xl font-bold">&#2547;620</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 font-jost">
-                                <p class="text-slate-600">Tomato / Mozzarella / Basil</p>
-                                <p class="text-slate-700">Extra Free Juice.</p>
-                            </div>
-                        </article>
-                    </div>
+                                    <div
+                                        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 font-jost">
+                                        <p class="text-slate-600">{{ $dish->short_description }}</p>
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+                    @empty
+                        <div data-pane="cat-empty" class="space-y-6">
+                            <p class="text-slate-600 font-jost">No menu items available right now.</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
     </section>
+
 
     <!-- Weekly & Monthly package -->
     <section class="bg-slate-900 w-full py-16 lg:py-28 relative overflow-hidden">
@@ -549,9 +441,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
             <div class="text-center font-oswald animate__animated animate__fadeInDown">
                 <div class="flex items-center justify-center gap-3">
-                    <img src="./assets/images/icons/arrow.png" alt="Arrow icon" class="h-3 rotate-180" />
-                    <p class="uppercase text-lg md:text-xl text-customRed-100 font-medium">Best deal</p>
-                    <img src="./assets/images/icons/arrow.png" alt="Arrow icon" class="h-3" />
+                    <img src="{{ asset('assets/images/icons/arrow.png') }}" alt="Arrow icon"
+                        class="h-2.5 rotate-180" />
+                    <p class="uppercase text-base md:text-xl text-customRed-100 font-medium">Best deal</p>
+                    <img src="{{ asset('assets/images/icons/arrow.png') }}" alt="Arrow icon" class="h-2.5" />
                 </div>
                 <h3 class="capitalize font-medium text-4xl md:text-5xl lg:text-6xl">Our Popular Dishes</h3>
             </div>
@@ -613,15 +506,15 @@
                         @endphp
 
                         <div class="swiper-slide">
-                            <div class="card bg-base-100 shadow-sm rounded-xl">
+                            <div class="card bg-base-100 shadow-sm rounded-md md:rounded-xl">
                                 <figure class="relative">
                                     <img src="{{ asset($dish->thumbnail) }}" alt="{{ $dish->title }}"
-                                        class="w-full h-48 object-cover rounded-t-xl" />
+                                        class="w-full h-36 md:h-48 object-cover rounded-t-md md:rounded-t-xl" />
 
                                     {{-- Discount Badge --}}
                                     @if ($dish->discount && $dish->discount_type)
                                         <span
-                                            class="absolute top-2 left-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-customRed-100/80 text-white z-10">
+                                            class="absolute top-2 left-2 inline-flex items-center px-2 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-semibold bg-customRed-100/80 text-white z-10">
                                             @php
                                                 $discountValue =
                                                     fmod($dish->discount, 1) === 0.0
@@ -638,65 +531,82 @@
                                             @endif
                                         </span>
                                     @endif
-
-                                    {{-- Small badge if variations exist --}}
-                                    @if ($hasVariations)
-                                        <span
-                                            class="absolute top-2 right-2 inline-flex items-center px-2 py-1 rounded-full text-[10px] font-semibold bg-black/60 text-white z-10">
-                                            Multiple Options
-                                        </span>
-                                    @endif
                                 </figure>
 
                                 <div class="card-body p-3">
-                                    <h2 class="card-title font-medium font-oswald line-clamp-1 text-slate-900">
+                                    <h2
+                                        class="card-title text-sm md:text-base md:font-medium font-oswald line-clamp-1 text-slate-950">
                                         {{ $dish->title }}
                                     </h2>
 
-                                    <p class="font-jost line-clamp-1">{{ $dish->short_description }}</p>
+                                    <p
+                                        class="font-jost line-clamp-1 text-xs md:text-sm font-medium md:font-normal pt-2">
+                                        {{ $dish->short_description }}</p>
 
-                                    <div class="flex items-center justify-between mt-2">
-                                        <div class="font-oswald text-customRed-100 flex items-center gap-2">
+                                    <div class="flex items-center justify-between mt-2 gap-2 md:items-center">
+                                        <div class="font-oswald text-customRed-100">
                                             @if ($hasVariations)
-                                                {{-- Show "From" price using base + min extra --}}
-                                                <p class="font-medium text-lg">
-                                                    <span class="font-bold">&#2547;</span>
-                                                    From {{ $money($fromPriceDiscounted) }}
-                                                </p>
-
-                                                {{-- Old price compare if discount present --}}
-                                                @if ($dish->discount && $dish->discount_type && $fromPriceDiscounted < $fromPriceOriginal)
-                                                    <p class="font-medium line-through text-gray-500">
+                                                <div class="leading-tight md:leading-normal flex items-center gap-1">
+                                                    <p class="font-medium text-xs md:text-lg">
                                                         <span class="font-bold">&#2547;</span>
-                                                        {{ $money($fromPriceOriginal) }}
+                                                        <span class="md:text-base font-semibold">From</span>
+                                                        {{ $money($fromPriceDiscounted) }}
                                                     </p>
-                                                @endif
+
+                                                    @if ($dish->discount && $dish->discount_type && $fromPriceDiscounted < $fromPriceOriginal)
+                                                        <p
+                                                            class="font-medium line-through text-gray-500 text-[10px] md:text-base">
+                                                            <span class="font-bold">&#2547;</span>
+                                                            {{ $money($fromPriceOriginal) }}
+                                                        </p>
+                                                    @endif
+                                                </div>
                                             @else
-                                                {{-- Normal dish price --}}
-                                                <p class="font-medium text-lg">
-                                                    <span class="font-bold">&#2547;</span>
-                                                    {{ $money($normalPrice) }}
-                                                </p>
-
-                                                @if ($normalPrice < $normalOld)
-                                                    <p class="font-medium line-through text-gray-500">
+                                                <div class="leading-tight md:leading-normal flex items-center gap-1">
+                                                    <p class="font-medium text-xs md:text-lg">
                                                         <span class="font-bold">&#2547;</span>
-                                                        {{ $money($normalOld) }}
+                                                        {{ $money($normalPrice) }}
                                                     </p>
-                                                @endif
+
+                                                    @if ($normalPrice < $normalOld)
+                                                        <p
+                                                            class="font-medium line-through text-gray-500 text-[10px] md:text-base">
+                                                            <span class="font-bold">&#2547;</span>
+                                                            {{ $money($normalOld) }}
+                                                        </p>
+                                                    @endif
+                                                </div>
                                             @endif
                                         </div>
 
                                         <button
                                             wire:click="$dispatch('open-add-to-cart', { dishId: {{ $dish->id }} })"
-                                            class="inline-block relative isolate rounded px-5 py-2 mt-1 overflow-hidden cursor-pointer bg-customRed-100 font-medium text-white group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60">
+                                            class="group relative isolate shrink-0 overflow-hidden cursor-pointer bg-customRed-100 text-white font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60 w-8 h-8 rounded-full grid place-items-center md:w-auto md:h-auto md:rounded md:px-5 md:py-2 md:mt-1 md:inline-flex md:items-center md:justify-center"
+                                            aria-label="Add to cart" title="Add to cart">
+                                            {{-- ✅ Hover sweep (md+) --}}
                                             <span
-                                                class="pointer-events-none absolute w-64 h-0 rotate-45 -translate-x-20 bg-slate-900 top-1/2 transition-all duration-300 ease-out group-hover:h-64 group-hover:-translate-y-32"></span>
+                                                class="pointer-events-none absolute hidden md:block w-64 h-0 rotate-45 -translate-x-20 bg-slate-900 top-1/2 transition-all duration-300 ease-out group-hover:h-64 group-hover:-translate-y-32">
+                                            </span>
+
+                                            {{-- Mobile icon --}}
+                                            <span class="relative z-10 md:hidden">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <circle cx="8" cy="21" r="1" />
+                                                    <circle cx="19" cy="21" r="1" />
+                                                    <path
+                                                        d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                                                </svg>
+                                            </span>
+
+                                            {{-- Desktop text --}}
                                             <span
-                                                class="relative z-10 transition-colors font-medium font-oswald duration-300 group-hover:text-white">
+                                                class="relative z-10 hidden md:inline transition-colors font-medium font-oswald duration-300 group-hover:text-white whitespace-nowrap">
                                                 Add to Cart
                                             </span>
                                         </button>
+
                                     </div>
                                 </div>
                             </div>
@@ -955,6 +865,41 @@
                         slidesPerView: 4
                     },
                 },
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabsWrap = document.getElementById('menuTabs');
+            const panesWrap = document.getElementById('menuPanes');
+            if (!tabsWrap || !panesWrap) return;
+
+            const tabs = Array.from(tabsWrap.querySelectorAll('[data-tab]'));
+            const panes = Array.from(panesWrap.querySelectorAll('[data-pane]'));
+
+            const setActive = (key) => {
+                tabs.forEach(t => {
+                    const isActive = t.getAttribute('data-tab') === key;
+                    t.classList.toggle('bg-customRed-100', isActive);
+                    t.classList.toggle('text-white', isActive);
+                    t.classList.toggle('bg-white', !isActive);
+                });
+
+                panes.forEach(p => {
+                    const isActive = p.getAttribute('data-pane') === key;
+                    p.classList.toggle('hidden', !isActive);
+                });
+            };
+
+            // Default: first tab active
+            if (tabs.length) setActive(tabs[0].getAttribute('data-tab'));
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    setActive(tab.getAttribute('data-tab'));
+                });
             });
         });
     </script>

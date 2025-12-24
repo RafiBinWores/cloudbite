@@ -105,6 +105,7 @@
             </aside>
 
             <!-- Mobile Filters Drawer -->
+          
             <div class="lg:hidden fixed inset-0 z-40" x-cloak x-show="filtersOpen" x-transition.opacity>
                 <!-- Overlay -->
                 <div class="absolute inset-0 bg-black/40" @click="filtersOpen=false"></div>
@@ -217,7 +218,7 @@
             <section class="col-span-12 lg:col-span-9 lg:ps-2">
                 <div class="flex flex-wrap items-center justify-between gap-3 font-jost">
                     <button
-                        class="lg:hidden inline-flex items-center gap-2 px-4 h-11 rounded-xl border border-gray-300 bg-white cursor-pointer hover:bg-slate-50 duration-300"
+                        class="lg:hidden inline-flex items-center gap-2 px-4 py-1.5 rounded border border-gray-300 bg-white cursor-pointer hover:bg-slate-50 duration-300"
                         @click="filtersOpen = true">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor">

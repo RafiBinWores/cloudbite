@@ -33,7 +33,8 @@ class Dish extends Model
         'show_in_hero',
         'hero_image',
         'hero_discount_image',
-
+        'show_in_menu',
+        'menu_sort',
     ];
 
     protected $casts = [
@@ -43,6 +44,7 @@ class Dish extends Model
         'gallery' => 'array',
         'variations' => 'array',
         'show_in_hero' => 'boolean',
+        'show_in_menu' => 'boolean',
     ];
 
     public function category()

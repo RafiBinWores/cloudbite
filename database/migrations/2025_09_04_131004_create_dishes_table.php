@@ -24,9 +24,6 @@ return new class extends Migration
             $table->decimal('discount', 10, 2)->nullable();
             $table->decimal('vat', 5, 2)->nullable();
             $table->string('thumbnail');
-            $table->boolean('show_in_hero')->default(false);
-            $table->string('hero_image')->nullable();
-            $table->string('hero_discount_image')->nullable();
             $table->json('gallery')->nullable();
             $table->string('sku')->nullable();
             $table->enum('track_stock', ['Yes', 'No'])->default('No');
@@ -36,6 +33,11 @@ return new class extends Migration
             $table->enum('visibility', ['Yes', 'No'])->default('Yes');
             $table->json('tags')->nullable();
             $table->json('variations')->nullable();
+            $table->boolean('show_in_hero')->default(false);
+            $table->string('hero_image')->nullable();
+            $table->string('hero_discount_image')->nullable();
+            $table->boolean('show_in_menu')->default(false);
+            $table->unsignedInteger('menu_sort')->default(0);
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->string('meta_keyword')->nullable();

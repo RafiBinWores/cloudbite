@@ -222,7 +222,7 @@
                                         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
                                             <div class="md:col-span-7">
                                                 <x-input label="Option Name (ex: Small, Medium)"
-                                                class="!border !border-neutral-300"
+                                                    class="!border !border-neutral-300"
                                                     wire:model.live="variations.{{ $vIndex }}.options.{{ $oIndex }}.label"
                                                     placeholder="Small" class="rounded-lg !bg-white/10 !py-[9px]" />
                                             </div>
@@ -272,7 +272,6 @@
                         <h3 class="text-lg font-semibold dark:text-gray-100">
                             Hero Section (Slider)
                         </h3>
-                        <small class="text-xs text-neutral-500 dark:text-neutral-300">(Optional)</small>
                     </div>
 
                     <div class="space-y-4">
@@ -594,6 +593,28 @@
                         </div>
                     </div>
                 </section>
+
+                <section
+                    class="bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-2xl p-5">
+                    <h3 class="text-lg font-semibold mb-4 dark:text-gray-100">Menu Page Section</h3>
+
+                    <div class="form-group mb-3">
+                        <x-select wire:model.live="show_in_menu" label="Show in Menu page section?" :options="['No', 'Yes']"
+                            class="rounded-lg !bg-white/10 !py-[9px] focus:!ring-red-500" />
+                        <small class="text-xs text-neutral-500 dark:text-neutral-300">
+                            Set "Yes" to display this dish in the Menu list section (tabs).
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <x-input type="number" min="0" wire:model.live="menu_sort" label="Menu sort order"
+                            class="rounded-lg !bg-white/10 !py-[9px] focus:!ring-red-500" placeholder="0" />
+                        <small class="text-xs text-neutral-500 dark:text-neutral-300">
+                            Lower number shows first.
+                        </small>
+                    </div>
+                </section>
+
 
 
             </div>

@@ -24,10 +24,11 @@ class CreateDish extends Component
     public $thumbnail = null;
     public $gallery = [];
 
-    // 🔥 New hero fields
     public $show_in_hero = 'No';          // Yes / No for UI
     public $hero_image = null;            // hero PNG image
     public $hero_discount_image = null;   // badge image
+    public $show_in_menu = 'No'; // Yes/No for UI
+    public $menu_sort = 0;
 
     public $meta_title, $meta_description, $meta_keyword;
 
@@ -78,7 +79,7 @@ class CreateDish extends Component
             'meta_description' => 'nullable|string|max:500',
             'meta_keyword' => 'nullable|string|max:255',
 
-            // NEW: variation validation
+            // variation validation
             'variations' => 'nullable|array',
             'variations.*.name' => 'nullable|string|max:100',
             'variations.*.options' => 'nullable|array',
@@ -89,6 +90,10 @@ class CreateDish extends Component
             'show_in_hero' => 'required|in:Yes,No',
             'hero_image' => 'nullable|required_if:show_in_hero,Yes|image|max:5048|mimes:png,jpg,jpeg,webp,svg',
             'hero_discount_image' => 'nullable|image|max:3048|mimes:png,webp,svg',
+
+            // Menu specific
+            'show_in_menu' => 'required|in:Yes,No',
+            'menu_sort'    => 'nullable|integer|min:0',
         ];
     }
 
@@ -277,13 +282,16 @@ class CreateDish extends Component
                 'hero_image'        => $storedHero,
                 'hero_discount_image' => $storedHeroDiscount,
 
+                'show_in_menu' => $this->show_in_menu === 'Yes',
+                'menu_sort'    => (int) ($this->menu_sort ?? 0),
+
                 'meta_title'        => $this->meta_title,
                 'meta_description'  => $this->meta_description,
                 'meta_keyword'      => $this->meta_keyword,
 
                 'tags'              => $this->tags ?: [],
 
-                // NEW: save cleaned variations
+                // save cleaned variations
                 'variations'        => $this->normalizeVariations(),
             ];
 
@@ -336,12 +344,16 @@ class CreateDish extends Component
                 'show_in_hero',
                 'hero_image',
                 'hero_discount_image',
+                'show_in_menu',
+                'menu_sort',
             ]);
 
             // defaults
             $this->track_stock = 'No';
             $this->visibility  = 'Yes';
             $this->show_in_hero = 'No';
+            $this->show_in_menu = 'No';
+            $this->menu_sort = 0;
 
             $this->success(
                 title: 'Dish created successfully',
@@ -349,7 +361,6 @@ class CreateDish extends Component
                 showProgress: true,
                 showCloseIcon: true,
             );
-
         } catch (\Throwable $e) {
             if ($storedThumb) Storage::disk('public')->delete($storedThumb);
             if (!empty($storedGallery)) Storage::disk('public')->delete($storedGallery);

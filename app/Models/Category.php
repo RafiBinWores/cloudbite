@@ -16,6 +16,11 @@ class Category extends Model
         'status',
     ];
 
+    public function dishes()
+    {
+        return $this->hasMany(Dish::class);
+    }
+
     public function scopeActive($q)
     {
         $q->where(function ($qq) {

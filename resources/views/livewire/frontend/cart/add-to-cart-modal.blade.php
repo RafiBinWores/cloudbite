@@ -34,7 +34,7 @@
                                     <button type="button" wire:click="toggleFavorite" wire:loading.attr="disabled"
                                         aria-pressed="{{ $isFavorited ? 'true' : 'false' }}"
                                         title="{{ $isFavorited ? 'Remove from Favorites' : 'Add to Favorites' }}"
-                                        class="inline-flex items-center justify-center rounded-full p-2 transition cursor-pointer
+                                        class="md:inline-flex items-center justify-center rounded-full p-2 transition cursor-pointer hidden
                                  {{ $isFavorited ? 'bg-red-500/10' : 'bg-slate-200/70 hover:bg-slate-300/70' }}">
                                         <svg xmlns="http://www.w3.org/2000/svg"
                                             class="size-3 md:size-5 {{ $isFavorited ? 'text-red-500 fill-red-500' : 'text-slate-700' }}"
@@ -75,8 +75,24 @@
 
                     <!-- Close -->
                     <button type="button"
-                        class="absolute right-3 top-3 inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full hover:bg-slate-100 text-slate-700"
+                        class="absolute right-3 top-3 inline-flex size-7 md:size-9 cursor-pointer items-center justify-center rounded-full hover:bg-slate-300/70 text-slate-700 bg-slate-200/70 text-xs md:text-lg"
                         @click="open = false" aria-label="Close">✕</button>
+
+                    {{-- Favorites --}}
+                    <button type="button" wire:click="toggleFavorite" wire:loading.attr="disabled"
+                        aria-pressed="{{ $isFavorited ? 'true' : 'false' }}"
+                        title="{{ $isFavorited ? 'Remove from Favorites' : 'Add to Favorites' }}"
+                        class="inline-flex absolute right-3 top-12 items-center justify-center rounded-full p-2 transition cursor-pointer md:hidden
+                                 {{ $isFavorited ? 'bg-red-500/10' : 'bg-slate-200/70 hover:bg-slate-300/70' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="size-3 md:size-5 {{ $isFavorited ? 'text-red-500 fill-red-500' : 'text-slate-700' }}"
+                            viewBox="0 0 24 24" fill="{{ $isFavorited ? 'currentColor' : 'none' }}"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
+                        </svg>
+                        <span class="sr-only">{{ $isFavorited ? 'Remove from Favorites' : 'Add to Favorites' }}</span>
+                    </button>
                 </div>
 
                 {{-- Body --}}
