@@ -8,7 +8,8 @@
 
     {{-- Model Button --}}
     <flux:modal.trigger name="banner-modal">
-        <flux:button class="cursor-pointer" variant="primary" color="rose" icon="add-icon" wire:click="$dispatch('open-banner-modal', {mode: 'create'})">
+        <flux:button class="cursor-pointer" variant="primary" color="rose" icon="add-icon"
+            wire:click="$dispatch('open-banner-modal', {mode: 'create'})">
             Add New</flux:button>
     </flux:modal.trigger>
 
@@ -20,7 +21,7 @@
     <livewire:common.delete-confirmation />
 
 
-        <!-- Table responsive wrapper -->
+    <!-- Table responsive wrapper -->
     <div class="border dark:border-none bg-white dark:bg-neutral-700 mt-8 p-4 sm:p-6 rounded-2xl">
 
         <!-- Top controls -->
@@ -79,64 +80,92 @@
                         <th scope="col" class="px-4 lg:px-6 py-3">Image</th>
                         @include('livewire.common.sortable-th', [
                             'name' => 'title',
-                            'displayName' => 'Title'
+                            'displayName' => 'Title',
                         ])
                         <th scope="col" class="px-4 lg:px-6 py-3">Item Type</th>
                         <th scope="col" class="px-4 lg:px-6 py-3">Item</th>
                         @include('livewire.common.sortable-th', [
                             'name' => 'status',
-                            'displayName' => 'Status'
+                            'displayName' => 'Status',
                         ])
+                        <th scope="col" class="px-4 lg:px-6 py-3">Schedule</th>
+
                         @include('livewire.common.sortable-th', [
                             'name' => 'created_at',
-                            'displayName' => 'Created At'
+                            'displayName' => 'Created At',
                         ])
                         <th scope="col" class="px-4 lg:px-6 py-3">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($banners as $cat)
-                        <tr wire:key="{{ $cat->id }}" class="border-b dark:border-neutral-600">
+                    @forelse ($banners as $banner)
+                        <tr wire:key="{{ $banner->id }}" class="border-b dark:border-neutral-600">
                             <th scope="row" class="px-4 lg:px-6 py-3">
                                 {{ ($banners->currentPage() - 1) * $banners->perPage() + $loop->iteration }}
                             </th>
                             <td class="px-4 lg:px-6 py-3">
-                                @if (!empty($cat->image))
-                                    <img src="{{ asset($cat->image) }}" alt="{{ $cat->title }}"
+                                @if (!empty($banner->image))
+                                    <img src="{{ asset($banner->image) }}" alt="{{ $banner->title }}"
                                         class="h-12 w-12 rounded object-cover">
                                 @else
                                     <img src="{{ asset('assets/images/placeholders/cat-placeholder.png') }}"
                                         alt="placeholder" class="h-12 w-12 rounded object-cover">
                                 @endif
                             </td>
-                            <td class="px-4 lg:px-6 py-3">{{ $cat->title }}</td>
-                            <td class="px-4 lg:px-6 py-3">{{ ucfirst($cat->item_type) }}</td>
+                            <td class="px-4 lg:px-6 py-3">{{ $banner->title }}</td>
+                            <td class="px-4 lg:px-6 py-3">{{ ucfirst($banner->item_type) }}</td>
                             <td class="px-4 lg:px-6 py-3">
-                                @if ($cat->item_type === 'category')
+                                @if ($banner->item_type === 'category')
                                     <flux:link href="{{ route('categories.index') }}" variant="ghost" wire:navigate>
-                                    {{ ucfirst($cat->item_name ) }}
-                                </flux:link>
-                                @elseif ($cat->item_type === 'dish')
-                                <flux:link href="{{ route('dishes.show', $cat->item_slug ) }}" variant="ghost" wire:navigate>{{ ucfirst($cat->item_name ) }}</flux:link>
-                                    
+                                        {{ ucfirst($banner->item_name) }}
+                                    </flux:link>
+                                @elseif ($banner->item_type === 'dish')
+                                    <flux:link href="{{ route('dishes.show', $banner->item_slug) }}" variant="ghost"
+                                        wire:navigate>{{ ucfirst($banner->item_name) }}</flux:link>
                                 @endif
                             </td>
-                            <td class="px-4 lg:px-6 py-3 capitalize">
-                                <flux:badge variant="solid" size="sm"
-                                    color="{{ $cat->status === 'active' ? 'green' : 'red' }}">{{ $cat->status }}
-                                </flux:badge>
+                            <td class="px-4 lg:px-6 py-3 capitalize" x-data="{ on: @js($banner->status === 'active') }">
+                                <flux:switch x-model="on" @change="$wire.setStatus({{ $banner->id }}, on)"
+                                    class="cursor-pointer" />
                             </td>
-                            <td class="px-4 lg:px-6 py-3">{{ $cat->created_at->format('M d, Y') }}</td>
+                            <td class="px-4 lg:px-6 py-3">
+                                <div class="text-sm leading-tight">
+                                    <div class="font-medium text-neutral-800 dark:text-neutral-100">
+                                        {{ $banner->start_at ? \Carbon\Carbon::parse($banner->start_at)->format('M d, Y • h:i A') : '—' }}
+                                    </div>
+
+                                    <div class="text-neutral-500 dark:text-neutral-300">
+                                        →
+                                        {{ $banner->end_at ? \Carbon\Carbon::parse($banner->end_at)->format('M d, Y • h:i A') : 'No end date' }}
+                                    </div>
+
+                                    @php
+                                        $now = now();
+                                        $isActive =
+                                            (!$banner->start_at || $now->gte($banner->start_at)) &&
+                                            (!$banner->end_at || $now->lte($banner->end_at));
+                                    @endphp
+
+                                    <span
+                                        class="inline-flex mt-1 items-center rounded-full px-2 py-0.5 text-xs font-medium
+            {{ $isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600' }}">
+                                        {{ $isActive ? 'Active now' : 'Inactive' }}
+                                    </span>
+                                </div>
+                            </td>
+
+
+                            <td class="px-4 lg:px-6 py-3">{{ $banner->created_at->format('M d, Y') }}</td>
                             <td class="px-4 lg:px-6 py-3">
                                 <div class="flex gap-2">
                                     <flux:modal.trigger name="banner-modal">
                                         <flux:button
-                                            wire:click="$dispatch('open-banner-modal', {mode: 'view', banner: {{ $cat }}})"
+                                            wire:click="$dispatch('open-banner-modal', {mode: 'view', banner: {{ $banner }}})"
                                             class="cursor-pointer min-h-[40px]" icon="eye" variant="primary"
                                             color="yellow">
                                         </flux:button>
                                         <flux:button
-                                            wire:click="$dispatch('open-banner-modal', {mode: 'edit', banner: {{ $cat }}})"
+                                            wire:click="$dispatch('open-banner-modal', {mode: 'edit', banner: {{ $banner }}})"
                                             class="cursor-pointer min-h-[40px]" icon="pencil" variant="primary"
                                             color="blue">
                                         </flux:button>
@@ -145,11 +174,11 @@
                                     <flux:modal.trigger name="delete-confirmation-modal">
                                         <flux:button
                                             wire:click="$dispatch('confirm-delete', {
-                                                id: {{ $cat->id }},
+                                                id: {{ $banner->id }},
                                                 dispatchAction: 'delete-banner',
                                                 modalName: 'delete-confirmation-modal',
                                                 heading: 'Delete banner?',
-                                                message: 'You are about to delete this banner: <strong>{{ $cat->name }}</strong>. This action cannot be reversed.',
+                                                message: 'You are about to delete this banner: <strong>{{ $banner->name }}</strong>. This action cannot be reversed.',
                                                 })"
                                             class="cursor-pointer min-h-[40px]" icon="trash" variant="primary"
                                             color="red">

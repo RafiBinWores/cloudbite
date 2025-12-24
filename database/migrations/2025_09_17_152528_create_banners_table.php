@@ -14,8 +14,12 @@ return new class extends Migration
         Schema::create('banners', function (Blueprint $table) {
             $table->id();
             $table->string('title')->unique();
-            $table->string('image')->nullable();  
-            $table->string('item_type');  
+            $table->string('image')->nullable();
+            $table->text('description')->nullable();
+            $table->boolean('is_slider')->default(false);
+            $table->dateTime('start_at')->nullable(); 
+            $table->dateTime('end_at')->nullable(); 
+            $table->string('item_type');
             $table->unsignedBigInteger('item_id');
             $table->enum('status', ['active', 'disable'])->default('active');
             $table->timestamps();

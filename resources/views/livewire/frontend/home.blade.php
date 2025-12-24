@@ -1,14 +1,40 @@
 <div>
+@push('styles')
+<style>
+.discountBannerPagination {
+    display: flex;
+    gap: 8px;
+}
+
+.discountBannerPagination .swiper-pagination-bullet {
+    width: 28px;
+    height: 4px;
+    border-radius: 9999px;
+    background: rgba(239, 68, 68, 0.35);
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+.discountBannerPagination .swiper-pagination-bullet-active {
+    width: 42px;
+    background: #ef4444;
+}
+</style>
+@endpush
+
+
+
+
     <!-- Hero section start -->
     <section class="overflow-hidden">
         <div
-            class="relative w-screen h-screen bg-[url(/assets/images/banner-bg.jpg)] bg-cover bg-center overflow-hidden">
+            class="relative w-screen h-screen bg-cover bg-center overflow-hidden" style="background-image: url('{{ asset('assets/images/banner-bg.jpg') }}')">
             <!-- bg left image -->
-            <img src="./assets/images/banner-left-bg.png" alt="Bg image"
+            <img src="{{ asset('assets/images/banner-left-bg.png') }}" alt="Bg image"
                 class="absolute -left-36 top-[30%] animate__animated animate__fadeInLeft hidden lg:block" />
 
             <!-- bg right image -->
-            <img src="./assets/images/banner-right-bg.png" alt="Bg Image"
+            <img src="{{ asset('assets/images/banner-right-bg.png') }}" alt="Bg Image"
                 class="absolute -right-24 top-[65%] animate__animated animate__fadeInRight hidden lg:block" />
             <div class="swiper myHeroSwiper relative top-24">
                 <div class="swiper-wrapper">
@@ -219,7 +245,7 @@
     @endphp
 
     <section
-        class="bg-[url({{ asset('assets/images/feature-dish-bg.jpg') }})] w-full bg-center bg-cover bg-no-repeat relative overflow-hidden">
+        class="w-full bg-center bg-cover bg-no-repeat relative overflow-hidden" style="background-image: url('{{ asset('assets/images/feature-dish-bg.jpg') }}')">
         <!-- Left white split: hide on mobile, show from md+ -->
         <div class="pointer-events-none hidden lg:block absolute inset-y-0 left-0 w-[37%] bg-white z-30"></div>
 
@@ -630,10 +656,135 @@
 
 
     <!-- Offer promotion section -->
-    <section class="relative bg-[url(/assets/images/discount-bg.jpg)] w-full bg-no-repeat bg-center object-cover">
+<section
+    class="relative w-full bg-no-repeat bg-center bg-cover"
+    style="background-image: url('{{ asset('assets/images/feature-dish-bg.jpg') }}')">
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+
+        <!-- Section Heading -->
+        <div class="mb-6 md:mb-8 text-center md:text-left">
+            <div class="inline-flex items-center gap-2 rounded-full bg-red-500/10 px-4 py-1.5 mb-3">
+                <span class="h-2 w-2 rounded-full bg-red-500"></span>
+                <span class="text-xs font-semibold uppercase tracking-widest text-red-500">
+                    Special Promotions
+                </span>
+            </div>
+
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-oswald text-neutral-900 dark:text-white">
+                Today’s Best Deals
+            </h2>
+
+            <p class="mt-2 max-w-2xl mx-auto md:mx-0 text-sm sm:text-base text-neutral-600 dark:text-neutral-300 font-jost">
+                Limited-time offers crafted specially for you. Don’t miss out on our hottest discounts.
+            </p>
+        </div>
+
+        <!-- Banner Slider -->
+        <div class="relative">
+
+            <div class="swiper discountBannerSwiper">
+                <div class="swiper-wrapper">
+
+                    <!-- Slide -->
+                    <div class="swiper-slide">
+                        <div
+                            class="relative w-full
+                                   min-h-[240px] sm:min-h-[300px]
+                                   md:aspect-[3/1] md:min-h-0
+                                   overflow-hidden rounded-2xl">
+
+                            <img
+                                src="{{ asset('assets/images/banner-bg.jpg') }}"
+                                alt="Promotion Banner"
+                                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105">
+
+                            <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
+
+                            <div class="absolute inset-0 flex items-end sm:items-center">
+                                <div class="p-4 sm:p-6 md:p-10 text-white max-w-lg">
+                                    <span
+                                        class="inline-block mb-2 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+                                        Limited Offer
+                                    </span>
+
+                                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-oswald leading-tight">
+                                        Mega Burger Discount
+                                    </h3>
+
+                                    <p class="mt-2 text-sm sm:text-base text-white/90 font-jost">
+                                        Enjoy exclusive deals for a short time only.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div
+                            class="relative w-full
+                                   min-h-[240px] sm:min-h-[300px]
+                                   md:aspect-[3/1] md:min-h-0
+                                   overflow-hidden rounded-2xl">
+
+                            <img
+                                src="{{ asset('assets/images/banner-bg.jpg') }}"
+                                alt="Promotion Banner"
+                                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105">
+
+                            <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
+
+                            <div class="absolute inset-0 flex items-end sm:items-center">
+                                <div class="p-4 sm:p-6 md:p-10 text-white max-w-lg">
+                                    <span
+                                        class="inline-block mb-2 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+                                        Limited Offer
+                                    </span>
+
+                                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-oswald leading-tight">
+                                        Mega Burger Discount
+                                    </h3>
+
+                                    <p class="mt-2 text-sm sm:text-base text-white/90 font-jost">
+                                        Enjoy exclusive deals for a short time only.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add more slides here -->
+
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <button type="button"
+                class="discountBannerPrev absolute -left-3 sm:-left-6 top-1/2 -translate-y-1/2 z-20
+                       h-11 w-11 rounded-full bg-white text-neutral-900
+                       grid place-items-center shadow-lg hover:bg-red-500 hover:text-white transition">
+                ‹
+            </button>
+
+            <button type="button"
+                class="discountBannerNext absolute -right-3 sm:-right-6 top-1/2 -translate-y-1/2 z-20
+                       h-11 w-11 rounded-full bg-white text-neutral-900
+                       grid place-items-center shadow-lg hover:bg-red-500 hover:text-white transition">
+                ›
+            </button>
+
+            <!-- Pagination -->
+            <div class="discountBannerPagination mt-4 flex justify-center"></div>
+
+        </div>
+    </div>
+</section>
+
+
+
+    <section class="relative w-full bg-no-repeat bg-center object-cover" style="background-image: url('{{ asset('assets/images/discount-bg.jpg') }}')">
 
         <!-- Brush -->
-        <img src="./assets/images/border-bttom.png" alt="" class="rotate-180 absolute top-0">
+        {{-- <img src="{{ asset('assets/images/border-bottom.png') }}" alt="Bottom border" class="rotate-180 absolute top-0"> --}}
 
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 lg:py-24">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
@@ -660,7 +811,7 @@
                     </p>
 
                     <!-- Countdown -->
-                    <div id="deal-countdown" data-deadline="2025-08-31T23:59:59+06:00"
+                    <div id="deal-countdown" data-deadline="2025-12-31T23:59:59+06:00"
                         class="mt-10 flex flex-wrap justify-center lg:justify-start gap-1 font-oswald animate__animated animate__fadeInDown">
 
                         <!-- Days -->
@@ -704,14 +855,8 @@
 
                 <!-- RIGHT: Burger visual -->
                 <div class="relative">
-                    <!-- splash/offer badge (optional) -->
-                    <div
-                        class="absolute right-0 lg:-top-2 md:top-5 md:right-10 lg:right-0 block z-40 animate__animated animate__fadeInRight">
-                        <img src="/assets/images/discount-50.png" alt="Save 50%"
-                            class="w-32 md:w-48 h-auto select-none pointer-events-none">
-                    </div>
                     <!-- burger -->
-                    <img src="/assets/images/discount-burger.png" alt="Delicious Burger"
+                    <img src="{{ asset('assets/images/discount-burger.png') }}" alt="Delicious Burger"
                         class="relative w-full max-w-[680px] mx-auto drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)] z-10 animate__animated animate__fadeInUp" />
                 </div>
 
@@ -903,4 +1048,79 @@
             });
         });
     </script>
+
+    <script>
+(function () {
+  const root = document.getElementById('deal-countdown');
+  if (!root) return;
+
+  // Prefer ISO datetime via data-deadline; fallback to +3 days from now
+  const deadlineAttr = root.getAttribute('data-deadline');
+  const target = deadlineAttr ? new Date(deadlineAttr) : new Date(Date.now() + 3*24*60*60*1000);
+
+  // Elements
+  const el = {
+    d: root.querySelector('[data-days]'),
+    h: root.querySelector('[data-hours]'),
+    m: root.querySelector('[data-minutes]'),
+    s: root.querySelector('[data-seconds]'),
+  };
+
+  const pad2 = (n) => String(n).padStart(2, '0');
+
+  function render(diffMs) {
+    if (diffMs <= 0) {
+      el.d.textContent = '00';
+      el.h.textContent = '00';
+      el.m.textContent = '00';
+      el.s.textContent = '00';
+      return false; // finished
+    }
+    const totalSec = Math.floor(diffMs / 1000);
+    const days    = Math.floor(totalSec / 86400);
+    const hours   = Math.floor((totalSec % 86400) / 3600);
+    const minutes = Math.floor((totalSec % 3600) / 60);
+    const seconds = totalSec % 60;
+
+    el.d.textContent = pad2(days);
+    el.h.textContent = pad2(hours);
+    el.m.textContent = pad2(minutes);
+    el.s.textContent = pad2(seconds);
+    return true; // keep going
+  }
+
+  function tick() {
+    const now = Date.now();
+    const alive = render(target - now);
+    if (alive) {
+      // Run roughly every 200ms for smoothness without heavy CPU
+      setTimeout(tick, 200);
+    }
+  }
+
+  tick();
+})();
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    new Swiper('.discountBannerSwiper', {
+        loop: true,
+        autoplay: {
+            delay: 4500,
+            disableOnInteraction: false,
+        },
+        speed: 700,
+        navigation: {
+            nextEl: '.discountBannerNext',
+            prevEl: '.discountBannerPrev',
+        },
+        pagination: {
+            el: '.discountBannerPagination',
+            clickable: true,
+        },
+    });
+});
+</script>
+
 @endpush

@@ -9,6 +9,10 @@ class Banner extends Model
     protected $fillable = [
         'image',
         'title',
+        'description',
+        'is_slider',
+        'start_at',
+        'end_at',
         'item_type',
         'item_id',
         'status',

@@ -97,6 +97,31 @@ class Banners extends Component
         return view('livewire.admin.banners.banners', compact('banners'));
     }
 
+    public function setStatus(int $id, bool $on): void
+    {
+        $banner = Banner::find($id);
+        if (!$banner) {
+            $this->error(
+                title: 'Banner not found.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
+            return;
+        }
+
+        $banner->status = $on ? 'active' : 'disable';
+        $banner->save();
+
+        $this->success(
+                title: 'Status updated to ' . $banner->status . '.',
+                position: 'top-right',
+                showProgress: true,
+                showCloseIcon: true,
+            );
+    }
+
+
     #[On('delete-banner')]
     public function deleteBanner($id)
     {

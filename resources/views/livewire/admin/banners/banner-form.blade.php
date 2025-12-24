@@ -1,3 +1,4 @@
+<div>
     <flux:modal name="banner-modal" class="md:w-full">
         <form wire:submit="submit" class="space-y-6">
             <div>
@@ -9,34 +10,37 @@
                 </flux:text>
             </div>
 
-
-
-            {{-- CREATE/EDIT MODE: show uploader block always --}}
+            {{-- Thumbnail --}}
             <section class="space-y-2">
                 <h3 class="text-base font-semibold">Thumbnail</h3>
 
                 <div x-data="{
-                    isOver: false,
-                    isUploading: false,
-                    progress: 0,
-                    pick() { $refs.file.click() }
-                }" x-on:dragover.prevent="isOver = true" x-on:dragleave.prevent="isOver = false"
-                    x-on:drop.prevent="isOver = false" x-on:livewire-upload-start="isUploading = true"
+                        isOver: false,
+                        isUploading: false,
+                        progress: 0,
+                        pick() { $refs.file.click() }
+                    }"
+                    x-on:dragover.prevent="isOver = true"
+                    x-on:dragleave.prevent="isOver = false"
+                    x-on:drop.prevent="isOver = false"
+                    x-on:livewire-upload-start="isUploading = true"
                     x-on:livewire-upload-finish="isUploading = false; progress = 0"
                     x-on:livewire-upload-error="isUploading = false"
-                    x-on:livewire-upload-progress="progress = $event.detail.progress" class="w-full">
-                    {{-- Hidden file input --}}
-                    <input x-ref="file" type="file" accept="image/*" class="hidden" wire:model.live="image"
+                    x-on:livewire-upload-progress="progress = $event.detail.progress"
+                    class="w-full">
+
+                    <input x-ref="file" type="file" accept="image/*" class="hidden"
+                        wire:model.live="image"
                         wire:key="image-input-{{ $bannerId ?? 'new' }}">
 
-                    {{-- TILE --}}
-                    <div class="relative w-full h-36 rounded-2xl border-2 border-dashed transition
-                   grid place-items-center cursor-pointer"
-                        :class="isOver ? 'border-slate-400 bg-slate-50' : 'border-slate-300'" @click="pick()">
-                        {{-- EMPTY STATE (like screenshot) --}}
+                    <div
+                        class="relative w-full h-36 rounded-2xl border-2 border-dashed transition grid place-items-center cursor-pointer
+                            {{ $errors->has('image') ? 'border-red-500' : 'border-slate-300' }}"
+                        x-bind:class="isOver ? 'border-slate-400 bg-slate-50' : ''"
+                        @click="pick()"
+                    >
                         @if (!$image && !$existingImage)
                             <div class="flex flex-col items-center gap-2 pointer-events-none">
-                                {{-- Cloud upload icon (inline SVG, subtle grey) --}}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round"
@@ -50,7 +54,6 @@
                             </div>
                         @endif
 
-                        {{-- UPLOADING BAR --}}
                         <template x-if="isUploading">
                             <div class="absolute inset-0 rounded-2xl bg-white/60 grid place-items-end">
                                 <div class="w-full h-1 bg-slate-200">
@@ -59,7 +62,6 @@
                             </div>
                         </template>
 
-                        {{-- PREVIEW (newly selected) --}}
                         @if ($image)
                             <img src="{{ $image->temporaryUrl() }}"
                                 class="absolute inset-0 w-full h-full object-cover rounded-2xl" alt="preview">
@@ -68,7 +70,6 @@
                                 Remove
                             </button>
                         @elseif ($existingImage)
-                            {{-- EXISTING --}}
                             <img src="{{ asset($existingImage) }}"
                                 class="absolute inset-0 w-full h-full object-cover rounded-2xl" alt="current">
                             <button type="button" @click.stop="pick()"
@@ -86,48 +87,139 @@
 
             {{-- Title --}}
             <div class="form-group">
-                <flux:input :disabled="$isView" wire:model="title" label="Title" placeholder="e.g. Eid Special" />
+                <x-input
+                    label="Title*"
+                    wire:model.live.debounce.300ms="title"
+                    class="rounded-lg !bg-white/10 !py-[9px]
+                        {{ $errors->has('title') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-400' }}"
+                    placeholder="e.g. Eid Special"
+                />
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {{-- Description --}}
+            <div class="form-group">
+                <x-textarea
+                    label="Description"
+                    rows="3"
+                    wire:model.live.debounce.300ms="description"
+                    class="rounded-lg !bg-white/10 !py-[9px]
+                        {{ $errors->has('description') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-400' }}"
+                    placeholder="Short details for this banner..."
+                />
+            </div>
+
+            {{-- Banner Type --}}
+            <div class="form-group">
+                <x-select
+                    wire:model.live="is_slider"
+                    label="Banner Type*"
+                    :options="[
+                        ['id' => 0, 'name' => 'Single Banner (Show one image)'],
+                        ['id' => 1, 'name' => 'Banner Slider (3:1 image ratio)'],
+                    ]"
+                    class="rounded-lg !bg-white/10 !py-[9px]
+                        {{ $errors->has('is_slider') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                    clearable="false"
+                />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {{-- Item Type --}}
                 <div class="form-group">
-                    <flux:select :disabled="$isView" wire:model.live="item_type" label="Item Type"
-                        placeholder="Choose item type...">
-                        <flux:select.option value="category">Category</flux:select.option>
-                        <flux:select.option value="dish">Dish</flux:select.option>
-                    </flux:select>
+                    <x-select
+                        wire:model.live="item_type"
+                        label="Item Type*"
+                        :options="[
+                            ['id' => 'category', 'name' => 'Category'],
+                            ['id' => 'dish', 'name' => 'Dish'],
+                        ]"
+                        class="rounded-lg !bg-white/10 !py-[9px]
+                            {{ $errors->has('item_type') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                    />
                 </div>
 
-                {{-- Item --}}
-                <div class="form-group">
-                    <flux:select :disabled="$isView" wire:model.live="item_id"
-                        :label="$item_type === 'category' ? 'Category' : 'Dish'"
-                        :placeholder="$item_type === 'category' ? 'Choose a category' : 'Choose a dish'">
+                {{-- Item (FIXED with wire:key) --}}
+                <div class="form-group" wire:key="banner-item-select-{{ $item_type }}">
+                    @php
+                        if ($item_type === 'category') {
+                            $items = \App\Models\Category::where('status', 'Active')
+                                ->orderBy('name', 'ASC')
+                                ->get(['id', 'name', 'image'])
+                                ->map(fn ($c) => [
+                                    'id' => $c->id,
+                                    'name' => $c->name,
+                                    'avatar' => $c->image
+                                        ? \Illuminate\Support\Facades\Storage::url($c->image)
+                                        : asset('assets/images/placeholders/cat-placeholder.png'),
+                                ])->values()->toArray();
 
-                        @if ($item_type === 'category')
-                            @foreach (\App\Models\Category::where('status', 'Active')->get() as $cat)
-                                <flux:select.option value="{{ $cat->id }}">{{ $cat->name }}</flux:select.option>
-                            @endforeach
-                        @elseif ($item_type === 'dish')
-                            @foreach (\App\Models\Dish::where('visibility', 'Yes')->get() as $dish)
-                                <flux:select.option value="{{ $dish->id }}">{{ $dish->title }}</flux:select.option>
-                            @endforeach
-                        @endif
-                    </flux:select>
+                            $itemLabel = 'Category*';
+                        } else {
+                            $items = \App\Models\Dish::where('visibility', 'Yes')
+                                ->orderBy('title', 'ASC')
+                                ->get(['id', 'title', 'thumbnail'])
+                                ->map(fn ($d) => [
+                                    'id' => $d->id,
+                                    'name' => $d->title,
+                                    'avatar' => $d->thumbnail
+                                        ? \Illuminate\Support\Facades\Storage::url($d->thumbnail)
+                                        : asset('assets/images/placeholders/cat-placeholder.png'),
+                                ])->values()->toArray();
+
+                            $itemLabel = 'Dish*';
+                        }
+                    @endphp
+
+                    <x-select
+                        wire:model.live="item_id"
+                        :label="$itemLabel"
+                        :options="$items"
+                        class="rounded-lg !bg-white/10 !py-[9px]
+                            {{ $errors->has('item_id') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                        searchable
+                    />
                 </div>
             </div>
 
+            {{-- Start/End date time --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <x-input
+                        type="datetime-local"
+                        label="Start Date & Time"
+                        wire:model.live="start_at"
+                        class="rounded-lg !bg-white/10 !py-[9px]
+                            {{ $errors->has('start_at') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <x-input
+                        type="datetime-local"
+                        label="End Date & Time"
+                        wire:model.live="end_at"
+                        class="rounded-lg !bg-white/10 !py-[9px]
+                            {{ $errors->has('end_at') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                    />
+                </div>
+            </div>
 
             {{-- Status --}}
             <div class="form-group">
-                <flux:select :disabled="$isView" wire:model="status" label="Status" placeholder="Choose status...">
-                    <flux:select.option value="active">Active</flux:select.option>
-                    <flux:select.option value="disable">Disable</flux:select.option>
-                </flux:select>
+                <x-select
+                    wire:model.live="status"
+                    label="Status*"
+                    :options="[
+                        ['id' => 'active', 'name' => 'Active'],
+                        ['id' => 'disable', 'name' => 'Disable'],
+                    ]"
+                    class="rounded-lg !bg-white/10 !py-[9px]
+                        {{ $errors->has('status') ? '!border-red-500 focus:!ring-red-500' : '!border-neutral-300 dark:!border-neutral-500 focus:!ring-red-500' }}"
+                    clearable="false"
+                />
             </div>
 
-            {{-- Submit & Cancel button --}}
+            {{-- Submit & Cancel --}}
             <div class="flex">
                 <flux:spacer />
 
@@ -139,10 +231,11 @@
                     <flux:button type="submit" icon="fileAdd-icon" class="cursor-pointer" variant="primary"
                         color="rose" wire:loading.attr="disabled" wire:target="submit">
                         <span wire:loading.remove wire:target="submit">{{ $bannerId ? 'Update' : 'Create' }}</span>
-                        <span wire:loading
-                            wire:target="submit">{{ $bannerId ? 'Updating...' : 'Creating...' }}</span>
+                        <span wire:loading wire:target="submit">{{ $bannerId ? 'Updating...' : 'Creating...' }}</span>
                     </flux:button>
                 @endif
             </div>
+
         </form>
     </flux:modal>
+</div>
