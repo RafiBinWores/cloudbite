@@ -69,7 +69,7 @@ Route::post('/payment/ssl/cancel', [SslCommerzController::class, 'cancel'])->nam
 // IPN (server-to-server) — optional but recommended
 Route::post('/payment/ssl/ipn', [SslCommerzController::class, 'ipn'])->name('ssl.ipn');
 
-Route::middleware(['auth', 'role:user'])->group(function () {
+Route::middleware(['auth', 'role:user,admin'])->group(function () {
     Route::get('checkout', CheckoutPage::class)->name('checkout');
     Route::get('/order/thank-you/{code}', OrderThankYouController::class)->name('orders.thankyou');
 

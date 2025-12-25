@@ -1,4 +1,30 @@
 <div>
+    @push('meta')
+        <title>{{ $seoTitle ?? 'CloudBite – Fresh Meals & Meal Plans Delivered in Dhaka' }}</title>
+
+        <meta name="description"
+            content="{{ $seoDesc ?? 'Order fresh, hygienic meals and flexible weekly or monthly meal plans. Fast delivery across Dhaka with customizable menus.' }}">
+        <meta name="robots" content="index, follow">
+        <meta name="keywords"
+            content="fresh meals, meal plans, food delivery, Dhaka, healthy eating, customizable menu, weekly meal plan, monthly meal plan, hygienic food, chef-crafted meals, cloud kitchen, food subscription, diet-friendly meals">
+
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="{{ $seoTitle ?? 'CloudBite – Fresh Meals & Meal Plans Delivered in Dhaka' }}">
+        <meta property="og:description"
+            content="{{ $seoDesc ?? 'Order fresh, hygienic meals and flexible weekly or monthly meal plans. Fast delivery across Dhaka with customizable menus.' }}">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:site_name" content="CloudBite">
+        <meta property="og:image" content="{{ $seoImage ?? asset('assets/images/seo/default-og.jpg') }}">
+        <meta property="og:image:alt" content="{{ $seoTitle ?? 'CloudBite Cloud Kitchen' }}">
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ $seoTitle ?? 'CloudBite – Fresh Meals & Meal Plans Delivered in Dhaka' }}">
+        <meta name="twitter:description"
+            content="{{ $seoDesc ?? 'Order fresh, hygienic meals and flexible weekly or monthly meal plans. Fast delivery across Dhaka with customizable menus.' }}">
+        <meta name="twitter:image" content="{{ $seoImage ?? asset('assets/images/seo/default-og.jpg') }}">
+    @endpush
+
+
     @push('styles')
         <style>
             .discountBannerPagination {
@@ -354,7 +380,6 @@
         </div>
     </section>
 
-
     <!-- Weekly & Monthly package -->
     <section class="bg-slate-900 w-full py-16 lg:py-28 relative overflow-hidden">
         <!-- decorated leaf -->
@@ -649,7 +674,6 @@
             </div>
     </section>
 
-
     <!-- Offer promotion section -->
     {{-- for promotion slider --}}
     @if ($sliderBanners->count())
@@ -689,10 +713,7 @@
                                     @if ($banner->item_type === 'category')
                                         {{-- CATEGORY → Redirect --}}
                                         <a href="{{ route('fontDishes.index', ['categories' => [$banner->category->slug]]) }}"
-                                            class="block relative w-full
-                      min-h-[240px] sm:min-h-[300px]
-                      md:aspect-[3/1] md:min-h-0
-                      overflow-hidden rounded-2xl group">
+                                            class="block relative w-full min-h-[240px] sm:min-h-[300px] md:aspect-[3/1] md:min-h-0 overflow-hidden rounded-2xl group">
 
                                             <img src="{{ asset($banner->image) }}" alt="{{ $banner->title }}"
                                                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
@@ -724,10 +745,7 @@
                                     @elseif($banner->item_type === 'dish')
                                         {{-- DISH → Open Add To Cart --}}
                                         <div wire:click="$dispatch('open-add-to-cart', { dishId: {{ $banner->item_id }} })"
-                                            class="relative w-full cursor-pointer
-                       min-h-[240px] sm:min-h-[300px]
-                       md:aspect-[3/1] md:min-h-0
-                       overflow-hidden rounded-2xl group">
+                                            class="relative w-full cursor-pointer min-h-[240px] sm:min-h-[300px] md:aspect-[3/1] md:min-h-0 overflow-hidden rounded-2xl group">
 
                                             <img src="{{ asset($banner->image) }}" alt="{{ $banner->title }}"
                                                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
@@ -796,15 +814,103 @@
         </section>
     @endif
 
+    <!-- for single banner -->
+    @if (!empty($singleBanner))
 
-<!-- for single banner -->
-@if (!empty($singleBanner))
+        @if ($singleBanner->item_type === 'category' && $singleBanner->category)
+            {{-- CATEGORY → Redirect using slug --}}
+            <a href="{{ route('fontDishes.index', ['categories' => [$singleBanner->category->slug]]) }}"
+                class="block">
+                <section class="relative w-full bg-no-repeat bg-center object-cover"
+                    style="background-image: url('{{ asset('assets/images/discount-bg.jpg') }}')">
 
-    @if($singleBanner->item_type === 'category' && $singleBanner->category)
-        {{-- CATEGORY → Redirect using slug --}}
-        <a href="{{ route('fontDishes.index', ['categories' => [$singleBanner->category->slug]]) }}" class="block">
+                    <!-- Brush -->
+                    {{-- <img src="{{ asset('assets/images/border-bottom.png') }}" alt="Bottom border" class="rotate-180 absolute top-0"> --}}
+
+                    <div
+                        class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 lg:py-24 cursor-pointer">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+
+                            <!-- LEFT: Text -->
+                            <div class="text-white text-center lg:text-left">
+                                <!-- Badge -->
+                                <div
+                                    class="inline-flex items-center gap-2 rounded-md border border-white/50 px-4 py-2 mb-6 font-oswald animate__animated animate__fadeInDown">
+                                    <span class="tracking-widest text-[22px]">LIMITED OFFER</span>
+                                </div>
+
+                                <!-- Title -->
+                                <h1
+                                    class="text-7xl md:text-7xl lg:text-[110px] font-extrabold bg-clip-text text-transparent bg-[url(/assets/images/pattern.png)] bg-cover bg-center uppercase font-oswald lg:leading-[110px] lg:w-[500px] animate__animated animate__fadeInDown">
+                                    {{ $singleBanner->title }}
+                                </h1>
+
+                                <!-- Paragraph -->
+                                <p
+                                    class="font-jost text-white text-lg leading-7 max-w-xl mx-auto mt-6 animate__animated animate__fadeInDown">
+                                    {{ $singleBanner->description }}
+                                </p>
+
+                                <!-- Countdown -->
+                                <div id="deal-countdown"
+                                    data-deadline="{{ \Carbon\Carbon::parse($singleBanner->end_at)->toIso8601String() }}"
+                                    class="mt-10 flex flex-wrap justify-center lg:justify-start gap-1 font-oswald animate__animated animate__fadeInDown">
+
+                                    <!-- Days -->
+                                    <div
+                                        class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                                        <div class="text-center">
+                                            <div class="text-xl md:text-2xl font-bold" data-days>05</div>
+                                            <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Days</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Hours -->
+                                    <div
+                                        class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                                        <div class="text-center">
+                                            <div class="text-xl md:text-2xl font-bold" data-hours>12</div>
+                                            <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Hours</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Minutes -->
+                                    <div
+                                        class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                                        <div class="text-center">
+                                            <div class="text-xl md:text-2xl font-bold" data-minutes>30</div>
+                                            <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Minutes</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Seconds -->
+                                    <div
+                                        class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                                        <div class="text-center">
+                                            <div class="text-xl md:text-2xl font-bold" data-seconds>40</div>
+                                            <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Seconds</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- RIGHT: Burger visual -->
+                            <div class="relative">
+                                <!-- burger -->
+                                <img src="{{ asset($singleBanner->image) }}" alt="{{ $singleBanner->title }}"
+                                    class="relative w-full max-w-[550px] mx-auto drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)] z-10 animate__animated animate__fadeInUp" />
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+            </a>
+        @elseif($singleBanner->item_type === 'dish')
+            {{-- DISH → Open add-to-cart modal --}}
             <section class="relative w-full bg-no-repeat bg-center object-cover"
-                style="background-image: url('{{ asset('assets/images/discount-bg.jpg') }}')">
+                style="background-image: url('{{ asset('assets/images/discount-bg.jpg') }}')"
+                wire:click="$dispatch('open-add-to-cart', { dishId: {{ $singleBanner->item_id }} })">
 
                 <!-- Brush -->
                 {{-- <img src="{{ asset('assets/images/border-bottom.png') }}" alt="Bottom border" class="rotate-180 absolute top-0"> --}}
@@ -886,100 +992,9 @@
                     </div>
                 </div>
             </section>
-        </a>
+        @endif
 
-    @elseif($singleBanner->item_type === 'dish')
-        {{-- DISH → Open add-to-cart modal --}}
-        <section class="relative w-full bg-no-repeat bg-center object-cover"
-            style="background-image: url('{{ asset('assets/images/discount-bg.jpg') }}')"
-            wire:click="$dispatch('open-add-to-cart', { dishId: {{ $singleBanner->item_id }} })">
-
-            <!-- Brush -->
-            {{-- <img src="{{ asset('assets/images/border-bottom.png') }}" alt="Bottom border" class="rotate-180 absolute top-0"> --}}
-
-            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 lg:py-24 cursor-pointer">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-
-                    <!-- LEFT: Text -->
-                    <div class="text-white text-center lg:text-left">
-                        <!-- Badge -->
-                        <div
-                            class="inline-flex items-center gap-2 rounded-md border border-white/50 px-4 py-2 mb-6 font-oswald animate__animated animate__fadeInDown">
-                            <span class="tracking-widest text-[22px]">LIMITED OFFER</span>
-                        </div>
-
-                        <!-- Title -->
-                        <h1
-                            class="text-7xl md:text-7xl lg:text-[110px] font-extrabold bg-clip-text text-transparent bg-[url(/assets/images/pattern.png)] bg-cover bg-center uppercase font-oswald lg:leading-[110px] lg:w-[500px] animate__animated animate__fadeInDown">
-                            {{ $singleBanner->title }}
-                        </h1>
-
-                        <!-- Paragraph -->
-                        <p
-                            class="font-jost text-white text-lg leading-7 max-w-xl mx-auto mt-6 animate__animated animate__fadeInDown">
-                            {{ $singleBanner->description }}
-                        </p>
-
-                        <!-- Countdown -->
-                        <div id="deal-countdown"
-                            data-deadline="{{ \Carbon\Carbon::parse($singleBanner->end_at)->toIso8601String() }}"
-                            class="mt-10 flex flex-wrap justify-center lg:justify-start gap-1 font-oswald animate__animated animate__fadeInDown">
-
-                            <!-- Days -->
-                            <div
-                                class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
-                                <div class="text-center">
-                                    <div class="text-xl md:text-2xl font-bold" data-days>05</div>
-                                    <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Days</div>
-                                </div>
-                            </div>
-
-                            <!-- Hours -->
-                            <div
-                                class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
-                                <div class="text-center">
-                                    <div class="text-xl md:text-2xl font-bold" data-hours>12</div>
-                                    <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Hours</div>
-                                </div>
-                            </div>
-
-                            <!-- Minutes -->
-                            <div
-                                class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
-                                <div class="text-center">
-                                    <div class="text-xl md:text-2xl font-bold" data-minutes>30</div>
-                                    <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Minutes</div>
-                                </div>
-                            </div>
-
-                            <!-- Seconds -->
-                            <div
-                                class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
-                                <div class="text-center">
-                                    <div class="text-xl md:text-2xl font-bold" data-seconds>40</div>
-                                    <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Seconds</div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- RIGHT: Burger visual -->
-                    <div class="relative">
-                        <!-- burger -->
-                        <img src="{{ asset($singleBanner->image) }}" alt="{{ $singleBanner->title }}"
-                            class="relative w-full max-w-[550px] mx-auto drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)] z-10 animate__animated animate__fadeInUp" />
-                    </div>
-
-                </div>
-            </div>
-        </section>
     @endif
-
-@endif
-
-
-
 
     {{-- cart modal --}}
     <livewire:frontend.cart.add-to-cart-modal />
@@ -1061,7 +1076,6 @@
             </div>
         </div>
     </section>
-
 </div>
 
 

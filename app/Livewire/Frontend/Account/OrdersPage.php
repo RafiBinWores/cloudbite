@@ -60,6 +60,6 @@ class OrdersPage extends Component
             'orders'         => $orders,
             'ongoingCount'   => $ongoingCount,
             'deliveredCount' => $deliveredCount,
-        ])->title('My Orders - CloudBite');
+        ]);
     }
 }

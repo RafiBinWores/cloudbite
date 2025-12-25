@@ -48,7 +48,6 @@ class Home extends Component
             ->first();
 
 
-        return view('livewire.frontend.home', compact('dishes', 'heroDishes', 'menuDishes', 'sliderBanners', 'singleBanner'))
-            ->title('Home - CloudBite');
+        return view('livewire.frontend.home', compact('dishes', 'heroDishes', 'menuDishes', 'sliderBanners', 'singleBanner'));
     }
 }
