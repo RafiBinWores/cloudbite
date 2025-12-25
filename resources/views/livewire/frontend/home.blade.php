@@ -1,34 +1,32 @@
 <div>
-@push('styles')
-<style>
-.discountBannerPagination {
-    display: flex;
-    gap: 8px;
-}
+    @push('styles')
+        <style>
+            .discountBannerPagination {
+                display: flex;
+                gap: 8px;
+            }
 
-.discountBannerPagination .swiper-pagination-bullet {
-    width: 28px;
-    height: 4px;
-    border-radius: 9999px;
-    background: rgba(239, 68, 68, 0.35);
-    opacity: 1;
-    transition: all 0.3s ease;
-}
+            .discountBannerPagination .swiper-pagination-bullet {
+                width: 28px;
+                height: 4px;
+                border-radius: 9999px;
+                background: rgba(239, 68, 68, 0.35);
+                opacity: 1;
+                transition: all 0.3s ease;
+            }
 
-.discountBannerPagination .swiper-pagination-bullet-active {
-    width: 42px;
-    background: #ef4444;
-}
-</style>
-@endpush
-
-
+            .discountBannerPagination .swiper-pagination-bullet-active {
+                width: 42px;
+                background: #ef4444;
+            }
+        </style>
+    @endpush
 
 
     <!-- Hero section start -->
     <section class="overflow-hidden">
-        <div
-            class="relative w-screen h-screen bg-cover bg-center overflow-hidden" style="background-image: url('{{ asset('assets/images/banner-bg.jpg') }}')">
+        <div class="relative w-screen h-screen bg-cover bg-center overflow-hidden"
+            style="background-image: url('{{ asset('assets/images/banner-bg.jpg') }}')">
             <!-- bg left image -->
             <img src="{{ asset('assets/images/banner-left-bg.png') }}" alt="Bg image"
                 class="absolute -left-36 top-[30%] animate__animated animate__fadeInLeft hidden lg:block" />
@@ -208,7 +206,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
             <div class="text-center font-oswald animate__animated animate__fadeInDown">
                 <div class="flex items-center justify-center gap-3">
-                    <img src="{{ asset('assets/images/icons/arrow.png') }}" alt="Arrow icon" class="h-2.5 rotate-180" />
+                    <img src="{{ asset('assets/images/icons/arrow.png') }}" alt="Arrow icon"
+                        class="h-2.5 rotate-180" />
                     <p class="uppercase text-base md:text-xl text-customRed-100 font-medium">Best deal</p>
                     <img src="{{ asset('assets/images/icons/arrow.png') }}" alt="Arrow icon" class="h-2.5" />
                 </div>
@@ -244,8 +243,8 @@
         $menuCategories = $menuDishes->groupBy('category_id');
     @endphp
 
-    <section
-        class="w-full bg-center bg-cover bg-no-repeat relative overflow-hidden" style="background-image: url('{{ asset('assets/images/feature-dish-bg.jpg') }}')">
+    <section class="w-full bg-center bg-cover bg-no-repeat relative overflow-hidden"
+        style="background-image: url('{{ asset('assets/images/feature-dish-bg.jpg') }}')">
         <!-- Left white split: hide on mobile, show from md+ -->
         <div class="pointer-events-none hidden lg:block absolute inset-y-0 left-0 w-[37%] bg-white z-30"></div>
 
@@ -651,219 +650,339 @@
     </section>
 
 
+    <!-- Offer promotion section -->
+    {{-- for promotion slider --}}
+    @if ($sliderBanners->count())
+        <section class="relative w-full bg-no-repeat bg-center bg-cover"
+            style="background-image: url('{{ asset('assets/images/feature-dish-bg.jpg') }}')">
+
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+
+                <!-- Section Heading -->
+                <div class="mb-6 md:mb-8 text-center md:text-left">
+                    <div class="inline-flex items-center gap-2 rounded-full bg-red-500/10 px-4 py-1.5 mb-3">
+                        <span class="h-2 w-2 rounded-full bg-red-500"></span>
+                        <span class="text-xs font-semibold uppercase tracking-widest text-red-500">
+                            Special Promotions
+                        </span>
+                    </div>
+
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-oswald text-neutral-900 dark:text-white">
+                        Today’s Best Deals
+                    </h2>
+
+                    <p
+                        class="mt-2 max-w-2xl mx-auto md:mx-0 text-sm sm:text-base text-neutral-600 dark:text-neutral-300 font-jost">
+                        Limited-time offers crafted specially for you. Don’t miss out on our hottest discounts.
+                    </p>
+                </div>
+
+                <!-- Banner Slider -->
+                <div class="relative">
+
+                    <div class="swiper discountBannerSwiper">
+                        <div class="swiper-wrapper">
+
+                            @foreach ($sliderBanners as $banner)
+                                <div class="swiper-slide">
+
+                                    @if ($banner->item_type === 'category')
+                                        {{-- CATEGORY → Redirect --}}
+                                        <a href="{{ route('fontDishes.index', ['categories' => [$banner->category->slug]]) }}"
+                                            class="block relative w-full
+                      min-h-[240px] sm:min-h-[300px]
+                      md:aspect-[3/1] md:min-h-0
+                      overflow-hidden rounded-2xl group">
+
+                                            <img src="{{ asset($banner->image) }}" alt="{{ $banner->title }}"
+                                                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+
+                                            <div
+                                                class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent">
+                                            </div>
+
+                                            <div class="absolute inset-0 flex items-end sm:items-center">
+                                                <div class="p-4 sm:p-6 md:p-10 text-white max-w-lg">
+                                                    <span
+                                                        class="inline-block mb-2 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+                                                        Limited Offer
+                                                    </span>
+
+                                                    <h3
+                                                        class="text-2xl sm:text-3xl md:text-4xl font-oswald leading-tight capitalize">
+                                                        {{ $banner->title }}
+                                                    </h3>
+
+                                                    @if ($banner->description)
+                                                        <p class="mt-2 text-sm sm:text-base text-white/90 font-jost">
+                                                            {{ $banner->description }}
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </a>
+                                    @elseif($banner->item_type === 'dish')
+                                        {{-- DISH → Open Add To Cart --}}
+                                        <div wire:click="$dispatch('open-add-to-cart', { dishId: {{ $banner->item_id }} })"
+                                            class="relative w-full cursor-pointer
+                       min-h-[240px] sm:min-h-[300px]
+                       md:aspect-[3/1] md:min-h-0
+                       overflow-hidden rounded-2xl group">
+
+                                            <img src="{{ asset($banner->image) }}" alt="{{ $banner->title }}"
+                                                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+
+                                            <div
+                                                class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent">
+                                            </div>
+
+                                            <div class="absolute inset-0 flex items-end sm:items-center">
+                                                <div class="p-4 sm:p-6 md:p-10 text-white max-w-lg">
+                                                    <span
+                                                        class="inline-block mb-2 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+                                                        Limited Offer
+                                                    </span>
+
+                                                    <h3
+                                                        class="text-2xl sm:text-3xl md:text-4xl font-oswald leading-tight capitalize">
+                                                        {{ $banner->title }}
+                                                    </h3>
+
+                                                    @if ($banner->description)
+                                                        <p class="mt-2 text-sm sm:text-base text-white/90 font-jost">
+                                                            {{ $banner->description }}
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                </div>
+                            @endforeach
+
+
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <button type="button"
+                        class="discountBannerPrev absolute -left-3 sm:-left-6 top-1/2 -translate-y-1/2 z-20
+                       h-11 w-11 rounded-full bg-white text-neutral-900
+                       grid place-items-center shadow-lg hover:bg-red-500 hover:text-white transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-chevron-left-icon lucide-chevron-left">
+                            <path d="m15 18-6-6 6-6" />
+                        </svg>
+                    </button>
+
+                    <button type="button"
+                        class="discountBannerNext absolute -right-3 sm:-right-6 top-1/2 -translate-y-1/2 z-20
+                       h-11 w-11 rounded-full bg-white text-neutral-900
+                       grid place-items-center shadow-lg hover:bg-red-500 hover:text-white transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-chevron-right-icon lucide-chevron-right">
+                            <path d="m9 18 6-6-6-6" />
+                        </svg>
+                    </button>
+
+                    <!-- Pagination -->
+                    <div class="discountBannerPagination mt-4 flex justify-center"></div>
+
+                </div>
+            </div>
+        </section>
+    @endif
+
+
+<!-- for single banner -->
+@if (!empty($singleBanner))
+
+    @if($singleBanner->item_type === 'category' && $singleBanner->category)
+        {{-- CATEGORY → Redirect using slug --}}
+        <a href="{{ route('fontDishes.index', ['categories' => [$singleBanner->category->slug]]) }}" class="block">
+            <section class="relative w-full bg-no-repeat bg-center object-cover"
+                style="background-image: url('{{ asset('assets/images/discount-bg.jpg') }}')">
+
+                <!-- Brush -->
+                {{-- <img src="{{ asset('assets/images/border-bottom.png') }}" alt="Bottom border" class="rotate-180 absolute top-0"> --}}
+
+                <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 lg:py-24 cursor-pointer">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+
+                        <!-- LEFT: Text -->
+                        <div class="text-white text-center lg:text-left">
+                            <!-- Badge -->
+                            <div
+                                class="inline-flex items-center gap-2 rounded-md border border-white/50 px-4 py-2 mb-6 font-oswald animate__animated animate__fadeInDown">
+                                <span class="tracking-widest text-[22px]">LIMITED OFFER</span>
+                            </div>
+
+                            <!-- Title -->
+                            <h1
+                                class="text-7xl md:text-7xl lg:text-[110px] font-extrabold bg-clip-text text-transparent bg-[url(/assets/images/pattern.png)] bg-cover bg-center uppercase font-oswald lg:leading-[110px] lg:w-[500px] animate__animated animate__fadeInDown">
+                                {{ $singleBanner->title }}
+                            </h1>
+
+                            <!-- Paragraph -->
+                            <p
+                                class="font-jost text-white text-lg leading-7 max-w-xl mx-auto mt-6 animate__animated animate__fadeInDown">
+                                {{ $singleBanner->description }}
+                            </p>
+
+                            <!-- Countdown -->
+                            <div id="deal-countdown"
+                                data-deadline="{{ \Carbon\Carbon::parse($singleBanner->end_at)->toIso8601String() }}"
+                                class="mt-10 flex flex-wrap justify-center lg:justify-start gap-1 font-oswald animate__animated animate__fadeInDown">
+
+                                <!-- Days -->
+                                <div
+                                    class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                                    <div class="text-center">
+                                        <div class="text-xl md:text-2xl font-bold" data-days>05</div>
+                                        <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Days</div>
+                                    </div>
+                                </div>
+
+                                <!-- Hours -->
+                                <div
+                                    class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                                    <div class="text-center">
+                                        <div class="text-xl md:text-2xl font-bold" data-hours>12</div>
+                                        <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Hours</div>
+                                    </div>
+                                </div>
+
+                                <!-- Minutes -->
+                                <div
+                                    class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                                    <div class="text-center">
+                                        <div class="text-xl md:text-2xl font-bold" data-minutes>30</div>
+                                        <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Minutes</div>
+                                    </div>
+                                </div>
+
+                                <!-- Seconds -->
+                                <div
+                                    class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                                    <div class="text-center">
+                                        <div class="text-xl md:text-2xl font-bold" data-seconds>40</div>
+                                        <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Seconds</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT: Burger visual -->
+                        <div class="relative">
+                            <!-- burger -->
+                            <img src="{{ asset($singleBanner->image) }}" alt="{{ $singleBanner->title }}"
+                                class="relative w-full max-w-[550px] mx-auto drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)] z-10 animate__animated animate__fadeInUp" />
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </a>
+
+    @elseif($singleBanner->item_type === 'dish')
+        {{-- DISH → Open add-to-cart modal --}}
+        <section class="relative w-full bg-no-repeat bg-center object-cover"
+            style="background-image: url('{{ asset('assets/images/discount-bg.jpg') }}')"
+            wire:click="$dispatch('open-add-to-cart', { dishId: {{ $singleBanner->item_id }} })">
+
+            <!-- Brush -->
+            {{-- <img src="{{ asset('assets/images/border-bottom.png') }}" alt="Bottom border" class="rotate-180 absolute top-0"> --}}
+
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 lg:py-24 cursor-pointer">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+
+                    <!-- LEFT: Text -->
+                    <div class="text-white text-center lg:text-left">
+                        <!-- Badge -->
+                        <div
+                            class="inline-flex items-center gap-2 rounded-md border border-white/50 px-4 py-2 mb-6 font-oswald animate__animated animate__fadeInDown">
+                            <span class="tracking-widest text-[22px]">LIMITED OFFER</span>
+                        </div>
+
+                        <!-- Title -->
+                        <h1
+                            class="text-7xl md:text-7xl lg:text-[110px] font-extrabold bg-clip-text text-transparent bg-[url(/assets/images/pattern.png)] bg-cover bg-center uppercase font-oswald lg:leading-[110px] lg:w-[500px] animate__animated animate__fadeInDown">
+                            {{ $singleBanner->title }}
+                        </h1>
+
+                        <!-- Paragraph -->
+                        <p
+                            class="font-jost text-white text-lg leading-7 max-w-xl mx-auto mt-6 animate__animated animate__fadeInDown">
+                            {{ $singleBanner->description }}
+                        </p>
+
+                        <!-- Countdown -->
+                        <div id="deal-countdown"
+                            data-deadline="{{ \Carbon\Carbon::parse($singleBanner->end_at)->toIso8601String() }}"
+                            class="mt-10 flex flex-wrap justify-center lg:justify-start gap-1 font-oswald animate__animated animate__fadeInDown">
+
+                            <!-- Days -->
+                            <div
+                                class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                                <div class="text-center">
+                                    <div class="text-xl md:text-2xl font-bold" data-days>05</div>
+                                    <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Days</div>
+                                </div>
+                            </div>
+
+                            <!-- Hours -->
+                            <div
+                                class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                                <div class="text-center">
+                                    <div class="text-xl md:text-2xl font-bold" data-hours>12</div>
+                                    <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Hours</div>
+                                </div>
+                            </div>
+
+                            <!-- Minutes -->
+                            <div
+                                class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                                <div class="text-center">
+                                    <div class="text-xl md:text-2xl font-bold" data-minutes>30</div>
+                                    <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Minutes</div>
+                                </div>
+                            </div>
+
+                            <!-- Seconds -->
+                            <div
+                                class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
+                                <div class="text-center">
+                                    <div class="text-xl md:text-2xl font-bold" data-seconds>40</div>
+                                    <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Seconds</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT: Burger visual -->
+                    <div class="relative">
+                        <!-- burger -->
+                        <img src="{{ asset($singleBanner->image) }}" alt="{{ $singleBanner->title }}"
+                            class="relative w-full max-w-[550px] mx-auto drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)] z-10 animate__animated animate__fadeInUp" />
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    @endif
+
+@endif
+
+
+
+
     {{-- cart modal --}}
     <livewire:frontend.cart.add-to-cart-modal />
-
-
-    <!-- Offer promotion section -->
-<section
-    class="relative w-full bg-no-repeat bg-center bg-cover"
-    style="background-image: url('{{ asset('assets/images/feature-dish-bg.jpg') }}')">
-
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
-
-        <!-- Section Heading -->
-        <div class="mb-6 md:mb-8 text-center md:text-left">
-            <div class="inline-flex items-center gap-2 rounded-full bg-red-500/10 px-4 py-1.5 mb-3">
-                <span class="h-2 w-2 rounded-full bg-red-500"></span>
-                <span class="text-xs font-semibold uppercase tracking-widest text-red-500">
-                    Special Promotions
-                </span>
-            </div>
-
-            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-oswald text-neutral-900 dark:text-white">
-                Today’s Best Deals
-            </h2>
-
-            <p class="mt-2 max-w-2xl mx-auto md:mx-0 text-sm sm:text-base text-neutral-600 dark:text-neutral-300 font-jost">
-                Limited-time offers crafted specially for you. Don’t miss out on our hottest discounts.
-            </p>
-        </div>
-
-        <!-- Banner Slider -->
-        <div class="relative">
-
-            <div class="swiper discountBannerSwiper">
-                <div class="swiper-wrapper">
-
-                    <!-- Slide -->
-                    <div class="swiper-slide">
-                        <div
-                            class="relative w-full
-                                   min-h-[240px] sm:min-h-[300px]
-                                   md:aspect-[3/1] md:min-h-0
-                                   overflow-hidden rounded-2xl">
-
-                            <img
-                                src="{{ asset('assets/images/banner-bg.jpg') }}"
-                                alt="Promotion Banner"
-                                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105">
-
-                            <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
-
-                            <div class="absolute inset-0 flex items-end sm:items-center">
-                                <div class="p-4 sm:p-6 md:p-10 text-white max-w-lg">
-                                    <span
-                                        class="inline-block mb-2 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-                                        Limited Offer
-                                    </span>
-
-                                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-oswald leading-tight">
-                                        Mega Burger Discount
-                                    </h3>
-
-                                    <p class="mt-2 text-sm sm:text-base text-white/90 font-jost">
-                                        Enjoy exclusive deals for a short time only.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div
-                            class="relative w-full
-                                   min-h-[240px] sm:min-h-[300px]
-                                   md:aspect-[3/1] md:min-h-0
-                                   overflow-hidden rounded-2xl">
-
-                            <img
-                                src="{{ asset('assets/images/banner-bg.jpg') }}"
-                                alt="Promotion Banner"
-                                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105">
-
-                            <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
-
-                            <div class="absolute inset-0 flex items-end sm:items-center">
-                                <div class="p-4 sm:p-6 md:p-10 text-white max-w-lg">
-                                    <span
-                                        class="inline-block mb-2 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-                                        Limited Offer
-                                    </span>
-
-                                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-oswald leading-tight">
-                                        Mega Burger Discount
-                                    </h3>
-
-                                    <p class="mt-2 text-sm sm:text-base text-white/90 font-jost">
-                                        Enjoy exclusive deals for a short time only.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Add more slides here -->
-
-                </div>
-            </div>
-
-            <!-- Navigation -->
-            <button type="button"
-                class="discountBannerPrev absolute -left-3 sm:-left-6 top-1/2 -translate-y-1/2 z-20
-                       h-11 w-11 rounded-full bg-white text-neutral-900
-                       grid place-items-center shadow-lg hover:bg-red-500 hover:text-white transition">
-                ‹
-            </button>
-
-            <button type="button"
-                class="discountBannerNext absolute -right-3 sm:-right-6 top-1/2 -translate-y-1/2 z-20
-                       h-11 w-11 rounded-full bg-white text-neutral-900
-                       grid place-items-center shadow-lg hover:bg-red-500 hover:text-white transition">
-                ›
-            </button>
-
-            <!-- Pagination -->
-            <div class="discountBannerPagination mt-4 flex justify-center"></div>
-
-        </div>
-    </div>
-</section>
-
-
-
-    <section class="relative w-full bg-no-repeat bg-center object-cover" style="background-image: url('{{ asset('assets/images/discount-bg.jpg') }}')">
-
-        <!-- Brush -->
-        {{-- <img src="{{ asset('assets/images/border-bottom.png') }}" alt="Bottom border" class="rotate-180 absolute top-0"> --}}
-
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 lg:py-24">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-
-                <!-- LEFT: Text -->
-                <div class="text-white text-center lg:text-left">
-                    <!-- Badge -->
-                    <div
-                        class="inline-flex items-center gap-2 rounded-md border border-white/50 px-4 py-2 mb-6 font-oswald animate__animated animate__fadeInDown">
-                        <span class="tracking-widest text-[22px]">LIMITED OFFER</span>
-                    </div>
-
-                    <!-- Title -->
-                    <h1
-                        class="text-7xl md:text-7xl lg:text-[110px] font-extrabold bg-clip-text text-transparent bg-[url(/assets/images/pattern.png)] bg-cover bg-center uppercase font-oswald lg:leading-[110px] lg:w-[500px] animate__animated animate__fadeInDown">
-                        Delicious Burger
-                    </h1>
-
-                    <!-- Paragraph -->
-                    <p
-                        class="font-jost text-white text-lg leading-7 max-w-xl mx-auto mt-6 animate__animated animate__fadeInDown">
-                        It is a long established fact that a reader will be distracted lorem the
-                        readable content of a page when looking
-                    </p>
-
-                    <!-- Countdown -->
-                    <div id="deal-countdown" data-deadline="2025-12-31T23:59:59+06:00"
-                        class="mt-10 flex flex-wrap justify-center lg:justify-start gap-1 font-oswald animate__animated animate__fadeInDown">
-
-                        <!-- Days -->
-                        <div
-                            class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
-                            <div class="text-center">
-                                <div class="text-xl md:text-2xl font-bold" data-days>05</div>
-                                <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Days</div>
-                            </div>
-                        </div>
-
-                        <!-- Hours -->
-                        <div
-                            class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
-                            <div class="text-center">
-                                <div class="text-xl md:text-2xl font-bold" data-hours>12</div>
-                                <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Hours</div>
-                            </div>
-                        </div>
-
-                        <!-- Minutes -->
-                        <div
-                            class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
-                            <div class="text-center">
-                                <div class="text-xl md:text-2xl font-bold" data-minutes>30</div>
-                                <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Minutes</div>
-                            </div>
-                        </div>
-
-                        <!-- Seconds -->
-                        <div
-                            class="w-[85px] md:w-[100px] h-[90px] rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 grid place-items-center">
-                            <div class="text-center">
-                                <div class="text-xl md:text-2xl font-bold" data-seconds>40</div>
-                                <div class="mt-1 text-sm md:tracking-[0.15em] uppercase">Seconds</div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- RIGHT: Burger visual -->
-                <div class="relative">
-                    <!-- burger -->
-                    <img src="{{ asset('assets/images/discount-burger.png') }}" alt="Delicious Burger"
-                        class="relative w-full max-w-[680px] mx-auto drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)] z-10 animate__animated animate__fadeInUp" />
-                </div>
-
-            </div>
-        </div>
-    </section>
-
 
     {{-- testimonial --}}
     <section class="relative bg-[url('/assets/images/testimonial-bg.jpg')] bg-center bg-cover overflow-hidden w-full">
@@ -898,7 +1017,7 @@
 
                             <!-- avatars -->
                             <div class="mt-8 sm:mt-10 relative h-24 sm:h-36">
-                                <img src="./assets/images/feature-dish.jpg" alt="Burger"
+                                <img src="{{ asset('assets/images/feature-dish.jpg') }}" alt="Burger"
                                     class="size-28 md:size-[190px] left-1/2 -translate-x-1/2 top-0 object-cover bg-center border-4 border-white rotate-10">
                                 <img src="./assets/images/user.jpg" alt="Burger"
                                     class="size-28 md:size-[190px] md:left-[30%] left-[20%] absolute top-10 md:top-14  object-cover bg-center border-4 border-white -rotate-2">
@@ -1050,77 +1169,76 @@
     </script>
 
     <script>
-(function () {
-  const root = document.getElementById('deal-countdown');
-  if (!root) return;
+        (function() {
+            const root = document.getElementById('deal-countdown');
+            if (!root) return;
 
-  // Prefer ISO datetime via data-deadline; fallback to +3 days from now
-  const deadlineAttr = root.getAttribute('data-deadline');
-  const target = deadlineAttr ? new Date(deadlineAttr) : new Date(Date.now() + 3*24*60*60*1000);
+            // Prefer ISO datetime via data-deadline; fallback to +3 days from now
+            const deadlineAttr = root.getAttribute('data-deadline');
+            const target = deadlineAttr ? new Date(deadlineAttr) : new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
 
-  // Elements
-  const el = {
-    d: root.querySelector('[data-days]'),
-    h: root.querySelector('[data-hours]'),
-    m: root.querySelector('[data-minutes]'),
-    s: root.querySelector('[data-seconds]'),
-  };
+            // Elements
+            const el = {
+                d: root.querySelector('[data-days]'),
+                h: root.querySelector('[data-hours]'),
+                m: root.querySelector('[data-minutes]'),
+                s: root.querySelector('[data-seconds]'),
+            };
 
-  const pad2 = (n) => String(n).padStart(2, '0');
+            const pad2 = (n) => String(n).padStart(2, '0');
 
-  function render(diffMs) {
-    if (diffMs <= 0) {
-      el.d.textContent = '00';
-      el.h.textContent = '00';
-      el.m.textContent = '00';
-      el.s.textContent = '00';
-      return false; // finished
-    }
-    const totalSec = Math.floor(diffMs / 1000);
-    const days    = Math.floor(totalSec / 86400);
-    const hours   = Math.floor((totalSec % 86400) / 3600);
-    const minutes = Math.floor((totalSec % 3600) / 60);
-    const seconds = totalSec % 60;
+            function render(diffMs) {
+                if (diffMs <= 0) {
+                    el.d.textContent = '00';
+                    el.h.textContent = '00';
+                    el.m.textContent = '00';
+                    el.s.textContent = '00';
+                    return false; // finished
+                }
+                const totalSec = Math.floor(diffMs / 1000);
+                const days = Math.floor(totalSec / 86400);
+                const hours = Math.floor((totalSec % 86400) / 3600);
+                const minutes = Math.floor((totalSec % 3600) / 60);
+                const seconds = totalSec % 60;
 
-    el.d.textContent = pad2(days);
-    el.h.textContent = pad2(hours);
-    el.m.textContent = pad2(minutes);
-    el.s.textContent = pad2(seconds);
-    return true; // keep going
-  }
+                el.d.textContent = pad2(days);
+                el.h.textContent = pad2(hours);
+                el.m.textContent = pad2(minutes);
+                el.s.textContent = pad2(seconds);
+                return true; // keep going
+            }
 
-  function tick() {
-    const now = Date.now();
-    const alive = render(target - now);
-    if (alive) {
-      // Run roughly every 200ms for smoothness without heavy CPU
-      setTimeout(tick, 200);
-    }
-  }
+            function tick() {
+                const now = Date.now();
+                const alive = render(target - now);
+                if (alive) {
+                    // Run roughly every 200ms for smoothness without heavy CPU
+                    setTimeout(tick, 200);
+                }
+            }
 
-  tick();
-})();
-</script>
+            tick();
+        })();
+    </script>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    new Swiper('.discountBannerSwiper', {
-        loop: true,
-        autoplay: {
-            delay: 4500,
-            disableOnInteraction: false,
-        },
-        speed: 700,
-        navigation: {
-            nextEl: '.discountBannerNext',
-            prevEl: '.discountBannerPrev',
-        },
-        pagination: {
-            el: '.discountBannerPagination',
-            clickable: true,
-        },
-    });
-});
-</script>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            new Swiper('.discountBannerSwiper', {
+                loop: true,
+                autoplay: {
+                    delay: 4500,
+                    disableOnInteraction: false,
+                },
+                speed: 700,
+                navigation: {
+                    nextEl: '.discountBannerNext',
+                    prevEl: '.discountBannerPrev',
+                },
+                pagination: {
+                    el: '.discountBannerPagination',
+                    clickable: true,
+                },
+            });
+        });
+    </script>
 @endpush

@@ -121,10 +121,10 @@ class BannerForm extends Component
          */
         if ($this->is_slider) {
             // strict 3:1 output
-            $image = $image->cover(1500, 500, 'center'); // 3:1
+            $image = $image->cover(1500, 500, 'center');
         } else {
-            // single banner: still clean and light (you can change size)
-            $image = $image->cover(1200, 600, 'center'); // 2:1 (or change to 1200,400 if you want same ratio)
+            // single banner: still clean and lightweight
+            $image = $image->cover(600, 600, 'center');
         }
 
         $encoded = $image->encode(new WebpEncoder(quality: 82));

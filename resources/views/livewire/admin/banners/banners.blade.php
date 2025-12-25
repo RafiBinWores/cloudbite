@@ -106,7 +106,7 @@
                             <td class="px-4 lg:px-6 py-3">
                                 @if (!empty($banner->image))
                                     <img src="{{ asset($banner->image) }}" alt="{{ $banner->title }}"
-                                        class="h-12 w-12 rounded object-cover">
+                                        class="h-12 w-12 rounded object-contain">
                                 @else
                                     <img src="{{ asset('assets/images/placeholders/cat-placeholder.png') }}"
                                         alt="placeholder" class="h-12 w-12 rounded object-cover">

@@ -18,6 +18,11 @@ class Banner extends Model
         'status',
     ];
 
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'item_id');
+    }
+
     public function scopeSearch($query, $value)
     {
         $query->where('title', 'like', "%{$value}%")->orWhere('status', 'like', "%{$value}%")->orWhere('created_at', 'like', "%{$value}%");
