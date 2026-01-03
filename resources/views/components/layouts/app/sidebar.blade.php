@@ -16,7 +16,9 @@
         <flux:navbar class="me-4">
 
             {{-- Notification --}}
-            <flux:navbar.item class="max-lg:hidden" icon="bell" href="" wire:navigate label="Help" />
+            {{-- <flux:navbar.item class="max-lg:hidden" icon="bell" href="" wire:navigate label="Help" /> --}}
+            <livewire:admin.notification.notification-bell />
+
 
             {{-- Theme Toggle --}}
             <flux:dropdown x-data align="end">
@@ -113,7 +115,7 @@
                     :current="request()->routeIs('orders.index')" wire:navigate>
                     {{ __('Orders') }}</flux:navlist.item>
 
-                    
+
                 {{-- Meal Booking --}}
                 <flux:navlist.item icon="shopping-bag" :href="route('mealBooking.index')"
                     :current="request()->routeIs('mealBooking.index')" wire:navigate>
@@ -341,9 +343,11 @@
 
     {{ $slot }}
 
-    @stack('scripts')
+@stack('scripts')
 
-    @fluxScripts
+@livewireScripts
+@fluxScripts
+
 </body>
 
 </html>

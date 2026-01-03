@@ -482,7 +482,7 @@
             </div>
         </div>
 
-        <img src="./assets/images/border-bttom.png" alt="brush"
+        <img src="./assets/images/border-bottom.png" alt="brush"
             class="absolute -bottom-0.5 left-0 bg-center object-cover bg-no-repeat z-10">
     </section>
 
@@ -1002,7 +1002,7 @@
     {{-- testimonial --}}
     <section class="relative bg-[url('/assets/images/testimonial-bg.jpg')] bg-center bg-cover overflow-hidden w-full">
         <!-- brush top -->
-        <img src="/assets/images/border-bttom.png" alt=""
+        <img src="/assets/images/border-bottom.png" alt=""
             class="rotate-180 absolute top-0 left-0 w-full pointer-events-none select-none">
 
         <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">

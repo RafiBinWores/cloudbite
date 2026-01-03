@@ -8,6 +8,8 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ShippingSetting;
+use App\Models\User;
+use App\Notifications\AdminNewOrderNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -321,7 +323,24 @@ class CheckoutPage extends Component
                 'meta' => null,
             ]);
 
-            $this->sendOrderPlacedMail($order);
+            DB::afterCommit(function () use ($order) {
+
+    // mail (optional)
+    $this->sendOrderPlacedMail($order);
+
+    // notify admins
+    $admins = \App\Models\User::where('role', 'admin')->get();
+
+    foreach ($admins as $admin) {
+        $admin->notify(new \App\Notifications\AdminNewOrderNotification($order));
+    }
+});
+
+            // $this->sendOrderPlacedMail($order);
+            // $admins = User::where('role', 'admin')->get();
+            // foreach ($admins as $admin) {
+            //     $admin->notify(new AdminNewOrderNotification($order));
+            // }
             return redirect()->route('orders.thankyou', ['code' => $order->order_code]);
         });
     }

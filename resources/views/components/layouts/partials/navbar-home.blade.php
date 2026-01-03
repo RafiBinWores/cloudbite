@@ -46,7 +46,7 @@
             </ul>
 
             <div class="flex items-center gap-3 ml-auto lg:ml-0">
-                <div class="drawer drawer-end z-[60]" x-data="cartDrawer()" x-cloak>
+                <div class="drawer drawer-end z-[60]" x-data="cartDrawer" x-cloak>
                     <!-- Cart button -->
                     <a href="{{ route('cart.page') }}" wire:navigate class="drawer-content">
                         <label for="cart-drawer"
@@ -56,6 +56,8 @@
                         </label>
                     </a>
                 </div>
+
+                <livewire:frontend.partials.notification-bell />
 
                 <!-- Account icon -->
                 <a href="{{ route('account') }}" wire:navigate

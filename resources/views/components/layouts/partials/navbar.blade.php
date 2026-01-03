@@ -53,6 +53,8 @@
                     <livewire:frontend.cart.cart-badge />
                 </a>
 
+                <livewire:frontend.partials.notification-bell />
+
                 <!-- Account icon -->
                 <a href="{{ route('account') }}" wire:navigate
                     class="grid border rounded-full border-slate-900 w-10 h-10 sm:w-12 sm:h-12 place-items-center hover:bg-slate-900 group duration-200 flex-none">

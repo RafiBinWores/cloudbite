@@ -3,29 +3,29 @@
 
 <title>{{ $title ?? config('app.name') }}</title>
 
-{{-- <link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png"> --}}
-
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="icon" href="{{ asset($businessSetting->favicon) }}" sizes="any">
 
-{{-- Google Font --}}
+{{-- ✅ put this BEFORE @vite so app.js can read it --}}
+<script>
+    window.Laravel = {
+        userId: @json(auth()->id()),
+    };
+</script>
+
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
-
-<!-- Google font -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-    href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&display=swap"
-    rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&display=swap"
+      rel="stylesheet" />
 
-{{-- Font Awesome --}}
 <link rel="stylesheet" href="{{ asset('assets/css/all.css') }}">
 
-{{-- Css --}}
 @stack('styles')
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+@livewireStyles
 @fluxAppearance

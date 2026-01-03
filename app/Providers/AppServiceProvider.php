@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Models\Category;
 use App\Models\CompanyInfo;
+use App\Models\Order;
 use App\Observers\CategoryObserver;
 use App\Observers\CompanyInfoObserver;
+use App\Observers\OrderObserver;
 use App\Repositories\CartRepository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
@@ -52,5 +54,7 @@ class AppServiceProvider extends ServiceProvider
 
         Category::observe(CategoryObserver::class);
         CompanyInfo::observe(CompanyInfoObserver::class);
+
+        Order::observe(OrderObserver::class);
     }
 }

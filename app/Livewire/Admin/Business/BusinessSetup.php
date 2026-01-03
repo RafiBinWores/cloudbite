@@ -27,7 +27,6 @@ class BusinessSetup extends Component
     public string $address = '';
     public string $facebook = '';
     public string $instagram = '';
-    public string $twitter = '';
     public string $tiktok = '';
     public string $youtube = '';
     public string $whatsapp = '';
@@ -75,7 +74,6 @@ class BusinessSetup extends Component
         $this->favicon      = $this->info->favicon;
         $this->facebook  = (string) ($this->info->facebook ?? '');
         $this->instagram = (string) ($this->info->instagram ?? '');
-        $this->twitter   = (string) ($this->info->twitter ?? '');
         $this->tiktok    = (string) ($this->info->tiktok ?? '');
         $this->youtube   = (string) ($this->info->youtube ?? '');
         $this->whatsapp  = (string) ($this->info->whatsapp ?? '');
@@ -108,12 +106,11 @@ class BusinessSetup extends Component
             'email'          => ['nullable', 'email', 'max:255'],
             'address'        => ['nullable', 'string', 'max:2000'],
             'footer_description_text'        => ['nullable', 'string', 'max:2000'],
-            'logo_dark_upload'  => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
-            'logo_light_upload' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
-            'favicon_upload' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,ico,svg', 'max:2048'],
+            'logo_dark_upload'  => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'dimensions:ratio=3/1', 'max:2048'],
+            'logo_light_upload' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,svg', 'dimensions:ratio=3/1', 'max:2048'],
+            'favicon_upload' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,ico,svg', 'dimensions:ratio=1/1', 'max:2048'],
             'facebook'       => ['nullable', 'url'],
             'instagram'      => ['nullable', 'url'],
-            'twitter'        => ['nullable', 'url'],
             'tiktok'         => ['nullable', 'url'],
             'youtube'        => ['nullable', 'url'],
             'whatsapp'       => ['nullable', 'url'],
@@ -239,7 +236,6 @@ class BusinessSetup extends Component
         $info->address      = $this->address;
         $info->facebook  = $this->facebook;
         $info->instagram = $this->instagram;
-        $info->twitter   = $this->twitter;
         $info->tiktok    = $this->tiktok;
         $info->youtube   = $this->youtube;
         $info->whatsapp  = $this->whatsapp;

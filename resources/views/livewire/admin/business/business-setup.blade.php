@@ -43,7 +43,8 @@
 
                         {{-- Logo dark --}}
                         <div class="form-group">
-                            <flux:input type="file" wire:model="logo_dark_upload" label="Logo Dark" accept="image/*" />
+                            <flux:input type="file" wire:model="logo_dark_upload" label="Logo Dark (3:1 Ratio)"
+                                accept="image/*" />
 
                             @if ($logo_dark_upload)
                                 <div class="mt-2">
@@ -55,7 +56,8 @@
                                 <div class="mt-2">
                                     <p class="text-xs text-slate-500 mb-1">Current Dark Logo</p>
                                     <img src="{{ asset('storage/' . $logo_dark) }}"
-                                        class="w-full aspect-[3/1] object-contain rounded-lg border" alt="Current dark logo">
+                                        class="w-full aspect-[3/1] object-contain rounded-lg border"
+                                        alt="Current dark logo">
                                 </div>
                             @else
                                 <div
@@ -67,7 +69,8 @@
 
                         {{-- Logo light --}}
                         <div class="form-group">
-                            <flux:input type="file" wire:model="logo_light_upload" label="Logo Light" accept="image/*" />
+                            <flux:input type="file" wire:model="logo_light_upload" label="Logo Light (3:1 Ratio)"
+                                accept="image/*" />
 
                             @if ($logo_light_upload)
                                 <div class="mt-2">
@@ -79,7 +82,8 @@
                                 <div class="mt-2">
                                     <p class="text-xs text-slate-500 mb-1">Current Logo_light</p>
                                     <img src="{{ asset('storage/' . $logo_light) }}"
-                                        class="w-full aspect-[3/1] object-contain rounded-lg border" alt="Current Light logo">
+                                        class="w-full aspect-[3/1] object-contain rounded-lg border"
+                                        alt="Current Light logo">
                                 </div>
                             @else
                                 <div
@@ -91,7 +95,8 @@
 
                         {{-- Favicon --}}
                         <div class="form-group">
-                            <flux:input type="file" wire:model="favicon_upload" label="Favicon" accept="image/*" />
+                            <flux:input type="file" wire:model="favicon_upload" label="Favicon (1:1 Ratio)"
+                                accept="image/*" />
 
                             @if ($favicon_upload)
                                 <div class="mt-2">
@@ -114,9 +119,9 @@
                     </div>
 
                     <div class="form-group">
-                            <flux:input wire:model="footer_description_text" label="Footer Description Text"
-                                placeholder="e.g. Best food delivery service." />
-                        </div>
+                        <flux:input wire:model="footer_description_text" label="Footer Description Text"
+                            placeholder="e.g. Best food delivery service." />
+                    </div>
 
                     <flux:button type="submit" variant="primary" class="cursor-pointer">
                         {{ $info ? 'Update Information' : 'Save Information' }}
@@ -186,10 +191,10 @@
                             placeholder="e.g. https://instagram.com/yourhandle" />
                     </div>
 
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <flux:input wire:model.defer="twitter" label="Twitter / X"
                             placeholder="e.g. https://x.com/yourhandle" />
-                    </div>
+                    </div> --}}
 
                     <div class="form-group">
                         <flux:input wire:model.defer="tiktok" label="TikTok"
@@ -213,7 +218,6 @@
                         $links = [
                             'Facebook' => $facebook,
                             'Instagram' => $instagram,
-                            'X' => $twitter,
                             'TikTok' => $tiktok,
                             'YouTube' => $youtube,
                             'WhatsApp' => $whatsapp,

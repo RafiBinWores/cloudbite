@@ -44,7 +44,10 @@ use App\Livewire\Frontend\MealPlan\PlanThankYou;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
+
+Broadcast::routes(['middleware' => ['web', 'auth']]);
 
 Route::get('/', Home::class)->name('home');
 
