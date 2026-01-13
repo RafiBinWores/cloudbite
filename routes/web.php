@@ -34,6 +34,7 @@ use App\Livewire\Frontend\Account\MealPlanOrder;
 use App\Livewire\Frontend\Account\MealPlanOrderDetails;
 use App\Livewire\Frontend\Account\OrderDetails;
 use App\Livewire\Frontend\Account\OrdersPage;
+use App\Livewire\Frontend\Account\UserProfile;
 use App\Livewire\Frontend\Cart\CartPage;
 use App\Livewire\Frontend\Checkout\CheckoutPage;
 use App\Livewire\Frontend\Checkout\PlanCheckoutPage;
@@ -64,36 +65,36 @@ Route::get('/meal-plans/{plan?}', MealPlan::class)
 
 
 // SSl Payment routes
-Route::get('/payment/ssl/init/{order}', [SslCommerzController::class, 'init'])->name('ssl.init');
-Route::post('/payment/ssl/success', [SslCommerzController::class, 'success'])->name('ssl.success');
-Route::post('/payment/ssl/fail', [SslCommerzController::class, 'fail'])->name('ssl.fail');
-Route::post('/payment/ssl/cancel', [SslCommerzController::class, 'cancel'])->name('ssl.cancel');
+Route::get('payment/ssl/init/{order}', [SslCommerzController::class, 'init'])->name('ssl.init');
+Route::post('payment/ssl/success', [SslCommerzController::class, 'success'])->name('ssl.success');
+Route::post('payment/ssl/fail', [SslCommerzController::class, 'fail'])->name('ssl.fail');
+Route::post('payment/ssl/cancel', [SslCommerzController::class, 'cancel'])->name('ssl.cancel');
 
 // IPN (server-to-server) — optional but recommended
 Route::post('/payment/ssl/ipn', [SslCommerzController::class, 'ipn'])->name('ssl.ipn');
 
 Route::middleware(['auth', 'role:user,admin'])->group(function () {
     Route::get('checkout', CheckoutPage::class)->name('checkout');
-    Route::get('/order/thank-you/{code}', OrderThankYouController::class)->name('orders.thankyou');
+    Route::get('order/thank-you/{code}', OrderThankYouController::class)->name('orders.thankyou');
 
-    Route::get('/plan-checkout', PlanCheckoutPage::class)->name('plans.checkout');
+    Route::get('plan-checkout', PlanCheckoutPage::class)->name('plans.checkout');
 
-    Route::get('/meal-plan/thank-you/{code}', PlanThankYou::class)->name('meal-plan.thankyou');
+    Route::get('meal-plan/thank-you/{code}', PlanThankYou::class)->name('meal-plan.thankyou');
 
-    Route::get('/ssl/plan/init/{booking}', [SslCommerzController::class, 'init'])
+    Route::get('ssl/plan/init/{booking}', [SslCommerzController::class, 'init'])
         ->name('ssl.plan.init');
 
     // Account Routes
     Route::get('account', Account::class)->name('account');
-    Route::get('account/profile', Profile::class)->name('account.profile');
-    Route::get('/account/favorites', Favorites::class)->name('account.favorites');
-    Route::get('/account/orders', OrdersPage::class)->name('account.orders');
-    Route::get('/account/orders/{code}', OrderDetails::class)->name('account.orders.show');
-    Route::get('/account/meal-plan-order-history', MealPlanOrder::class)->name('meal-plan.history');
-    Route::get('/account/meal-plans/{code}', MealPlanOrderDetails::class)->name('meal-plan.booking.show');
+    Route::get('account/profile', UserProfile::class)->name('account.userProfile');
+    Route::get('account/favorites', Favorites::class)->name('account.favorites');
+    Route::get('account/orders', OrdersPage::class)->name('account.orders');
+    Route::get('account/orders/{code}', OrderDetails::class)->name('account.orders.show');
+    Route::get('account/meal-plan-order-history', MealPlanOrder::class)->name('meal-plan.history');
+    Route::get('account/meal-plans/{code}', MealPlanOrderDetails::class)->name('meal-plan.booking.show');
 
-    Route::get('/account/address', Address::class)->name('account.address');
-    Route::get('/create-address/{label?}', AddressForm::class)->name('address.create');
+    Route::get('account/address', Address::class)->name('account.address');
+    Route::get('create-address/{label?}', AddressForm::class)->name('address.create');
 });
 
 
@@ -155,7 +156,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     // Meal Booking Route
     Route::get('meal-booking', MealPlanBooking::class)->name('mealBooking.index');
     Route::get('meal-bookings-details/{code}', MealPlanBookingDetails::class)->name('meal-plan-bookings.details');
-    Route::get('/admin/meal-plan-bookings/{code}/print', [MealPlanBookingPrintController::class, 'thermal'])->name('meal-plan-bookings.thermalPrint');
+    Route::get('admin/meal-plan-bookings/{code}/print', [MealPlanBookingPrintController::class, 'thermal'])->name('meal-plan-bookings.thermalPrint');
 
     // Customers Route
     Route::get('customers', Customers::class)->name('customers.index');

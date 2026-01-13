@@ -106,7 +106,7 @@ class CheckoutPage extends Component
             $this->hasExistingAddress = $this->addresses->isNotEmpty();
 
             if (! $this->hasExistingAddress) {
-                redirect()->route('address.create')->send();
+                redirect()->route('address.create');
                 return;
             }
 
@@ -325,16 +325,16 @@ class CheckoutPage extends Component
 
             DB::afterCommit(function () use ($order) {
 
-    // mail (optional)
-    $this->sendOrderPlacedMail($order);
+                // mail (optional)
+                $this->sendOrderPlacedMail($order);
 
-    // notify admins
-    $admins = \App\Models\User::where('role', 'admin')->get();
+                // notify admins
+                $admins = \App\Models\User::where('role', 'admin')->get();
 
-    foreach ($admins as $admin) {
-        $admin->notify(new \App\Notifications\AdminNewOrderNotification($order));
-    }
-});
+                foreach ($admins as $admin) {
+                    $admin->notify(new \App\Notifications\AdminNewOrderNotification($order));
+                }
+            });
 
             // $this->sendOrderPlacedMail($order);
             // $admins = User::where('role', 'admin')->get();

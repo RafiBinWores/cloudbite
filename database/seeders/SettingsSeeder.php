@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\CompanyInfo;
 use Illuminate\Database\Seeder;
-use App\Models\Setting;
 
 class SettingsSeeder extends Seeder
 {
@@ -15,7 +14,5 @@ class SettingsSeeder extends Seeder
             'logo_light' => 'logo-light.png',
             'favicon' => 'favicon.ico',
         ]);
-
-        $this->command->info('Default settings created!');
     }
 }

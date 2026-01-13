@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('title')->unique();
             $table->string('slug');
             $table->string('short_description');
-            $table->longText('description');
+            // $table->longText('description');
             $table->decimal('price', 10, 2);
             $table->enum('discount_type', ['amount', 'percent'])->nullable();
             $table->decimal('discount', 10, 2)->nullable();

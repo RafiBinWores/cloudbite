@@ -66,7 +66,7 @@ class AddressForm extends Component
                 $this->contact_country = $existing->contact_country ?: $this->contact_country;
             }
         } else {
-            $this->reset('addressId','address','city','postcode','lat','lng','contact_name','contact_phone','note');
+            $this->reset('addressId', 'address', 'city', 'postcode', 'lat', 'lng', 'contact_name', 'contact_phone', 'note');
             $this->city = 'Dhaka';
             $this->contact_country = $this->contact_country ?: 'BD';
         }
@@ -82,7 +82,9 @@ class AddressForm extends Component
             'lat'             => ['nullable', 'numeric', 'between:-90,90'],
             'lng'             => ['nullable', 'numeric', 'between:-180,180'],
             'contact_name'    => ['required', 'string', 'max:100'],
-            'contact_phone'   => ['required', 'string', 'max:30'],
+
+            'contact_phone' => ['required', 'phone:BD'],
+
             'contact_country' => ['nullable', 'string', 'size:2'],
             'note'            => ['nullable', 'string', 'max:200'],
             'save_as_default' => ['boolean'],
